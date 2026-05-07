@@ -2,31 +2,23 @@ spring:
   application:
     name: banking-api
   datasource:
-    url: jdbc:hsqldb:mem:banking
-    username: sa
-    password:
-    driver-class-name: org.hsqldb.jdbc.JDBCDriver
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/banking}
+    username: ${DB_USERNAME:banking}
+    password: ${DB_PASSWORD:banking}
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: none
     open-in-view: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.HSQLDialect
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   flyway:
     locations: classpath:db/migration
 
----
-spring:
-  config:
-    activate:
-      on-profile: postgres
-  datasource:
-    url: jdbc:postgresql://localhost:5432/banking
-    username: banking
-    password: banking
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+security:
+  jwt:
+    secret: ${JWT_SECRET:change-this-secret-key-change-this-secret-key}
+    expiration-minutes: ${JWT_EXPIRATION_MINUTES:60}
+    refresh-expiration-days: ${JWT_REFRESH_EXPIRATION_DAYS:14}
+

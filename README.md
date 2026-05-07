@@ -44,6 +44,22 @@ setx JAVA_HOME "C:\Program Files\Eclipse Adoptium\jdk-21.0.11.10-hotspot"
 
 Then close and reopen the terminal before starting the backend again.
 
+## Run Backend (PostgreSQL)
+
+From `backend/banking-api`:
+
+```powershell
+Copy-Item .env.example .env
+docker compose --env-file .env -f docker-compose.postgres.yaml up -d
+.\mvnw.cmd spring-boot:run
+```
+
+When finished:
+
+```powershell
+docker compose --env-file .env -f docker-compose.postgres.yaml down
+```
+
 ## Run Frontend
 
 In a separate terminal, from the repository root:
@@ -61,3 +77,4 @@ The frontend runs at `http://localhost:4200` by default.
 - Keep app-specific settings and scripts inside each app folder.
 - Use this root README for shared setup and workflow instructions.
 - Root `.gitignore` covers cross-project and generated files at the repository level.
+

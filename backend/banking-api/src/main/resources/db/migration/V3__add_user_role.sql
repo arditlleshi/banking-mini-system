@@ -1,0 +1,6 @@
+ALTER TABLE users
+ADD COLUMN IF NOT EXISTS user_role VARCHAR(30) NOT NULL DEFAULT 'USER';
+
+ALTER TABLE users
+ADD CONSTRAINT chk_users_role
+CHECK (user_role IN ('USER', 'ADMIN'));

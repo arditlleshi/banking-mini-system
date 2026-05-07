@@ -47,6 +47,48 @@ src/main/resources
     V1__baseline.sql
 ```
 
+## Local PostgreSQL Setup
+
+This project supports running with a real local PostgreSQL database.
+
+1. Copy environment template:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+2. Start PostgreSQL with Docker:
+
+```powershell
+docker compose --env-file .env -f docker-compose.postgres.yaml up -d
+```
+
+3. Run backend:
+
+```powershell
+.\mvnw.cmd spring-boot:run
+```
+
+4. Stop database when done:
+
+```powershell
+docker compose --env-file .env -f docker-compose.postgres.yaml down
+```
+
+Notes:
+- Database data is persisted in Docker volume `banking_postgres_data`.
+- You can change credentials and DB name in `.env`.
+- Set `JWT_SECRET` in `.env` to a long random string before non-local usage.
+
+## Authentication
+
+- `POST /api/auth/login` accepts `username` and `password` and returns `accessToken` and `refreshToken`.
+- `POST /api/auth/refresh` accepts `refreshToken` and returns a new token pair.
+- `POST /api/auth/logout` accepts `refreshToken` and revokes it.
+- Include token in header as `Authorization: Bearer <token>`.
+- `GET /api/test` is public.
+- `GET /api/secure/me` requires a valid token.
+
 ## Placement Rules
 
 - Controller classes: `*.controller`
