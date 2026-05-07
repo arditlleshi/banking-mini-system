@@ -1,0 +1,24 @@
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Env and secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+
+# Frontend (Angular/Node)
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/coverage/
+
+# Backend (Spring Boot / Maven)
+backend/banking-api/target/
+backend/banking-api/.mvn/wrapper/maven-wrapper.jar
+
