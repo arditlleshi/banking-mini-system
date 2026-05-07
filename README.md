@@ -50,8 +50,8 @@ In a separate terminal, from the repository root:
 
 ```bash
 cd frontend
-npm install
-ng serve
+bun install
+bun run start
 ```
 
 The frontend runs at `http://localhost:4200` by default.
