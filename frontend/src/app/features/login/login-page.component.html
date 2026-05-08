@@ -1,4 +1,8 @@
 <section class="quiet-auth-shell relative min-h-screen overflow-hidden px-6 py-10 sm:px-10 lg:px-14">
+  <div class="absolute right-6 top-6 z-10 sm:right-10">
+    <app-theme-toggle />
+  </div>
+
   <div class="quiet-auth-orb quiet-auth-orb-left" aria-hidden="true"></div>
   <div class="quiet-auth-orb quiet-auth-orb-right" aria-hidden="true"></div>
 
@@ -48,6 +52,7 @@
             <label hlmLabel for="username" class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase">Username</label>
             <input
               id="username"
+              name="username"
               hlmInput
               class="rounded-2xl border border-border/80 bg-background/70 px-4 py-3 text-base text-foreground shadow-sm transition focus-visible:ring-4 focus-visible:ring-ring/20"
               type="text"
@@ -60,6 +65,7 @@
             <label hlmLabel for="password" class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase">Password</label>
             <input
               id="password"
+              name="password"
               hlmInput
               class="rounded-2xl border border-border/80 bg-background/70 px-4 py-3 text-base text-foreground shadow-sm transition focus-visible:ring-4 focus-visible:ring-ring/20"
               type="password"

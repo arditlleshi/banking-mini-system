@@ -1,0 +1,97 @@
+<div class="banking-shell">
+  <a class="banking-shell__skip-link" href="#main-content">Skip to main content</a>
+
+  <button
+    hlmBtn
+    type="button"
+    variant="outline"
+    size="sm"
+    class="banking-shell__menu-button"
+    (click)="toggleSidebar()"
+    [attr.aria-expanded]="sidebarOpen()"
+    aria-controls="banking-sidebar"
+    aria-label="Toggle navigation"
+  >
+    <span class="banking-shell__menu-icon" aria-hidden="true">
+      <span></span>
+      <span></span>
+      <span></span>
+    </span>
+    Menu
+  </button>
+
+  @if (sidebarOpen()) {
+    <button
+      type="button"
+      class="banking-shell__backdrop"
+      aria-label="Close navigation"
+      (click)="closeSidebar()"
+    ></button>
+  }
+
+  <aside
+    id="banking-sidebar"
+    class="banking-sidebar quiet-glass-panel"
+    [class.banking-sidebar--open]="sidebarOpen()"
+    aria-label="Primary navigation"
+  >
+    <div class="banking-sidebar__brand">
+      <div>
+        <p class="quiet-kicker">Private banking suite</p>
+        <p class="font-display banking-sidebar__title">Operations Console</p>
+      </div>
+      <p class="banking-sidebar__intro">
+        Quiet, controlled navigation for relationship managers, operations staff, and approvals teams.
+      </p>
+    </div>
+
+    <hlm-separator decorative></hlm-separator>
+
+    <nav class="banking-sidebar__nav" aria-label="Banking sections">
+      @for (item of navigation(); track item.path) {
+        <a
+          [routerLink]="item.path"
+          routerLinkActive="banking-sidebar__link--active"
+          [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+          class="banking-sidebar__link"
+          (click)="closeSidebar()"
+        >
+          <span class="banking-sidebar__badge">{{ item.badge }}</span>
+          <span class="banking-sidebar__copy">
+            <span class="banking-sidebar__label">{{ item.label }}</span>
+            <span class="banking-sidebar__description">{{ item.description }}</span>
+          </span>
+        </a>
+      }
+    </nav>
+
+    <section hlmCard class="banking-sidebar__spotlight border-sidebar-border/70 bg-sidebar/85">
+      <div hlmCardHeader class="gap-3 p-5">
+        <p class="quiet-stat-label">Live workspace</p>
+        <h2 hlmCardTitle class="font-display text-3xl text-sidebar-foreground">{{ activeItem().label }}</h2>
+        <p hlmCardDescription class="text-sm leading-6 text-muted-foreground">
+          {{ activeItem().description }}
+        </p>
+      </div>
+      <div hlmCardContent class="space-y-4 px-5 pb-5">
+        <div class="banking-sidebar__desk-note">
+          <p class="quiet-stat-label">Relationship desk</p>
+          <p class="mt-2 text-sm leading-6 text-muted-foreground">
+            The shell is ready for production modules, while preserving a calm, premium tone across the workspace.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="banking-sidebar__footer">
+      <app-theme-toggle />
+      <button hlmBtn type="button" variant="outline" class="w-full justify-center rounded-full" (click)="logout()">
+        Sign out
+      </button>
+    </div>
+  </aside>
+
+  <main id="main-content" class="banking-main" tabindex="-1">
+    <router-outlet />
+  </main>
+</div>

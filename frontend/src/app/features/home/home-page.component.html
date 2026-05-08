@@ -1,26 +1,23 @@
-<main class="quiet-dashboard min-h-screen px-4 py-20 sm:px-6 lg:px-10">
+<main class="quiet-dashboard min-h-screen px-4 py-8 sm:px-6 lg:px-10">
   <div class="mx-auto flex max-w-6xl flex-col gap-8">
     <header class="quiet-hero rounded-[2rem] border border-border/70 bg-card/82 px-6 py-8 shadow-xl shadow-black/6 backdrop-blur-lg sm:px-8 lg:px-10">
       <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div class="max-w-3xl space-y-4">
-          <p class="quiet-kicker">Client platform</p>
+          <p class="quiet-kicker">Executive overview</p>
           <h1 class="font-display text-4xl tracking-tight text-foreground sm:text-5xl">
             Private banking operations, presented with restraint.
           </h1>
           <p class="max-w-2xl text-base leading-7 text-muted-foreground">
-            This first view confirms the secure session, shows live backend availability, and previews the structure for accounts, relationships, and transaction workflows.
+            The overview is now anchored by a dedicated banking shell, with live session status, backend reachability, and a clean path into core operating modules.
           </p>
         </div>
 
-        <button
-          hlmBtn
-          type="button"
-          variant="outline"
-          class="rounded-full border-border/80 bg-background/70 px-5"
-          (click)="logout()"
-        >
-          Sign out
-        </button>
+        <div class="rounded-[1.5rem] border border-border/70 bg-background/65 px-5 py-4 backdrop-blur-sm">
+          <p class="quiet-stat-label">Workspace</p>
+          <p class="mt-2 max-w-xs text-sm leading-6 text-muted-foreground">
+            Navigate through accounts, customers, transactions, and settings from the new left rail.
+          </p>
+        </div>
       </div>
     </header>
 

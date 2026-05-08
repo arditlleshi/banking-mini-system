@@ -10,6 +10,7 @@ import { HlmCard, HlmCardContent, HlmCardDescription, HlmCardFooter, HlmCardHead
 import { HlmInput } from '../../shared/ui/spartan/input';
 import { HlmLabel } from '../../shared/ui/spartan/label';
 import { HlmSeparator } from '../../shared/ui/spartan/separator';
+import { ThemeToggleComponent } from '../../shared/theme/theme-toggle.component';
 
 @Component({
   selector: 'app-login-page',
@@ -24,7 +25,8 @@ import { HlmSeparator } from '../../shared/ui/spartan/separator';
     HlmCardTitle,
     HlmInput,
     HlmLabel,
-    HlmSeparator
+    HlmSeparator,
+    ThemeToggleComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './login-page.component.html',
