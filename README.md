@@ -60,6 +60,28 @@ When finished:
 docker compose --env-file .env -f docker-compose.postgres.yaml down
 ```
 
+## Run Database Only (Docker Compose)
+
+From `backend/banking-api`:
+
+```powershell
+cd backend/banking-api
+Copy-Item .env.example .env
+docker compose --env-file .env -f docker-compose.postgres.yaml up -d
+```
+
+Stop the database:
+
+```powershell
+docker compose --env-file .env -f docker-compose.postgres.yaml down
+```
+
+Stop and remove saved database data:
+
+```powershell
+docker compose --env-file .env -f docker-compose.postgres.yaml down -v
+```
+
 ## Run Frontend
 
 In a separate terminal, from the repository root:

@@ -1,16 +1,1 @@
-<main class="wrap">
-  <h1>{{ title() }}</h1>
-  <p class="status">{{ status() }}</p>
-  <p class="hint">Test endpoint: <code>GET /api/test</code></p>
-
-  @if (items().length > 0) {
-    <section>
-      <h2 class="text-2xl font-bold text-gray-800">Items from Backend</h2>
-      <ul class="list-disc list-inside">
-        @for (item of items(); track item.id) {
-          <li class="text-gray-600">{{ item.id }} - {{ item.name }}</li>
-        }
-      </ul>
-    </section>
-  }
-</main>
+<router-outlet />
