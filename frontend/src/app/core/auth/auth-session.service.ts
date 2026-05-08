@@ -18,12 +18,7 @@ export class AuthSessionService {
       return this.refreshInFlight$;
     }
 
-    const refreshToken = this.authState.getRefreshToken();
-    if (!refreshToken) {
-      return throwError(() => new Error('No refresh token available'));
-    }
-
-    this.refreshInFlight$ = this.authApi.refresh(refreshToken).pipe(
+    this.refreshInFlight$ = this.authApi.refresh().pipe(
       map((tokens) => {
         this.authState.setTokens(tokens);
         return tokens;
@@ -42,18 +37,9 @@ export class AuthSessionService {
   }
 
   logoutAndClear(): Observable<void> {
-    const refreshToken = this.authState.getRefreshToken();
-    if (!refreshToken) {
-      this.authState.clear();
-      return new Observable<void>((subscriber) => {
-        subscriber.next();
-        subscriber.complete();
-      });
-    }
-
-    return this.authApi.logout(refreshToken).pipe(
+    return this.authApi.logout().pipe(
+      catchError(() => of(void 0)),
       finalize(() => this.authState.clear())
     );
   }
 }
-

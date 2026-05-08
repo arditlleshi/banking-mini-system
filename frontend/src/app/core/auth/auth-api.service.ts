@@ -11,7 +11,6 @@ export type LoginRequest = {
 
 export type AuthTokens = {
   accessToken: string;
-  refreshToken: string;
 };
 
 @Injectable({ providedIn: 'root' })
@@ -22,24 +21,24 @@ export class AuthApiService {
 
   login(payload: LoginRequest): Observable<AuthTokens> {
     return this.http.post<AuthTokens>(`${this.baseUrl}/auth/login`, payload, {
-      context: this.skipAuthContext
+      context: this.skipAuthContext,
+      withCredentials: true
     });
   }
 
-  refresh(refreshToken: string): Observable<AuthTokens> {
+  refresh(): Observable<AuthTokens> {
     return this.http.post<AuthTokens>(
       `${this.baseUrl}/auth/refresh`,
-      { refreshToken },
-      { context: this.skipAuthContext }
+      {},
+      { context: this.skipAuthContext, withCredentials: true }
     );
   }
 
-  logout(refreshToken: string): Observable<void> {
+  logout(): Observable<void> {
     return this.http.post<void>(
       `${this.baseUrl}/auth/logout`,
-      { refreshToken },
-      { context: this.skipAuthContext }
+      {},
+      { context: this.skipAuthContext, withCredentials: true }
     );
   }
 }
-

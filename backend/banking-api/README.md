@@ -82,12 +82,13 @@ Notes:
 
 ## Authentication
 
-- `POST /api/auth/login` accepts `username` and `password` and returns `accessToken` and `refreshToken`.
-- `POST /api/auth/refresh` accepts `refreshToken` and returns a new token pair.
-- `POST /api/auth/logout` accepts `refreshToken` and revokes it.
-- Include token in header as `Authorization: Bearer <token>`.
+- `POST /api/auth/login` accepts `username` and `password`, returns `accessToken`, and sets refresh token in an HttpOnly cookie.
+- `POST /api/auth/refresh` uses refresh cookie and returns a new `accessToken`.
+- `POST /api/auth/logout` revokes refresh cookie/token and clears cookie.
+- Access token must be sent in `Authorization: Bearer <token>`.
+- Refresh token is **not** exposed to frontend JavaScript.
 - `GET /api/test` is public.
-- `GET /api/secure/me` requires a valid token.
+- `GET /api/secure/me` requires a valid access token.
 
 ## Placement Rules
 
@@ -104,4 +105,3 @@ Notes:
 - `common/exception/ApiError`
 - feature services and controllers for each business area
 - profile-specific configs (`application-local.yaml`, `application-dev.yaml`)
-

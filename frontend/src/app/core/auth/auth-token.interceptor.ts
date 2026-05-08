@@ -21,9 +21,10 @@ export const authTokenInterceptor: HttpInterceptorFn = (req, next) => {
     ? req.clone({
         setHeaders: {
           Authorization: `Bearer ${accessToken}`
-        }
+        },
+        withCredentials: true
       })
-    : req;
+    : req.clone({ withCredentials: true });
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
@@ -36,7 +37,8 @@ export const authTokenInterceptor: HttpInterceptorFn = (req, next) => {
           const retryReq = req.clone({
             setHeaders: {
               Authorization: `Bearer ${tokens.accessToken}`
-            }
+            },
+            withCredentials: true
           });
           return next(retryReq);
         }),
@@ -48,4 +50,3 @@ export const authTokenInterceptor: HttpInterceptorFn = (req, next) => {
     })
   );
 };
-
