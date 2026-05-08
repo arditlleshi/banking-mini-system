@@ -1,24 +1,14 @@
- :host {
+:host {
   display: block;
-  font-family: Arial, sans-serif;
 }
 
-.wrap {
-  max-width: 720px;
-  margin: 64px auto;
-  padding: 0 16px;
+.app-shell {
+  min-height: 100vh;
 }
 
-h1 {
-  margin: 0 0 16px;
-}
-
-.status {
-  font-size: 18px;
-  margin: 0 0 8px;
-}
-
-.hint {
-  color: #555;
-  margin: 0;
+.theme-toggle-slot {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 40;
 }

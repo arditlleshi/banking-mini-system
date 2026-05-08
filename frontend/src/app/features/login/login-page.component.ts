@@ -1,14 +1,32 @@
-import { Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { AuthApiService } from '../../core/auth/auth-api.service';
 import { AuthStateService } from '../../core/auth/auth-state.service';
+import { HlmButton } from '../../shared/ui/spartan/button';
+import { HlmCard, HlmCardContent, HlmCardDescription, HlmCardFooter, HlmCardHeader, HlmCardTitle } from '../../shared/ui/spartan/card';
+import { HlmInput } from '../../shared/ui/spartan/input';
+import { HlmLabel } from '../../shared/ui/spartan/label';
+import { HlmSeparator } from '../../shared/ui/spartan/separator';
 
 @Component({
   selector: 'app-login-page',
-  imports: [ReactiveFormsModule],
+  imports: [
+    ReactiveFormsModule,
+    HlmButton,
+    HlmCard,
+    HlmCardContent,
+    HlmCardDescription,
+    HlmCardFooter,
+    HlmCardHeader,
+    HlmCardTitle,
+    HlmInput,
+    HlmLabel,
+    HlmSeparator
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './login-page.component.html',
   styleUrl: './login-page.component.css'
 })

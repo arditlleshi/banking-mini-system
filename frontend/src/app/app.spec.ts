@@ -17,7 +17,8 @@ describe('App', () => {
   it('should render title', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
+    fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, frontend');
+    expect(compiled.textContent).toContain('Night mode');
   });
 });

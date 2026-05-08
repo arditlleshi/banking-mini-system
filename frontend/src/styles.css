@@ -1,3 +1,176 @@
-/* You can add global styles to this file, and also import other style files */
-
+@import '@fontsource-variable/manrope';
+@import '@fontsource/cormorant-garamond/600.css';
+@import '@fontsource/cormorant-garamond/700.css';
 @import 'tailwindcss';
+@import '@spartan-ng/brain/hlm-tailwind-preset.css';
+
+@theme inline {
+  --font-sans: var(--font-manrope);
+  --font-display: var(--font-cormorant);
+}
+
+:root {
+  color-scheme: light;
+
+  --font-manrope:
+    'Manrope Variable',
+    'Manrope',
+    'Segoe UI',
+    sans-serif;
+  --font-cormorant:
+    'Cormorant Garamond',
+    Georgia,
+    serif;
+
+  --radius: 1.5rem;
+  --background: oklch(0.985 0.006 95);
+  --foreground: oklch(0.24 0.018 145);
+  --card: oklch(0.998 0.004 95);
+  --card-foreground: oklch(0.22 0.018 145);
+  --popover: oklch(0.998 0.004 95);
+  --popover-foreground: oklch(0.22 0.018 145);
+  --primary: oklch(0.34 0.07 160);
+  --primary-foreground: oklch(0.985 0.01 95);
+  --secondary: oklch(0.947 0.014 95);
+  --secondary-foreground: oklch(0.26 0.02 145);
+  --muted: oklch(0.952 0.009 95);
+  --muted-foreground: oklch(0.55 0.022 145);
+  --accent: oklch(0.89 0.028 88);
+  --accent-foreground: oklch(0.28 0.025 145);
+  --destructive: oklch(0.58 0.22 27);
+  --border: oklch(0.89 0.014 95);
+  --input: oklch(0.91 0.014 95);
+  --ring: oklch(0.58 0.048 150);
+  --sidebar: oklch(0.978 0.006 95);
+  --sidebar-foreground: oklch(0.22 0.018 145);
+  --sidebar-primary: oklch(0.34 0.07 160);
+  --sidebar-primary-foreground: oklch(0.985 0.01 95);
+  --sidebar-accent: oklch(0.92 0.026 88);
+  --sidebar-accent-foreground: oklch(0.25 0.02 145);
+  --sidebar-border: oklch(0.89 0.014 95);
+  --sidebar-ring: oklch(0.58 0.048 150);
+
+  --quiet-gold: oklch(0.73 0.09 85);
+  --quiet-orb-left: color-mix(in oklab, oklch(0.88 0.038 86) 58%, transparent);
+  --quiet-orb-right: color-mix(in oklab, oklch(0.8 0.06 162) 34%, transparent);
+}
+
+:root.dark {
+  color-scheme: dark;
+
+  --background: oklch(0.19 0.012 150);
+  --foreground: oklch(0.95 0.014 92);
+  --card: oklch(0.23 0.012 150);
+  --card-foreground: oklch(0.95 0.014 92);
+  --popover: oklch(0.23 0.012 150);
+  --popover-foreground: oklch(0.95 0.014 92);
+  --primary: oklch(0.78 0.055 155);
+  --primary-foreground: oklch(0.2 0.015 150);
+  --secondary: oklch(0.28 0.01 150);
+  --secondary-foreground: oklch(0.95 0.014 92);
+  --muted: oklch(0.27 0.009 150);
+  --muted-foreground: oklch(0.75 0.012 94);
+  --accent: oklch(0.56 0.055 84);
+  --accent-foreground: oklch(0.97 0.01 92);
+  --destructive: oklch(0.7 0.18 25);
+  --border: oklch(1 0 0 / 11%);
+  --input: oklch(1 0 0 / 14%);
+  --ring: oklch(0.68 0.048 154);
+  --sidebar: oklch(0.22 0.012 150);
+  --sidebar-foreground: oklch(0.95 0.014 92);
+  --sidebar-primary: oklch(0.78 0.055 155);
+  --sidebar-primary-foreground: oklch(0.2 0.015 150);
+  --sidebar-accent: oklch(0.31 0.01 150);
+  --sidebar-accent-foreground: oklch(0.95 0.014 92);
+  --sidebar-border: oklch(1 0 0 / 11%);
+  --sidebar-ring: oklch(0.68 0.048 154);
+
+  --quiet-gold: oklch(0.76 0.095 83);
+  --quiet-orb-left: color-mix(in oklab, oklch(0.54 0.07 86) 24%, transparent);
+  --quiet-orb-right: color-mix(in oklab, oklch(0.52 0.08 158) 20%, transparent);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-manrope);
+    background-image:
+      radial-gradient(circle at top left, var(--quiet-orb-left), transparent 28rem),
+      radial-gradient(circle at top right, var(--quiet-orb-right), transparent 30rem),
+      linear-gradient(180deg, color-mix(in oklab, var(--background) 92%, white 8%), var(--background));
+  }
+}
+
+@layer components {
+  .font-display {
+    font-family: var(--font-cormorant);
+    letter-spacing: -0.03em;
+  }
+
+  .quiet-kicker {
+    @apply text-[0.72rem] font-semibold uppercase tracking-[0.28em] text-muted-foreground;
+  }
+
+  .quiet-stat-label {
+    @apply text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground;
+  }
+
+  .quiet-glass-panel {
+    background:
+      linear-gradient(180deg, color-mix(in oklab, var(--card) 85%, white 15%), color-mix(in oklab, var(--card) 94%, transparent));
+    border: 1px solid color-mix(in oklab, var(--border) 78%, transparent);
+    box-shadow: 0 24px 70px -38px rgba(15, 23, 42, 0.28);
+  }
+
+  .quiet-auth-card,
+  .quiet-panel,
+  .quiet-metric-card,
+  .quiet-hero {
+    background:
+      linear-gradient(160deg, color-mix(in oklab, var(--card) 96%, white 4%), color-mix(in oklab, var(--card) 90%, transparent));
+  }
+
+  .quiet-auth-shell::before {
+    content: '';
+    position: absolute;
+    inset: 2rem;
+    border: 1px solid color-mix(in oklab, var(--border) 70%, transparent);
+    border-radius: 2.5rem;
+    pointer-events: none;
+  }
+
+  .quiet-auth-orb {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(30px);
+    opacity: 0.8;
+  }
+
+  .quiet-auth-orb-left {
+    left: 5%;
+    top: 10%;
+    height: 18rem;
+    width: 18rem;
+    background: var(--quiet-orb-left);
+  }
+
+  .quiet-auth-orb-right {
+    right: 4%;
+    bottom: 14%;
+    height: 22rem;
+    width: 22rem;
+    background: var(--quiet-orb-right);
+  }
+
+  .quiet-theme-toggle {
+    border-radius: 9999px;
+  }
+}

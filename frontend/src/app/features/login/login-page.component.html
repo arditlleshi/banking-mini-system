@@ -1,41 +1,98 @@
-<section class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 px-6 py-10 grid place-items-center">
-  <form
-    class="w-full max-w-sm rounded-2xl border border-blue-100 bg-white/95 p-6 shadow-xl shadow-blue-900/10 backdrop-blur-sm space-y-4"
-    [formGroup]="form"
-    (ngSubmit)="submit()"
-  >
-    <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Sign in</h1>
+<section class="quiet-auth-shell relative min-h-screen overflow-hidden px-6 py-10 sm:px-10 lg:px-14">
+  <div class="quiet-auth-orb quiet-auth-orb-left" aria-hidden="true"></div>
+  <div class="quiet-auth-orb quiet-auth-orb-right" aria-hidden="true"></div>
 
-    <label class="block space-y-1 text-sm font-medium text-slate-700">
-      Username
-      <input
-        class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-        type="text"
-        formControlName="username"
-        autocomplete="username"
-      />
-    </label>
+  <div class="relative mx-auto grid min-h-[calc(100vh-5rem)] max-w-6xl items-center gap-10 lg:grid-cols-[1.15fr_0.85fr]">
+    <div class="space-y-8">
+      <div class="space-y-4">
+        <p class="quiet-kicker">Private client access</p>
+        <h1 class="font-display text-5xl leading-none tracking-tight text-foreground sm:text-6xl">
+          Quiet wealth, carefully stewarded.
+        </h1>
+        <p class="max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">
+          A refined workspace for relationship managers and clients to review account activity, monitor portfolios, and move through secure banking workflows without noise.
+        </p>
+      </div>
 
-    <label class="block space-y-1 text-sm font-medium text-slate-700">
-      Password
-      <input
-        class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-        type="password"
-        formControlName="password"
-        autocomplete="current-password"
-      />
-    </label>
+      <div class="grid gap-4 sm:grid-cols-3">
+        <article class="quiet-glass-panel rounded-3xl p-5">
+          <p class="quiet-stat-label">Advisory standard</p>
+          <p class="mt-3 font-display text-3xl text-foreground">Bespoke</p>
+          <p class="mt-2 text-sm text-muted-foreground">High-touch client journeys with clear, discreet communication.</p>
+        </article>
+        <article class="quiet-glass-panel rounded-3xl p-5">
+          <p class="quiet-stat-label">Security posture</p>
+          <p class="mt-3 font-display text-3xl text-foreground">Layered</p>
+          <p class="mt-2 text-sm text-muted-foreground">Short-lived access, protected refresh, and guarded routes already wired in.</p>
+        </article>
+        <article class="quiet-glass-panel rounded-3xl p-5">
+          <p class="quiet-stat-label">Client tone</p>
+          <p class="mt-3 font-display text-3xl text-foreground">Reserved</p>
+          <p class="mt-2 text-sm text-muted-foreground">Luxury through restraint, not visual excess.</p>
+        </article>
+      </div>
+    </div>
 
-    @if (errorMessage()) {
-      <p class="text-sm font-medium text-red-700">{{ errorMessage() }}</p>
-    }
+    <form [formGroup]="form" (ngSubmit)="submit()" class="relative">
+      <section hlmCard class="quiet-auth-card border-border/70 bg-card/88 shadow-2xl shadow-black/10 backdrop-blur-xl">
+        <div hlmCardHeader class="gap-3 p-8 sm:p-10">
+          <p class="quiet-kicker">Sign in</p>
+          <h2 hlmCardTitle class="font-display text-4xl text-card-foreground">Welcome back</h2>
+          <p hlmCardDescription class="max-w-sm text-sm leading-6 text-muted-foreground">
+            Continue to the client platform with your advisory credentials.
+          </p>
+        </div>
 
-    <button
-      class="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
-      type="submit"
-      [disabled]="loading()"
-    >
-      {{ loading() ? 'Signing in...' : 'Sign in' }}
-    </button>
-  </form>
+        <div hlmCardContent class="flex flex-col gap-5 px-8 pb-8 sm:px-10">
+          <div class="flex flex-col gap-2">
+            <label hlmLabel for="username" class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase">Username</label>
+            <input
+              id="username"
+              hlmInput
+              class="rounded-2xl border border-border/80 bg-background/70 px-4 py-3 text-base text-foreground shadow-sm transition focus-visible:ring-4 focus-visible:ring-ring/20"
+              type="text"
+              formControlName="username"
+              autocomplete="username"
+            />
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label hlmLabel for="password" class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase">Password</label>
+            <input
+              id="password"
+              hlmInput
+              class="rounded-2xl border border-border/80 bg-background/70 px-4 py-3 text-base text-foreground shadow-sm transition focus-visible:ring-4 focus-visible:ring-ring/20"
+              type="password"
+              formControlName="password"
+              autocomplete="current-password"
+            />
+          </div>
+
+          @if (errorMessage()) {
+            <p class="rounded-2xl border border-red-500/20 bg-red-500/8 px-4 py-3 text-sm font-medium text-red-700 dark:text-red-300">
+              {{ errorMessage() }}
+            </p>
+          }
+        </div>
+
+        <div hlmCardFooter class="flex flex-col gap-5 px-8 pb-8 sm:px-10">
+          <button
+            hlmBtn
+            class="w-full rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/15 transition hover:-translate-y-0.5"
+            type="submit"
+            size="lg"
+            [disabled]="loading()"
+          >
+            {{ loading() ? 'Signing in...' : 'Enter client workspace' }}
+          </button>
+
+          <div class="flex items-center gap-4 text-xs tracking-[0.18em] text-muted-foreground uppercase">
+            <hlm-separator decorative class="flex-1"></hlm-separator>
+            Secure session
+            <hlm-separator decorative class="flex-1"></hlm-separator>
+          </div>
+        </div>
+      </section>
+    </form>
+  </div>
 </section>
