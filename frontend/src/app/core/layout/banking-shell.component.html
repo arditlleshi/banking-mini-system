@@ -1,97 +1,162 @@
-<div class="banking-shell">
-  <a class="banking-shell__skip-link" href="#main-content">Skip to main content</a>
-
-  <button
-    hlmBtn
-    type="button"
-    variant="outline"
-    size="sm"
-    class="banking-shell__menu-button"
-    (click)="toggleSidebar()"
-    [attr.aria-expanded]="sidebarOpen()"
-    aria-controls="banking-sidebar"
-    aria-label="Toggle navigation"
+<div hlmSidebarWrapper class="relative min-h-screen">
+  <a
+    href="#main-content"
+    class="absolute left-4 top-4 z-80 translate-y-[-180%] rounded-full bg-card px-4 py-2.5 text-foreground no-underline shadow-[0_18px_40px_-30px_rgba(15,23,42,0.45)] transition-transform duration-200 focus-visible:translate-y-0"
   >
-    <span class="banking-shell__menu-icon" aria-hidden="true">
-      <span></span>
-      <span></span>
-      <span></span>
-    </span>
-    Menu
-  </button>
+    Skip to main content
+  </a>
 
-  @if (sidebarOpen()) {
-    <button
-      type="button"
-      class="banking-shell__backdrop"
-      aria-label="Close navigation"
-      (click)="closeSidebar()"
-    ></button>
-  }
-
-  <aside
-    id="banking-sidebar"
-    class="banking-sidebar quiet-glass-panel"
-    [class.banking-sidebar--open]="sidebarOpen()"
+  <hlm-sidebar
+    variant="floating"
+    collapsible="icon"
+    side="left"
+    sidebarContainerClass="max-lg:p-0"
     aria-label="Primary navigation"
   >
-    <div class="banking-sidebar__brand">
-      <div>
-        <p class="quiet-kicker">Private banking suite</p>
-        <p class="font-display banking-sidebar__title">Operations Console</p>
-      </div>
-      <p class="banking-sidebar__intro">
-        Quiet, controlled navigation for relationship managers, operations staff, and approvals teams.
-      </p>
+    <div hlmSidebarHeader class="p-1.5 pt-1">
+      <section
+        class="grid grid-cols-[auto_1fr_auto] items-center gap-3.5 rounded-2xl border border-sidebar-border/75 bg-[linear-gradient(180deg,color-mix(in_oklab,var(--sidebar)_96%,white_4%),color-mix(in_oklab,var(--sidebar)_90%,transparent))] px-4 py-3.5 group-data-[collapsible=icon]:grid-cols-1 group-data-[collapsible=icon]:px-1.5 group-data-[collapsible=icon]:py-2.5"
+      >
+        <div
+          aria-hidden="true"
+          class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[color-mix(in_oklab,white_92%,var(--sidebar-accent)_8%)] text-sidebar-foreground/95 shadow-[inset_0_1px_0_rgba(255,255,255,0.32)]"
+        >
+          <ng-icon hlm name="lucideBuilding2" size="sm"></ng-icon>
+        </div>
+
+        <div class="min-w-0 group-data-[collapsible=icon]:hidden">
+          <p class="text-base font-bold leading-tight text-sidebar-foreground">Acme Private Bank</p>
+          <p class="mt-0.5 text-sm leading-tight text-sidebar-foreground/85">Enterprise desk</p>
+        </div>
+
+        <button
+          hlmBtn
+          type="button"
+          variant="ghost"
+          size="icon-sm"
+          class="text-sidebar-foreground/75 group-data-[collapsible=icon]:hidden"
+          aria-label="Switch workspace"
+        >
+          <ng-icon hlm name="lucideChevronDown" size="sm"></ng-icon>
+        </button>
+      </section>
     </div>
 
-    <hlm-separator decorative></hlm-separator>
+    <div hlmSidebarContent class="gap-1 p-1.5 pt-4">
+      <section hlmSidebarGroup class="p-0">
+        <div hlmSidebarGroupLabel class="px-3.5 pb-2.5 text-[0.92rem] font-bold normal-case tracking-normal text-sidebar-foreground/65">
+          Platform
+        </div>
 
-    <nav class="banking-sidebar__nav" aria-label="Banking sections">
-      @for (item of navigation(); track item.path) {
-        <a
-          [routerLink]="item.path"
-          routerLinkActive="banking-sidebar__link--active"
-          [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
-          class="banking-sidebar__link"
-          (click)="closeSidebar()"
+        <div hlmSidebarGroupContent>
+          <ul hlmSidebarMenu class="flex flex-col gap-0.5" aria-label="Platform">
+            @for (item of navigation(); track item.path) {
+              <li hlmSidebarMenuItem>
+                <a
+                  hlmSidebarMenuButton
+                  [routerLink]="item.path"
+                  [isActive]="matchesRoute(item.path, item.exact ?? false)"
+                  [tooltip]="item.label"
+                  class="min-h-[2.9rem] rounded-xl border-0 bg-transparent px-3.5 py-2.5 text-sidebar-foreground/95 transition-colors duration-150 hover:bg-[color-mix(in_oklab,var(--sidebar-accent)_34%,var(--sidebar)_66%)] focus-visible:bg-[color-mix(in_oklab,var(--sidebar-accent)_34%,var(--sidebar)_66%)] data-[active=true]:bg-[color-mix(in_oklab,var(--sidebar-accent)_34%,var(--sidebar)_66%)]"
+                >
+                  <span class="inline-flex items-center gap-3">
+                    <ng-icon hlm [name]="item.icon" size="sm"></ng-icon>
+                    <span class="text-base font-semibold leading-tight">{{ item.label }}</span>
+                  </span>
+
+                  <span class="ml-auto inline-flex items-center gap-2 text-sidebar-foreground/65">
+                    <span class="text-[0.73rem] font-bold tracking-[0.12em] text-sidebar-foreground/55">{{ item.badge }}</span>
+                    <ng-icon hlm name="lucideChevronRight" size="sm"></ng-icon>
+                  </span>
+                </a>
+              </li>
+            }
+          </ul>
+        </div>
+      </section>
+    </div>
+
+    <div hlmSidebarFooter class="p-3">
+      <button
+        hlmBtn
+        type="button"
+        variant="ghost"
+        class="w-full min-h-17 justify-start gap-3 rounded-2xl border border-sidebar-border/75 bg-[linear-gradient(180deg,color-mix(in_oklab,var(--sidebar)_96%,white_4%),color-mix(in_oklab,var(--sidebar)_90%,transparent))] px-3.5 py-3 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-1.5"
+        [hlmDropdownMenuTrigger]="profileMenu"
+        side="top"
+        align="start"
+      >
+        <span
+          aria-hidden="true"
+          class="inline-flex h-9.5 w-9.5 items-center justify-center rounded-full bg-[color-mix(in_oklab,white_92%,var(--sidebar-accent)_8%)] text-[0.84rem] font-bold tracking-[0.08em] text-sidebar-foreground/92"
         >
-          <span class="banking-sidebar__badge">{{ item.badge }}</span>
-          <span class="banking-sidebar__copy">
-            <span class="banking-sidebar__label">{{ item.label }}</span>
-            <span class="banking-sidebar__description">{{ item.description }}</span>
-          </span>
-        </a>
-      }
-    </nav>
+          {{ userInitials() }}
+        </span>
 
-    <section hlmCard class="banking-sidebar__spotlight border-sidebar-border/70 bg-sidebar/85">
-      <div hlmCardHeader class="gap-3 p-5">
-        <p class="quiet-stat-label">Live workspace</p>
-        <h2 hlmCardTitle class="font-display text-3xl text-sidebar-foreground">{{ activeItem().label }}</h2>
-        <p hlmCardDescription class="text-sm leading-6 text-muted-foreground">
-          {{ activeItem().description }}
-        </p>
-      </div>
-      <div hlmCardContent class="space-y-4 px-5 pb-5">
-        <div class="banking-sidebar__desk-note">
-          <p class="quiet-stat-label">Relationship desk</p>
-          <p class="mt-2 text-sm leading-6 text-muted-foreground">
-            The shell is ready for production modules, while preserving a calm, premium tone across the workspace.
+        <span class="inline-flex min-w-0 flex-col items-start gap-0.5 group-data-[collapsible=icon]:hidden">
+          <span class="text-base font-bold leading-tight text-sidebar-foreground">Ardit Lleshi</span>
+        </span>
+
+        <span aria-hidden="true" class="ml-auto text-sidebar-foreground/65 group-data-[collapsible=icon]:hidden">
+          <ng-icon hlm name="lucideChevronUp" size="sm"></ng-icon>
+        </span>
+      </button>
+
+      <ng-template #profileMenu>
+        <div hlmDropdownMenu class="min-w-64">
+          <div hlmDropdownMenuLabel class="text-[0.74rem] uppercase tracking-[0.12em]">Account controls</div>
+          <div hlmDropdownMenuSeparator></div>
+
+          <div hlmDropdownMenuItem class="cursor-default">
+            <label hlmLabel for="sidebar-theme-mode" class="flex w-full items-center justify-between gap-4">
+              <span class="inline-flex flex-col gap-0.5">
+                <span class="text-sm font-semibold">Theme</span>
+                <span class="text-xs text-muted-foreground">Switch appearance</span>
+              </span>
+              <hlm-switch
+                inputId="sidebar-theme-mode"
+                [checked]="theme.isDark()"
+                (checkedChange)="toggleTheme($event)"
+                aria-label="Toggle color theme"
+              />
+            </label>
+          </div>
+
+          <div hlmDropdownMenuSeparator></div>
+
+          <button hlmDropdownMenuItem type="button" variant="destructive" (triggered)="logout()">
+            <ng-icon hlm name="lucideLogOut" size="sm"></ng-icon>
+            Sign out
+          </button>
+        </div>
+      </ng-template>
+    </div>
+  </hlm-sidebar>
+
+  <main id="main-content" hlmSidebarInset class="min-w-0" tabindex="-1">
+    <header
+      class="sticky top-0 z-30 flex items-center gap-4 bg-[linear-gradient(180deg,color-mix(in_oklab,var(--background)_92%,transparent),transparent_86%)] px-4 pt-4 backdrop-blur-[10px] max-lg:px-3.5 max-lg:pt-3.5"
+    >
+      <button
+        hlmSidebarTrigger
+        type="button"
+        class="rounded-full border border-border/70 bg-card/90 shadow-[0_18px_36px_-28px_rgba(15,23,42,0.28)]"
+        aria-label="Toggle navigation"
+      ></button>
+
+      <div class="flex min-w-0 flex-col gap-1.5">
+        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">Current workspace</p>
+        <div>
+          <h1 class="font-display text-[clamp(1.8rem,2vw,2.5rem)] leading-[0.96]">{{ activeItem().label }}</h1>
+          <p class="text-[0.96rem] leading-relaxed text-muted-foreground">
+            Operational surface for approvals, servicing, and client context.
           </p>
         </div>
       </div>
-    </section>
+    </header>
 
-    <div class="banking-sidebar__footer">
-      <app-theme-toggle />
-      <button hlmBtn type="button" variant="outline" class="w-full justify-center rounded-full" (click)="logout()">
-        Sign out
-      </button>
+    <div class="min-w-0 p-4 max-lg:p-3.5">
+      <router-outlet />
     </div>
-  </aside>
-
-  <main id="main-content" class="banking-main" tabindex="-1">
-    <router-outlet />
   </main>
 </div>

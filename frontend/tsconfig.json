@@ -1,5 +1,3 @@
-/* To learn more about TypeScript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
-/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
 {
   "compileOnSave": false,
   "compilerOptions": {
@@ -17,7 +15,20 @@
     "baseUrl": ".",
     "paths": {
       "@spartan": ["src/app/shared/ui/spartan/index.ts"],
-      "@spartan/*": ["src/app/shared/ui/spartan/*"]
+      "@spartan/button": ["src/app/shared/ui/spartan/button/index.ts"],
+      "@spartan/card": ["src/app/shared/ui/spartan/card/index.ts"],
+      "@spartan/input": ["src/app/shared/ui/spartan/input/index.ts"],
+      "@spartan/label": ["src/app/shared/ui/spartan/label/index.ts"],
+      "@spartan/separator": ["src/app/shared/ui/spartan/separator/index.ts"],
+      "@spartan/switch": ["src/app/shared/ui/spartan/switch/index.ts"],
+      "@spartan/utils": ["src/app/shared/ui/spartan/utils/index.ts"],
+      "@spartan/*": ["src/app/shared/ui/spartan/*"],
+      "@spartan/sidebar": ["./src/app/shared/ui/spartan/sidebar/src/index.ts"],
+      "@spartan/icon": ["./src/app/shared/ui/spartan/icon/src/index.ts"],
+      "@spartan/sheet": ["./src/app/shared/ui/spartan/sheet/src/index.ts"],
+      "@spartan/skeleton": ["./src/app/shared/ui/spartan/skeleton/src/index.ts"],
+      "@spartan/tooltip": ["./src/app/shared/ui/spartan/tooltip/src/index.ts"],
+      "@spartan/dropdown-menu": ["./src/app/shared/ui/spartan/dropdown-menu/src/index.ts"]
     }
   },
   "angularCompilerOptions": {

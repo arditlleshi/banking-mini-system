@@ -1,24 +1,58 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { provideIcons } from '@ng-icons/core';
+import {
+  lucideArrowLeftRight,
+  lucideBadgeEuro,
+  lucideBuilding2,
+  lucideChevronDown,
+  lucideChevronUp,
+  lucideChevronRight,
+  lucideLayoutDashboard,
+  lucideLogOut,
+  lucideSettings2,
+  lucideUsers,
+  lucideWalletCards
+} from '@ng-icons/lucide';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 
 import { AuthSessionService } from '../auth/auth-session.service';
-import { HlmButton } from '../../shared/ui/spartan/button';
+import { ThemeService } from '../theme/theme.service';
+import { HlmButton } from '@spartan/button';
 import {
-  HlmCard,
-  HlmCardContent,
-  HlmCardDescription,
-  HlmCardHeader,
-  HlmCardTitle
-} from '../../shared/ui/spartan/card';
-import { HlmSeparator } from '../../shared/ui/spartan/separator';
-import { ThemeToggleComponent } from '../../shared/theme/theme-toggle.component';
+  HlmDropdownMenu,
+  HlmDropdownMenuItem,
+  HlmDropdownMenuLabel,
+  HlmDropdownMenuSeparator,
+  HlmDropdownMenuTrigger
+} from '@spartan/dropdown-menu';
+import {
+  HlmIconImports
+} from '@spartan/icon';
+import { HlmLabel } from '@spartan/label';
+import {
+  HlmSidebar,
+  HlmSidebarContent,
+  HlmSidebarFooter,
+  HlmSidebarGroup,
+  HlmSidebarGroupContent,
+  HlmSidebarGroupLabel,
+  HlmSidebarHeader,
+  HlmSidebarInset,
+  HlmSidebarMenu,
+  HlmSidebarMenuButton,
+  HlmSidebarMenuItem,
+  HlmSidebarTrigger,
+  HlmSidebarWrapper,
+  provideHlmSidebarConfig
+} from '@spartan/sidebar';
+import { HlmSwitch } from '@spartan/switch';
 
 type NavigationItem = {
   readonly path: string;
   readonly label: string;
-  readonly description: string;
+  readonly icon: string;
   readonly badge: string;
   readonly exact?: boolean;
 };
@@ -27,56 +61,89 @@ type NavigationItem = {
   selector: 'app-banking-shell',
   imports: [
     RouterLink,
-    RouterLinkActive,
     RouterOutlet,
-    ThemeToggleComponent,
     HlmButton,
-    HlmCard,
-    HlmCardContent,
-    HlmCardDescription,
-    HlmCardHeader,
-    HlmCardTitle,
-    HlmSeparator
+    HlmDropdownMenu,
+    HlmDropdownMenuItem,
+    HlmDropdownMenuLabel,
+    HlmDropdownMenuSeparator,
+    HlmDropdownMenuTrigger,
+    HlmIconImports,
+    HlmLabel,
+    HlmSidebar,
+    HlmSidebarContent,
+    HlmSidebarFooter,
+    HlmSidebarGroup,
+    HlmSidebarGroupContent,
+    HlmSidebarGroupLabel,
+    HlmSidebarHeader,
+    HlmSidebarInset,
+    HlmSidebarMenu,
+    HlmSidebarMenuButton,
+    HlmSidebarMenuItem,
+    HlmSidebarTrigger,
+    HlmSidebarWrapper,
+    HlmSwitch
+  ],
+  providers: [
+    provideIcons({
+      lucideArrowLeftRight,
+      lucideBadgeEuro,
+      lucideBuilding2,
+      lucideChevronDown,
+      lucideChevronUp,
+      lucideChevronRight,
+      lucideLayoutDashboard,
+      lucideLogOut,
+      lucideSettings2,
+      lucideUsers,
+      lucideWalletCards
+    }),
+    provideHlmSidebarConfig({
+      sidebarWidth: '21rem',
+      sidebarWidthMobile: '20rem',
+      mobileBreakpoint: '1024px',
+      closeMobileSidebarOnMenuButtonClick: true
+    })
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './banking-shell.component.html',
-  styleUrl: './banking-shell.component.css'
+  templateUrl: './banking-shell.component.html'
 })
 export class BankingShellComponent {
   private readonly authSession = inject(AuthSessionService);
   private readonly router = inject(Router);
+  protected readonly theme = inject(ThemeService);
 
-  protected readonly sidebarOpen = signal(false);
   protected readonly navigation = signal<readonly NavigationItem[]>([
     {
       path: '/home',
       label: 'Overview',
-      description: 'Executive summary and live platform status.',
+      icon: 'lucideLayoutDashboard',
       badge: '01',
       exact: true
     },
     {
       path: '/accounts',
       label: 'Accounts',
-      description: 'Balances, limits, product states, and servicing.',
+      icon: 'lucideWalletCards',
       badge: '02'
     },
     {
       path: '/customers',
       label: 'Customers',
-      description: 'Client records, relationships, and compliance context.',
+      icon: 'lucideUsers',
       badge: '03'
     },
     {
       path: '/transactions',
       label: 'Transactions',
-      description: 'Payment review, approvals, and investigations.',
+      icon: 'lucideArrowLeftRight',
       badge: '04'
     },
     {
       path: '/settings',
       label: 'Settings',
-      description: 'Policy, preferences, and operational governance.',
+      icon: 'lucideSettings2',
       badge: '05'
     }
   ]);
@@ -84,6 +151,7 @@ export class BankingShellComponent {
   protected readonly activeItem = computed(
     () => this.navigation().find((item) => this.matchesRoute(item.path, item.exact ?? false)) ?? this.navigation()[0]
   );
+  protected readonly userInitials = computed(() => 'AL');
 
   constructor() {
     this.router.events
@@ -93,16 +161,7 @@ export class BankingShellComponent {
       )
       .subscribe((event) => {
         this.activePath.set(event.urlAfterRedirects);
-        this.sidebarOpen.set(false);
       });
-  }
-
-  protected toggleSidebar(): void {
-    this.sidebarOpen.update((isOpen) => !isOpen);
-  }
-
-  protected closeSidebar(): void {
-    this.sidebarOpen.set(false);
   }
 
   protected logout(): void {
@@ -114,5 +173,9 @@ export class BankingShellComponent {
 
   protected matchesRoute(path: string, exact: boolean): boolean {
     return exact ? this.activePath() === path : this.activePath().startsWith(path);
+  }
+
+  protected toggleTheme(isDark: boolean): void {
+    this.theme.setMode(isDark ? 'dark' : 'light');
   }
 }
