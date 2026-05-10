@@ -44,7 +44,7 @@
         </div>
 
         <div hlmSidebarGroupContent>
-          <ul hlmSidebarMenu class="flex flex-col gap-0.5 group-data-[collapsible=icon]:items-center" aria-label="Platform">
+          <ul hlmSidebarMenu class="flex flex-col gap-1 group-data-[collapsible=icon]:items-center" aria-label="Platform">
             @for (item of navigation(); track item.path) {
               <li hlmSidebarMenuItem class="group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
                 <a
@@ -52,10 +52,10 @@
                   [routerLink]="item.path"
                   [isActive]="matchesRoute(item.path, item.exact ?? false)"
                   [tooltip]="item.label"
-                  class="min-h-[2.9rem] rounded-lg border-0 bg-transparent px-3.5 py-2.5 text-sidebar-foreground/95 transition-colors duration-150 hover:bg-[color-mix(in_oklab,var(--sidebar-accent)_34%,var(--sidebar)_66%)] focus-visible:bg-[color-mix(in_oklab,var(--sidebar-accent)_34%,var(--sidebar)_66%)] data-[active=true]:bg-[color-mix(in_oklab,var(--sidebar-accent)_34%,var(--sidebar)_66%)]"
+                  class="rounded-lg border-0 bg-transparent px-3 py-2 text-sidebar-foreground/95 transition-colors duration-150 hover:bg-[color-mix(in_oklab,var(--sidebar-accent)_34%,var(--sidebar)_66%)] focus-visible:bg-[color-mix(in_oklab,var(--sidebar-accent)_34%,var(--sidebar)_66%)] active:bg-[color-mix(in_oklab,var(--sidebar-accent)_46%,var(--sidebar)_54%)] data-[active=true]:bg-[color-mix(in_oklab,var(--sidebar-accent)_34%,var(--sidebar)_66%)] data-[active=true]:hover:bg-[color-mix(in_oklab,var(--sidebar-accent)_34%,var(--sidebar)_66%)] data-[active=true]:active:bg-[color-mix(in_oklab,var(--sidebar-accent)_46%,var(--sidebar)_54%)]"
                 >
                   <ng-icon hlm [name]="item.icon" size="sm"></ng-icon>
-                  <span class="text-base font-semibold leading-tight">{{ item.label }}</span>
+                  <span class="text-base leading-tight">{{ item.label }}</span>
                 </a>
                 <span hlmSidebarMenuBadge class="text-[0.73rem] font-bold tracking-[0.12em] text-sidebar-foreground/55">{{ item.badge }}</span>
               </li>
