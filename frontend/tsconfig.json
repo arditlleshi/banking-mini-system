@@ -25,6 +25,7 @@
       "@spartan/*": ["src/app/shared/ui/spartan/*"],
       "@spartan/sidebar": ["./src/app/shared/ui/spartan/sidebar/src/index.ts"],
       "@spartan/icon": ["./src/app/shared/ui/spartan/icon/src/index.ts"],
+      "@spartan/dialog": ["./src/app/shared/ui/spartan/dialog/src/index.ts"],
       "@spartan/sheet": ["./src/app/shared/ui/spartan/sheet/src/index.ts"],
       "@spartan/skeleton": ["./src/app/shared/ui/spartan/skeleton/src/index.ts"],
       "@spartan/tooltip": ["./src/app/shared/ui/spartan/tooltip/src/index.ts"],
