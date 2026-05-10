@@ -4,7 +4,6 @@ import {
   lucideArrowLeftRight,
   lucideBadgeEuro,
   lucideBuilding2,
-  lucideChevronDown,
   lucideChevronUp,
   lucideChevronRight,
   lucideLayoutDashboard,
@@ -41,6 +40,7 @@ import {
   HlmSidebarHeader,
   HlmSidebarInset,
   HlmSidebarMenu,
+  HlmSidebarMenuBadge,
   HlmSidebarMenuButton,
   HlmSidebarMenuItem,
   HlmSidebarTrigger,
@@ -79,6 +79,7 @@ type NavigationItem = {
     HlmSidebarHeader,
     HlmSidebarInset,
     HlmSidebarMenu,
+    HlmSidebarMenuBadge,
     HlmSidebarMenuButton,
     HlmSidebarMenuItem,
     HlmSidebarTrigger,
@@ -90,7 +91,6 @@ type NavigationItem = {
       lucideArrowLeftRight,
       lucideBadgeEuro,
       lucideBuilding2,
-      lucideChevronDown,
       lucideChevronUp,
       lucideChevronRight,
       lucideLayoutDashboard,
@@ -100,8 +100,9 @@ type NavigationItem = {
       lucideWalletCards
     }),
     provideHlmSidebarConfig({
-      sidebarWidth: '21rem',
+      sidebarWidth: '16rem',
       sidebarWidthMobile: '20rem',
+      sidebarWidthIcon: '3.875rem',
       mobileBreakpoint: '1024px',
       closeMobileSidebarOnMenuButtonClick: true
     })

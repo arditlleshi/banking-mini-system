@@ -1,43 +1,38 @@
 <div hlmSidebarWrapper class="relative min-h-screen">
   <a
     href="#main-content"
-    class="absolute left-4 top-4 z-80 translate-y-[-180%] rounded-full bg-card px-4 py-2.5 text-foreground no-underline shadow-[0_18px_40px_-30px_rgba(15,23,42,0.45)] transition-transform duration-200 focus-visible:translate-y-0"
+    class="absolute left-4 top-4 z-80 translate-y-[-180%] rounded-lg bg-card px-4 py-2.5 text-foreground no-underline shadow-[0_18px_40px_-30px_rgba(15,23,42,0.45)] transition-transform duration-200 focus-visible:translate-y-0"
   >
     Skip to main content
   </a>
 
   <hlm-sidebar
-    variant="floating"
+    variant="sidebar"
     collapsible="icon"
     side="left"
     sidebarContainerClass="max-lg:p-0"
     aria-label="Primary navigation"
   >
-    <div hlmSidebarHeader class="p-1.5 pt-1">
-      <section
-        class="grid grid-cols-[auto_1fr_auto] items-center gap-3.5 rounded-2xl border border-sidebar-border/75 bg-[linear-gradient(180deg,color-mix(in_oklab,var(--sidebar)_96%,white_4%),color-mix(in_oklab,var(--sidebar)_90%,transparent))] px-4 py-3.5 group-data-[collapsible=icon]:grid-cols-1 group-data-[collapsible=icon]:px-1.5 group-data-[collapsible=icon]:py-2.5"
-      >
+    <div hlmSidebarHeader class="px-3 pt-3 pb-2">
+      <section class="flex items-center gap-3 group-data-[collapsible=icon]:justify-center">
         <div
           aria-hidden="true"
-          class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[color-mix(in_oklab,white_92%,var(--sidebar-accent)_8%)] text-sidebar-foreground/95 shadow-[inset_0_1px_0_rgba(255,255,255,0.32)]"
+          class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[color-mix(in_oklab,white_92%,var(--sidebar-accent)_8%)] text-sidebar-foreground/95 shadow-[inset_0_1px_0_rgba(255,255,255,0.32)] group-data-[collapsible=icon]:hidden"
         >
           <ng-icon hlm name="lucideBuilding2" size="sm"></ng-icon>
         </div>
 
         <div class="min-w-0 group-data-[collapsible=icon]:hidden">
-          <p class="text-base font-bold leading-tight text-sidebar-foreground">Acme Private Bank</p>
+          <p class="text-base font-bold leading-tight text-sidebar-foreground">Acme Bank</p>
           <p class="mt-0.5 text-sm leading-tight text-sidebar-foreground/85">Enterprise desk</p>
         </div>
 
         <button
-          hlmBtn
+          hlmSidebarTrigger
           type="button"
-          variant="ghost"
-          size="icon-sm"
-          class="text-sidebar-foreground/75 group-data-[collapsible=icon]:hidden"
-          aria-label="Switch workspace"
+          class="ml-auto rounded-lg bg-sidebar/70 text-sidebar-foreground/75 shadow-none group-data-[collapsible=icon]:ml-0 group-data-[collapsible=icon]:size-8 group-data-[collapsible=icon]:p-0"
+          aria-label="Toggle sidebar"
         >
-          <ng-icon hlm name="lucideChevronDown" size="sm"></ng-icon>
         </button>
       </section>
     </div>
@@ -49,26 +44,20 @@
         </div>
 
         <div hlmSidebarGroupContent>
-          <ul hlmSidebarMenu class="flex flex-col gap-0.5" aria-label="Platform">
+          <ul hlmSidebarMenu class="flex flex-col gap-0.5 group-data-[collapsible=icon]:items-center" aria-label="Platform">
             @for (item of navigation(); track item.path) {
-              <li hlmSidebarMenuItem>
+              <li hlmSidebarMenuItem class="group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
                 <a
                   hlmSidebarMenuButton
                   [routerLink]="item.path"
                   [isActive]="matchesRoute(item.path, item.exact ?? false)"
                   [tooltip]="item.label"
-                  class="min-h-[2.9rem] rounded-xl border-0 bg-transparent px-3.5 py-2.5 text-sidebar-foreground/95 transition-colors duration-150 hover:bg-[color-mix(in_oklab,var(--sidebar-accent)_34%,var(--sidebar)_66%)] focus-visible:bg-[color-mix(in_oklab,var(--sidebar-accent)_34%,var(--sidebar)_66%)] data-[active=true]:bg-[color-mix(in_oklab,var(--sidebar-accent)_34%,var(--sidebar)_66%)]"
+                  class="min-h-[2.9rem] rounded-lg border-0 bg-transparent px-3.5 py-2.5 text-sidebar-foreground/95 transition-colors duration-150 hover:bg-[color-mix(in_oklab,var(--sidebar-accent)_34%,var(--sidebar)_66%)] focus-visible:bg-[color-mix(in_oklab,var(--sidebar-accent)_34%,var(--sidebar)_66%)] data-[active=true]:bg-[color-mix(in_oklab,var(--sidebar-accent)_34%,var(--sidebar)_66%)]"
                 >
-                  <span class="inline-flex items-center gap-3">
-                    <ng-icon hlm [name]="item.icon" size="sm"></ng-icon>
-                    <span class="text-base font-semibold leading-tight">{{ item.label }}</span>
-                  </span>
-
-                  <span class="ml-auto inline-flex items-center gap-2 text-sidebar-foreground/65">
-                    <span class="text-[0.73rem] font-bold tracking-[0.12em] text-sidebar-foreground/55">{{ item.badge }}</span>
-                    <ng-icon hlm name="lucideChevronRight" size="sm"></ng-icon>
-                  </span>
+                  <ng-icon hlm [name]="item.icon" size="sm"></ng-icon>
+                  <span class="text-base font-semibold leading-tight">{{ item.label }}</span>
                 </a>
+                <span hlmSidebarMenuBadge class="text-[0.73rem] font-bold tracking-[0.12em] text-sidebar-foreground/55">{{ item.badge }}</span>
               </li>
             }
           </ul>
@@ -76,19 +65,19 @@
       </section>
     </div>
 
-    <div hlmSidebarFooter class="p-3">
+    <div hlmSidebarFooter class="p-3 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-1 group-data-[collapsible=icon]:py-2">
       <button
         hlmBtn
         type="button"
         variant="ghost"
-        class="w-full min-h-17 justify-start gap-3 rounded-2xl border border-sidebar-border/75 bg-[linear-gradient(180deg,color-mix(in_oklab,var(--sidebar)_96%,white_4%),color-mix(in_oklab,var(--sidebar)_90%,transparent))] px-3.5 py-3 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-1.5"
+        class="w-full min-h-15 justify-start gap-3 rounded-lg bg-[linear-gradient(180deg,color-mix(in_oklab,var(--sidebar)_96%,white_4%),color-mix(in_oklab,var(--sidebar)_90%,transparent))] px-3 py-2.5 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:size-10 group-data-[collapsible=icon]:min-h-10 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:py-0"
         [hlmDropdownMenuTrigger]="profileMenu"
         side="top"
         align="start"
       >
         <span
           aria-hidden="true"
-          class="inline-flex h-9.5 w-9.5 items-center justify-center rounded-full bg-[color-mix(in_oklab,white_92%,var(--sidebar-accent)_8%)] text-[0.84rem] font-bold tracking-[0.08em] text-sidebar-foreground/92"
+          class="inline-flex h-8.5 w-8.5 items-center justify-center rounded-full bg-[color-mix(in_oklab,white_92%,var(--sidebar-accent)_8%)] text-[0.78rem] font-bold tracking-[0.06em] text-sidebar-foreground/92 group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8"
         >
           {{ userInitials() }}
         </span>
@@ -137,13 +126,6 @@
     <header
       class="sticky top-0 z-30 flex items-center gap-4 bg-[linear-gradient(180deg,color-mix(in_oklab,var(--background)_92%,transparent),transparent_86%)] px-4 pt-4 backdrop-blur-[10px] max-lg:px-3.5 max-lg:pt-3.5"
     >
-      <button
-        hlmSidebarTrigger
-        type="button"
-        class="rounded-full border border-border/70 bg-card/90 shadow-[0_18px_36px_-28px_rgba(15,23,42,0.28)]"
-        aria-label="Toggle navigation"
-      ></button>
-
       <div class="flex min-w-0 flex-col gap-1.5">
         <p class="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">Current workspace</p>
         <div>
