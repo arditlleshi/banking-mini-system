@@ -41,6 +41,15 @@ public class AccountEntity {
     @Column(name = "iban", unique = true, length = 34)
     private String iban;
 
+    @Column(name = "base_number", length = 6)
+    private String baseNumber;
+
+    @Column(name = "account_class_code", length = 3)
+    private String accountClassCode;
+
+    @Column(name = "serial_number")
+    private Integer serialNumber;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "account_type", nullable = false, length = 30)
     private AccountType type;
@@ -97,6 +106,9 @@ public class AccountEntity {
     public static AccountEntity open(
         String accountNumber,
         String iban,
+        String baseNumber,
+        String accountClassCode,
+        Integer serialNumber,
         AccountType type,
         AccountCurrency currency,
         String name,
@@ -109,6 +121,9 @@ public class AccountEntity {
         AccountEntity account = new AccountEntity();
         account.accountNumber = normalizeRequiredText(accountNumber, "accountNumber");
         account.iban = normalizeOptionalText(iban);
+        account.baseNumber = normalizeOptionalText(baseNumber);
+        account.accountClassCode = normalizeOptionalText(accountClassCode);
+        account.serialNumber = serialNumber;
         account.type = Objects.requireNonNull(type, "type must not be null");
         account.currency = Objects.requireNonNull(currency, "currency must not be null");
         account.name = normalizeRequiredText(name, "name");
@@ -132,6 +147,18 @@ public class AccountEntity {
 
     public String getIban() {
         return iban;
+    }
+
+    public String getBaseNumber() {
+        return baseNumber;
+    }
+
+    public String getAccountClassCode() {
+        return accountClassCode;
+    }
+
+    public Integer getSerialNumber() {
+        return serialNumber;
     }
 
     public AccountType getType() {

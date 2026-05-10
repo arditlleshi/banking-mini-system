@@ -1,6 +1,7 @@
 package com.ardit.banking.account.service;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.List;
 
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.ardit.banking.account.config.AccountNumberingProperties;
 import com.ardit.banking.account.domain.AccountEntity;
 import com.ardit.banking.account.domain.AccountStatus;
 import com.ardit.banking.account.domain.AccountType;
@@ -24,28 +26,39 @@ import com.ardit.banking.transaction.service.TransactionService;
 public class AccountService {
 
     private static final BigDecimal ZERO_MONEY = new BigDecimal("0.00");
-    private static final int ACCOUNT_NUMBER_LENGTH = 16;
 
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
     private final TransactionService transactionService;
+    private final AccountNumberingProperties accountNumberingProperties;
     private final SecureRandom secureRandom = new SecureRandom();
 
     public AccountService(AccountRepository accountRepository, UserRepository userRepository,
-                          TransactionService transactionService) {
+                          TransactionService transactionService,
+                          AccountNumberingProperties accountNumberingProperties) {
         this.accountRepository = accountRepository;
         this.userRepository = userRepository;
         this.transactionService = transactionService;
+        this.accountNumberingProperties = accountNumberingProperties;
     }
 
     @Transactional
     public AccountResponse createAccountForUsername(String username, CreateAccountRequest request) {
-        UserEntity owner = getOwnerByUsername(username);
+        UserEntity owner = userRepository.findByUsernameAndActiveTrue(username)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authenticated user not found"));
+        String baseNumber = resolveOrAssignBaseNumber(owner);
+        String accountClassCode = request.type().accountClassCode();
+        int serialNumber = nextSerialNumber(owner.getId(), accountClassCode);
+        String accountNumber = generateLocalAccountNumber(baseNumber, accountClassCode, serialNumber);
+        String iban = generateIban(accountNumber);
 
         BigDecimal initialDeposit = request.initialDeposit().setScale(2, java.math.RoundingMode.HALF_EVEN);
         AccountEntity account = AccountEntity.open(
-            generateAccountNumber(),
-            null,
+            accountNumber,
+            iban,
+            baseNumber,
+            accountClassCode,
+            serialNumber,
             request.type(),
             request.currency(),
             request.name(),
@@ -119,17 +132,79 @@ public class AccountService {
         }
     }
 
-    private String generateAccountNumber() {
-        String candidate;
-        do {
-            StringBuilder builder = new StringBuilder(ACCOUNT_NUMBER_LENGTH);
-            for (int index = 0; index < ACCOUNT_NUMBER_LENGTH; index++) {
-                builder.append(secureRandom.nextInt(10));
-            }
-            candidate = builder.toString();
-        } while (accountRepository.existsByAccountNumber(candidate));
+    private String resolveOrAssignBaseNumber(UserEntity owner) {
+        if (owner.getBaseNumber() != null && !owner.getBaseNumber().isBlank()) {
+            return owner.getBaseNumber();
+        }
 
+        String generatedBaseNumber;
+        do {
+            generatedBaseNumber = generateNumericString(accountNumberingProperties.baseNumberLength());
+        } while (userRepository.existsByBaseNumber(generatedBaseNumber));
+
+        owner.assignBaseNumber(generatedBaseNumber);
+        return generatedBaseNumber;
+    }
+
+    private int nextSerialNumber(Long ownerId, String accountClassCode) {
+        Integer currentMax = accountRepository.findMaxSerialNumberByOwnerIdAndAccountClassCode(ownerId, accountClassCode);
+        int nextSerial = currentMax == null ? 1 : currentMax + 1;
+        int maxSerial = (int) Math.pow(10, accountNumberingProperties.serialLength()) - 1;
+        if (nextSerial > maxSerial) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "No available serial number for account class");
+        }
+        return nextSerial;
+    }
+
+    private String generateLocalAccountNumber(String baseNumber, String accountClassCode, int serialNumber) {
+        String serial = String.format("%0" + accountNumberingProperties.serialLength() + "d", serialNumber);
+        String accountNumber = baseNumber + accountClassCode + serial;
+        if (accountNumber.length() != accountNumberingProperties.localAccountNumberLength()) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Invalid account number configuration");
+        }
+        return accountNumber;
+    }
+
+    private String generateIban(String accountNumber) {
+        String countryCode = accountNumberingProperties.countryCode();
+        String bban = accountNumberingProperties.bankCode()
+            + leftPad(accountNumber, accountNumberingProperties.ibanAccountNumberLength());
+        String rearranged = bban + countryCodeToNumeric(countryCode) + "00";
+        int checksum = 98 - mod97(rearranged);
+        return countryCode + String.format("%02d", checksum) + bban;
+    }
+
+    private String generateNumericString(int length) {
+        String candidate;
+        StringBuilder builder = new StringBuilder(length);
+        builder.append(1 + secureRandom.nextInt(9));
+        for (int index = 1; index < length; index++) {
+            builder.append(secureRandom.nextInt(10));
+        }
+        candidate = builder.toString();
         return candidate;
+    }
+
+    private static String leftPad(String value, int targetLength) {
+        return "0".repeat(Math.max(0, targetLength - value.length())) + value;
+    }
+
+    private static String countryCodeToNumeric(String countryCode) {
+        StringBuilder builder = new StringBuilder();
+        for (char character : countryCode.toUpperCase().toCharArray()) {
+            builder.append(character - 'A' + 10);
+        }
+        return builder.toString();
+    }
+
+    private static int mod97(String numericValue) {
+        BigInteger remainder = BigInteger.ZERO;
+        for (char digit : numericValue.toCharArray()) {
+            remainder = remainder.multiply(BigInteger.TEN)
+                .add(BigInteger.valueOf(Character.digit(digit, 10)))
+                .mod(BigInteger.valueOf(97));
+        }
+        return remainder.intValue();
     }
 
     private static BigDecimal defaultAnnualInterestRate(AccountType accountType) {
@@ -145,6 +220,9 @@ public class AccountService {
             account.getId(),
             account.getAccountNumber(),
             account.getIban(),
+            account.getBaseNumber(),
+            account.getAccountClassCode(),
+            account.getSerialNumber(),
             account.getType().name(),
             account.getCurrency().name(),
             account.getName(),

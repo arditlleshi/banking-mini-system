@@ -41,6 +41,9 @@ public class UserEntity {
     @Column(name = "user_role", nullable = false, length = 30)
     private String role;
 
+    @Column(name = "base_number", unique = true, length = 6)
+    private String baseNumber;
+
     @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
     private Set<AccountEntity> accounts = new LinkedHashSet<>();
 
@@ -70,6 +73,17 @@ public class UserEntity {
 
     public String getRole() {
         return role;
+    }
+
+    public String getBaseNumber() {
+        return baseNumber;
+    }
+
+    public void assignBaseNumber(String baseNumber) {
+        if (baseNumber == null || baseNumber.trim().isEmpty()) {
+            throw new IllegalArgumentException("baseNumber must not be blank");
+        }
+        this.baseNumber = baseNumber.trim();
     }
 
     public Set<AccountEntity> getAccounts() {

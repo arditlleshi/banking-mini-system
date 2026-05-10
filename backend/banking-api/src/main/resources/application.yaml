@@ -22,3 +22,13 @@ security:
     expiration-minutes: ${JWT_EXPIRATION_MINUTES:60}
     refresh-expiration-days: ${JWT_REFRESH_EXPIRATION_DAYS:14}
 
+banking:
+  account:
+    numbering:
+      country-code: ${BANKING_ACCOUNT_COUNTRY_CODE:AL}
+      bank-code: ${BANKING_ACCOUNT_BANK_CODE:21211009}
+      local-account-number-length: ${BANKING_ACCOUNT_LOCAL_NUMBER_LENGTH:11}
+      iban-account-number-length: ${BANKING_ACCOUNT_IBAN_NUMBER_LENGTH:16}
+      base-number-length: ${BANKING_ACCOUNT_BASE_NUMBER_LENGTH:6}
+      serial-length: ${BANKING_ACCOUNT_SERIAL_LENGTH:2}
+
