@@ -1,10 +1,18 @@
 package com.ardit.banking.security.user.domain;
 
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import com.ardit.banking.account.domain.AccountEntity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -33,6 +41,9 @@ public class UserEntity {
     @Column(name = "user_role", nullable = false, length = 30)
     private String role;
 
+    @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
+    private Set<AccountEntity> accounts = new LinkedHashSet<>();
+
     public Long getId() {
         return id;
     }
@@ -59,5 +70,9 @@ public class UserEntity {
 
     public String getRole() {
         return role;
+    }
+
+    public Set<AccountEntity> getAccounts() {
+        return Collections.unmodifiableSet(accounts);
     }
 }
