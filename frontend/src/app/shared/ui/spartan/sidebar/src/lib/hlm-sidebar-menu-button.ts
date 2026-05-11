@@ -16,7 +16,7 @@ import { HlmSidebarService } from './hlm-sidebar.service';
 import { injectHlmSidebarConfig } from './hlm-sidebar.token';
 
 const sidebarMenuButtonVariants = cva(
-  'peer/menu-button ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground active:bg-sidebar-accent active:text-sidebar-accent-foreground data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground flex w-full items-center justify-start gap-2 overflow-hidden rounded-md p-2 text-left text-sm transition-[width,height,padding] outline-none group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 hover:cursor-pointer focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 disabled:hover:cursor-default aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:font-medium [&>_ng-icon]:size-4 [&>_ng-icon]:shrink-0 group-data-[collapsible=icon]:[&>span]:hidden [&>span:last-child]:truncate',
+  'peer/menu-button ring-sidebar-ring hover:bg-[color-mix(in_oklab,var(--sidebar-accent)_74%,var(--sidebar)_26%)] hover:text-sidebar-accent-foreground active:bg-[color-mix(in_oklab,var(--sidebar-accent)_82%,var(--sidebar)_18%)] active:text-sidebar-accent-foreground data-[active=true]:bg-[color-mix(in_oklab,var(--sidebar-accent)_78%,var(--sidebar)_22%)] data-[active=true]:text-sidebar-accent-foreground data-[active=true]:shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--sidebar-primary)_16%,transparent)] data-[state=open]:hover:bg-[color-mix(in_oklab,var(--sidebar-accent)_74%,var(--sidebar)_26%)] data-[state=open]:hover:text-sidebar-accent-foreground flex w-full items-center justify-start gap-2 overflow-hidden rounded-lg p-2.5 text-left text-sm transition-[width,height,padding,background-color,color,box-shadow] outline-none group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 group-data-[collapsible=icon]:!size-9 group-data-[collapsible=icon]:!p-2.5 hover:cursor-pointer focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 disabled:hover:cursor-default aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:font-semibold [&>_ng-icon]:size-4 [&>_ng-icon]:shrink-0 group-data-[collapsible=icon]:[&>span]:hidden [&>span:last-child]:truncate',
   {
     variants: {
       variant: {
@@ -25,8 +25,8 @@ const sidebarMenuButtonVariants = cva(
           'bg-background shadow-sidebar-border hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-sidebar-accent',
       },
       size: {
-        default: 'h-8 text-sm',
-        sm: 'h-7 text-xs',
+        default: 'h-10 text-sm',
+        sm: 'h-8 text-xs',
         lg: 'h-12 text-sm group-data-[collapsible=icon]:!p-0',
       },
     },

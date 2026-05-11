@@ -2,29 +2,29 @@
   <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_0%,color-mix(in_oklab,var(--quiet-gold)_18%,transparent),transparent_24rem),radial-gradient(circle_at_90%_8%,color-mix(in_oklab,var(--ring)_16%,transparent),transparent_22rem)] opacity-85"></div>
 
   <div class="relative mx-auto flex max-w-7xl flex-col gap-6">
-    <section class="overflow-hidden rounded-[2rem] border border-border/70 bg-[linear-gradient(160deg,color-mix(in_oklab,var(--card)_96%,white_4%),color-mix(in_oklab,var(--card)_88%,transparent))] px-6 py-8 shadow-xl shadow-black/6 sm:px-8 lg:px-10">
+    <section class="overflow-hidden rounded-lg border border-border/70 bg-[linear-gradient(160deg,color-mix(in_oklab,var(--card)_96%,white_4%),color-mix(in_oklab,var(--card)_88%,transparent))] px-6 py-8 shadow-xl shadow-black/6 sm:px-8 lg:px-10">
       <div class="grid gap-8 lg:grid-cols-[1.25fr_0.75fr] lg:items-end">
         <div class="space-y-4">
-          <p class="quiet-kicker">Portfolio command</p>
+          <p class="quiet-kicker">Account operations</p>
           <h1 class="font-display text-4xl tracking-tight text-foreground sm:text-5xl">
-            Relationship-led account views with structure you can actually operate.
+            Structured account views built for day-to-day banking operations.
           </h1>
           <p class="max-w-2xl text-base leading-7 text-muted-foreground">
-            Open current, savings, and savings-plan accounts from the same client workspace, with structured numbering, class codes, and IBAN-ready details already aligned to the backend model.
+            Open and review current, savings, and savings-plan accounts from one workspace, with numbering, class codes, and IBAN details aligned to the backend model.
           </p>
         </div>
 
-        <div class="flex flex-col gap-3 rounded-[1.75rem] border border-border/70 bg-[linear-gradient(160deg,color-mix(in_oklab,var(--card)_96%,white_4%),color-mix(in_oklab,var(--card)_88%,transparent))] p-5">
+        <div class="flex flex-col gap-3 rounded-lg border border-border/70 bg-[linear-gradient(160deg,color-mix(in_oklab,var(--card)_96%,white_4%),color-mix(in_oklab,var(--card)_88%,transparent))] p-5">
           <p class="quiet-stat-label">Workflow entry</p>
           <p class="text-sm leading-6 text-muted-foreground">
-            Use the account desk to open a new account with product type, currency, initial funding, and generated numbering already handled server-side.
+            Open a new account with product type, currency, initial funding, and generated numbering handled by the backend.
           </p>
 
           <button
             hlmBtn
             type="button"
             size="lg"
-            class="mt-2 w-full rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/15 transition hover:-translate-y-0.5"
+            class="mt-2 w-full rounded-lg bg-primary text-primary-foreground shadow-lg shadow-primary/15 transition hover:-translate-y-0.5"
             (click)="openCreateSheet()"
           >
             Create Account
@@ -39,7 +39,7 @@
           <p class="quiet-stat-label">Accounts</p>
           <h2 hlmCardTitle class="font-display text-4xl text-card-foreground">{{ accounts().length }}</h2>
           <p hlmCardDescription class="text-sm leading-6 text-muted-foreground">
-            {{ activeAccountCount() }} active relationships currently visible in this workspace.
+            {{ activeAccountCount() }} active accounts currently visible in this workspace.
           </p>
         </div>
       </section>
@@ -49,7 +49,7 @@
           <p class="quiet-stat-label">Booked balance</p>
           <h2 hlmCardTitle class="font-display text-4xl text-card-foreground">{{ totalCurrentBalance() | number: '1.2-2' }}</h2>
           <p hlmCardDescription class="text-sm leading-6 text-muted-foreground">
-            Total booked balance across the visible account set, before currency segmentation.
+            Total booked balance across the visible account set before currency segmentation.
           </p>
         </div>
       </section>
@@ -59,7 +59,7 @@
           <p class="quiet-stat-label">Available balance</p>
           <h2 hlmCardTitle class="font-display text-4xl text-card-foreground">{{ totalAvailableBalance() | number: '1.2-2' }}</h2>
           <p hlmCardDescription class="text-sm leading-6 text-muted-foreground">
-            Liquidity view based on available balances returned by the backend.
+            Available liquidity view based on balances returned by the backend.
           </p>
         </div>
       </section>
@@ -70,7 +70,7 @@
         <p class="quiet-kicker">Account desk</p>
         <h2 hlmCardTitle class="font-display text-4xl text-card-foreground">Managed account inventory</h2>
         <p hlmCardDescription class="max-w-3xl text-sm leading-6 text-muted-foreground">
-          Each row reflects the structured numbering model from the backend, including base number, class code, serial, and the generated IBAN for external payment use.
+          Each row shows the structured numbering model from the backend, including base number, class code, serial number, and the generated IBAN.
         </p>
       </div>
 
@@ -78,33 +78,33 @@
         @if (loading()) {
           <div class="grid gap-4 lg:grid-cols-2">
             @for (item of [1, 2, 3, 4]; track item) {
-              <article class="min-h-[18rem] animate-pulse rounded-[1.75rem] border border-border/70 bg-[linear-gradient(120deg,color-mix(in_oklab,var(--card)_82%,transparent),color-mix(in_oklab,var(--card)_96%,white_4%),color-mix(in_oklab,var(--card)_82%,transparent))] p-6"></article>
+              <article class="min-h-[18rem] animate-pulse rounded-lg border border-border/70 bg-[linear-gradient(120deg,color-mix(in_oklab,var(--card)_82%,transparent),color-mix(in_oklab,var(--card)_96%,white_4%),color-mix(in_oklab,var(--card)_82%,transparent))] p-6"></article>
             }
           </div>
         } @else if (errorMessage()) {
-          <p class="rounded-2xl border border-red-500/20 bg-red-500/8 px-4 py-3 text-sm font-medium text-red-700 dark:text-red-300">
+          <p class="rounded-lg border border-red-500/20 bg-red-500/8 px-4 py-3 text-sm font-medium text-red-700 dark:text-red-300">
             {{ errorMessage() }}
           </p>
         } @else if (!accounts().length) {
-          <article class="empty-accounts-state rounded-[1.75rem] border border-dashed border-border/80 bg-background/68 p-8 text-center">
+          <article class="empty-accounts-state rounded-lg border border-dashed border-border/80 bg-background/68 p-8 text-center">
             <p class="quiet-kicker">No accounts yet</p>
             <h3 class="mt-3 font-display text-4xl text-foreground">Open the first account from this workspace</h3>
             <p class="mx-auto mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
               Once created, the account will appear here with its generated base number, class code, local account number, and IBAN.
             </p>
-            <button hlmBtn type="button" class="mt-6 rounded-full" (click)="openCreateSheet()">Create Account</button>
+            <button hlmBtn type="button" class="mt-6 rounded-lg" (click)="openCreateSheet()">Create Account</button>
           </article>
         } @else {
           <div class="grid gap-4 xl:grid-cols-2">
             @for (account of accounts(); track trackByAccountId($index, account)) {
-              <article class="rounded-[1.75rem] border border-border/70 bg-[linear-gradient(160deg,color-mix(in_oklab,var(--card)_96%,white_4%),color-mix(in_oklab,var(--card)_88%,transparent))] p-6">
+              <article class="rounded-lg border border-border/70 bg-[linear-gradient(160deg,color-mix(in_oklab,var(--card)_96%,white_4%),color-mix(in_oklab,var(--card)_88%,transparent))] p-6">
                 <div class="flex flex-col gap-5">
                   <div class="flex flex-wrap items-start justify-between gap-4">
                     <div class="space-y-2">
-                      <p class="quiet-stat-label">Base {{ account.baseNumber ?? 'Pending' }} · Class {{ account.accountClassCode ?? '---' }} · Serial {{ formatSerialNumber(account.serialNumber) }}</p>
+                      <p class="quiet-stat-label">Base {{ account.baseNumber ?? 'Pending' }} - Class {{ account.accountClassCode ?? '---' }} - Serial {{ formatSerialNumber(account.serialNumber) }}</p>
                       <h3 class="font-display text-4xl leading-none text-foreground">{{ account.name }}</h3>
                       <p class="text-sm leading-6 text-muted-foreground">
-                        {{ account.type.replaceAll('_', ' ') }} · {{ account.currency }} · {{ accountTypeMeta(account.type) }}
+                        {{ account.type.replaceAll('_', ' ') }} - {{ account.currency }} - {{ accountTypeMeta(account.type) }}
                       </p>
                     </div>
                     <span class="rounded-full border border-[color-mix(in_oklab,var(--border)_76%,transparent)] bg-[color-mix(in_oklab,var(--accent)_65%,white_35%)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-[color-mix(in_oklab,var(--primary)_78%,black_22%)]">
@@ -113,26 +113,26 @@
                   </div>
 
                   <div class="grid gap-4 sm:grid-cols-2">
-                    <div class="rounded-[1.35rem] border border-border/70 bg-[linear-gradient(160deg,color-mix(in_oklab,var(--card)_96%,white_4%),color-mix(in_oklab,var(--card)_88%,transparent))] p-4 shadow-[0_22px_48px_-40px_rgba(15,23,42,0.34)]">
+                    <div class="rounded-lg border border-border/70 bg-[linear-gradient(160deg,color-mix(in_oklab,var(--card)_96%,white_4%),color-mix(in_oklab,var(--card)_88%,transparent))] p-4 shadow-[0_22px_48px_-40px_rgba(15,23,42,0.34)]">
                       <p class="quiet-stat-label">Account number</p>
                       <p class="mt-3 font-mono text-lg text-foreground">{{ account.accountNumber }}</p>
                     </div>
-                    <div class="rounded-[1.35rem] border border-border/70 bg-[linear-gradient(160deg,color-mix(in_oklab,var(--card)_96%,white_4%),color-mix(in_oklab,var(--card)_88%,transparent))] p-4 shadow-[0_22px_48px_-40px_rgba(15,23,42,0.34)]">
+                    <div class="rounded-lg border border-border/70 bg-[linear-gradient(160deg,color-mix(in_oklab,var(--card)_96%,white_4%),color-mix(in_oklab,var(--card)_88%,transparent))] p-4 shadow-[0_22px_48px_-40px_rgba(15,23,42,0.34)]">
                       <p class="quiet-stat-label">IBAN</p>
                       <p class="mt-3 font-mono text-lg text-foreground">{{ account.iban ?? 'Pending' }}</p>
                     </div>
                   </div>
 
                   <div class="grid gap-4 sm:grid-cols-3">
-                    <div class="rounded-[1.35rem] border border-border/70 bg-[linear-gradient(160deg,color-mix(in_oklab,var(--card)_96%,white_4%),color-mix(in_oklab,var(--card)_88%,transparent))] p-4 shadow-[0_22px_48px_-40px_rgba(15,23,42,0.34)]">
+                    <div class="rounded-lg border border-border/70 bg-[linear-gradient(160deg,color-mix(in_oklab,var(--card)_96%,white_4%),color-mix(in_oklab,var(--card)_88%,transparent))] p-4 shadow-[0_22px_48px_-40px_rgba(15,23,42,0.34)]">
                       <p class="quiet-stat-label">Booked</p>
                       <p class="mt-3 font-display text-3xl text-card-foreground">{{ account.currentBalance | number: '1.2-2' }}</p>
                     </div>
-                    <div class="rounded-[1.35rem] border border-border/70 bg-[linear-gradient(160deg,color-mix(in_oklab,var(--card)_96%,white_4%),color-mix(in_oklab,var(--card)_88%,transparent))] p-4 shadow-[0_22px_48px_-40px_rgba(15,23,42,0.34)]">
+                    <div class="rounded-lg border border-border/70 bg-[linear-gradient(160deg,color-mix(in_oklab,var(--card)_96%,white_4%),color-mix(in_oklab,var(--card)_88%,transparent))] p-4 shadow-[0_22px_48px_-40px_rgba(15,23,42,0.34)]">
                       <p class="quiet-stat-label">Available</p>
                       <p class="mt-3 font-display text-3xl text-card-foreground">{{ account.availableBalance | number: '1.2-2' }}</p>
                     </div>
-                    <div class="rounded-[1.35rem] border border-border/70 bg-[linear-gradient(160deg,color-mix(in_oklab,var(--card)_96%,white_4%),color-mix(in_oklab,var(--card)_88%,transparent))] p-4 shadow-[0_22px_48px_-40px_rgba(15,23,42,0.34)]">
+                    <div class="rounded-lg border border-border/70 bg-[linear-gradient(160deg,color-mix(in_oklab,var(--card)_96%,white_4%),color-mix(in_oklab,var(--card)_88%,transparent))] p-4 shadow-[0_22px_48px_-40px_rgba(15,23,42,0.34)]">
                       <p class="quiet-stat-label">Opened</p>
                       <p class="mt-3 text-sm font-medium text-foreground">{{ account.openedAt | date: 'dd MMM yyyy' }}</p>
                     </div>

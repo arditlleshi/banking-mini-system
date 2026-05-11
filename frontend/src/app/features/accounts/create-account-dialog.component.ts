@@ -43,7 +43,7 @@ type AccountFormOption<T extends string> = {
     <hlm-dialog [state]="open() ? 'open' : 'closed'" (stateChanged)="handleStateChanged($event)">
       <hlm-dialog-content
         *hlmDialogPortal="let ctx"
-        class="flex max-h-[min(88vh,42rem)] w-[calc(100vw-2rem)] max-w-2xl flex-col overflow-hidden rounded-[2rem] border-border/70 bg-card/96 p-0 backdrop-blur-xl"
+        class="flex max-h-[min(88vh,42rem)] w-[calc(100vw-2rem)] max-w-2xl flex-col overflow-hidden rounded-lg border-border/70 bg-card/96 p-0 backdrop-blur-xl"
       >
         <div class="flex min-h-0 flex-col">
           <div hlmDialogHeader class="gap-3 border-b border-border/70 px-6 py-6 sm:px-8">
@@ -62,8 +62,8 @@ type AccountFormOption<T extends string> = {
                   hlmInput
                   type="text"
                   formControlName="name"
-                  class="rounded-2xl border border-border/80 bg-background/70 px-4 py-3 text-base text-foreground shadow-sm transition focus-visible:ring-4 focus-visible:ring-ring/20"
-                  placeholder="e.g. Daily operating account"
+                  class="rounded-lg border border-border/80 bg-background/70 px-4 py-3 text-base text-foreground shadow-sm transition focus-visible:ring-4 focus-visible:ring-ring/20"
+                  placeholder="e.g. Daily operating account…"
                 />
               </div>
 
@@ -73,10 +73,10 @@ type AccountFormOption<T extends string> = {
                   <select
                     id="account-type"
                     formControlName="type"
-                    class="w-full rounded-2xl border border-border/80 bg-background/70 bg-[linear-gradient(45deg,transparent_50%,color-mix(in_oklab,var(--muted-foreground)_82%,transparent)_50%),linear-gradient(135deg,color-mix(in_oklab,var(--muted-foreground)_82%,transparent)_50%,transparent_50%)] bg-[position:calc(100%-1.35rem)_calc(50%-0.15rem),calc(100%-0.95rem)_calc(50%-0.15rem)] bg-[size:0.45rem_0.45rem,0.45rem_0.45rem] bg-no-repeat px-4 py-3 text-base text-foreground shadow-sm outline-none transition focus-visible:ring-4 focus-visible:ring-ring/20"
+                    class="w-full rounded-lg border border-border/80 bg-background/70 bg-[linear-gradient(45deg,transparent_50%,color-mix(in_oklab,var(--muted-foreground)_82%,transparent)_50%),linear-gradient(135deg,color-mix(in_oklab,var(--muted-foreground)_82%,transparent)_50%,transparent_50%)] bg-[position:calc(100%-1.35rem)_calc(50%-0.15rem),calc(100%-0.95rem)_calc(50%-0.15rem)] bg-[size:0.45rem_0.45rem,0.45rem_0.45rem] bg-no-repeat px-4 py-3 text-base text-foreground shadow-sm outline-none transition focus-visible:ring-4 focus-visible:ring-ring/20"
                   >
                     @for (option of typeOptions(); track option.value) {
-                      <option [value]="option.value">{{ option.label }} · {{ option.meta }}</option>
+                      <option [value]="option.value">{{ option.label }} - {{ option.meta }}</option>
                     }
                   </select>
                 </div>
@@ -86,10 +86,10 @@ type AccountFormOption<T extends string> = {
                   <select
                     id="account-currency"
                     formControlName="currency"
-                    class="w-full rounded-2xl border border-border/80 bg-background/70 bg-[linear-gradient(45deg,transparent_50%,color-mix(in_oklab,var(--muted-foreground)_82%,transparent)_50%),linear-gradient(135deg,color-mix(in_oklab,var(--muted-foreground)_82%,transparent)_50%,transparent_50%)] bg-[position:calc(100%-1.35rem)_calc(50%-0.15rem),calc(100%-0.95rem)_calc(50%-0.15rem)] bg-[size:0.45rem_0.45rem,0.45rem_0.45rem] bg-no-repeat px-4 py-3 text-base text-foreground shadow-sm outline-none transition focus-visible:ring-4 focus-visible:ring-ring/20"
+                    class="w-full rounded-lg border border-border/80 bg-background/70 bg-[linear-gradient(45deg,transparent_50%,color-mix(in_oklab,var(--muted-foreground)_82%,transparent)_50%),linear-gradient(135deg,color-mix(in_oklab,var(--muted-foreground)_82%,transparent)_50%,transparent_50%)] bg-[position:calc(100%-1.35rem)_calc(50%-0.15rem),calc(100%-0.95rem)_calc(50%-0.15rem)] bg-[size:0.45rem_0.45rem,0.45rem_0.45rem] bg-no-repeat px-4 py-3 text-base text-foreground shadow-sm outline-none transition focus-visible:ring-4 focus-visible:ring-ring/20"
                   >
                     @for (option of currencyOptions(); track option.value) {
-                      <option [value]="option.value">{{ option.label }} · {{ option.meta }}</option>
+                      <option [value]="option.value">{{ option.label }} - {{ option.meta }}</option>
                     }
                   </select>
                 </div>
@@ -104,14 +104,14 @@ type AccountFormOption<T extends string> = {
                   min="0"
                   step="0.01"
                   formControlName="initialDeposit"
-                  class="rounded-2xl border border-border/80 bg-background/70 px-4 py-3 text-base text-foreground shadow-sm transition focus-visible:ring-4 focus-visible:ring-ring/20"
+                  class="rounded-lg border border-border/80 bg-background/70 px-4 py-3 text-base text-foreground shadow-sm transition focus-visible:ring-4 focus-visible:ring-ring/20"
                 />
               </div>
             </div>
 
             <div class="border-t border-border/70 px-6 py-5 sm:px-8">
               @if (submitErrorMessage()) {
-                <p class="mb-4 rounded-2xl border border-red-500/20 bg-red-500/8 px-4 py-3 text-sm font-medium text-red-700 dark:text-red-300">
+                <p class="mb-4 rounded-lg border border-red-500/20 bg-red-500/8 px-4 py-3 text-sm font-medium text-red-700 dark:text-red-300">
                   {{ submitErrorMessage() }}
                 </p>
               }
@@ -121,7 +121,7 @@ type AccountFormOption<T extends string> = {
                   hlmBtn
                   type="button"
                   variant="outline"
-                  class="rounded-full"
+                  class="rounded-lg"
                   hlmDialogClose
                 >
                   Cancel
@@ -129,10 +129,10 @@ type AccountFormOption<T extends string> = {
                 <button
                   hlmBtn
                   type="submit"
-                  class="rounded-full"
+                  class="rounded-lg"
                   [disabled]="submitting()"
                 >
-                  {{ submitting() ? 'Creating...' : 'Create account' }}
+                  {{ submitting() ? 'Creating…' : 'Create account' }}
                 </button>
               </div>
             </div>

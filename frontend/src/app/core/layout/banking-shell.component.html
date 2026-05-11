@@ -17,7 +17,7 @@
       <section class="flex items-center gap-3 group-data-[collapsible=icon]:justify-center">
         <div
           aria-hidden="true"
-          class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[color-mix(in_oklab,white_92%,var(--sidebar-accent)_8%)] text-sidebar-foreground/95 shadow-[inset_0_1px_0_rgba(255,255,255,0.32)] group-data-[collapsible=icon]:hidden"
+          class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[color-mix(in_oklab,var(--sidebar-accent)_66%,var(--sidebar)_34%)] text-sidebar-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] group-data-[collapsible=icon]:hidden"
         >
           <ng-icon hlm name="lucideBuilding2" size="sm"></ng-icon>
         </div>
@@ -30,7 +30,7 @@
         <button
           hlmSidebarTrigger
           type="button"
-          class="ml-auto rounded-lg bg-sidebar/70 text-sidebar-foreground/75 shadow-none group-data-[collapsible=icon]:ml-0 group-data-[collapsible=icon]:size-8 group-data-[collapsible=icon]:p-0"
+          class="ml-auto rounded-lg border border-sidebar-border/70 bg-sidebar/78 text-sidebar-foreground/80 shadow-none group-data-[collapsible=icon]:ml-0 group-data-[collapsible=icon]:size-9 group-data-[collapsible=icon]:p-0"
           aria-label="Toggle sidebar"
         >
         </button>
@@ -52,7 +52,7 @@
                   [routerLink]="item.path"
                   [isActive]="matchesRoute(item.path, item.exact ?? false)"
                   [tooltip]="item.label"
-                  class="rounded-lg border-0 bg-transparent px-3 py-2 text-sidebar-foreground/95 transition-colors duration-150 hover:bg-[color-mix(in_oklab,var(--sidebar-accent)_34%,var(--sidebar)_66%)] focus-visible:bg-[color-mix(in_oklab,var(--sidebar-accent)_34%,var(--sidebar)_66%)] active:bg-[color-mix(in_oklab,var(--sidebar-accent)_46%,var(--sidebar)_54%)] data-[active=true]:bg-[color-mix(in_oklab,var(--sidebar-accent)_34%,var(--sidebar)_66%)] data-[active=true]:hover:bg-[color-mix(in_oklab,var(--sidebar-accent)_34%,var(--sidebar)_66%)] data-[active=true]:active:bg-[color-mix(in_oklab,var(--sidebar-accent)_46%,var(--sidebar)_54%)]"
+                  class="border-0 bg-transparent px-3 py-2.5 text-sidebar-foreground/96"
                 >
                   <ng-icon hlm [name]="item.icon" size="sm"></ng-icon>
                   <span class="text-base leading-tight">{{ item.label }}</span>
@@ -70,14 +70,14 @@
         hlmBtn
         type="button"
         variant="ghost"
-        class="w-full min-h-15 justify-start gap-3 rounded-lg bg-[linear-gradient(180deg,color-mix(in_oklab,var(--sidebar)_96%,white_4%),color-mix(in_oklab,var(--sidebar)_90%,transparent))] px-3 py-2.5 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:size-10 group-data-[collapsible=icon]:min-h-10 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:py-0"
+        class="w-full min-h-15 justify-start gap-3 rounded-lg border border-sidebar-border/65 bg-[linear-gradient(180deg,color-mix(in_oklab,var(--sidebar)_96%,white_4%),color-mix(in_oklab,var(--sidebar)_90%,transparent))] px-3 py-2.5 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:size-10 group-data-[collapsible=icon]:min-h-10 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:py-0"
         [hlmDropdownMenuTrigger]="profileMenu"
         side="top"
         align="start"
       >
         <span
           aria-hidden="true"
-          class="inline-flex h-8.5 w-8.5 items-center justify-center rounded-full bg-[color-mix(in_oklab,white_92%,var(--sidebar-accent)_8%)] text-[0.78rem] font-bold tracking-[0.06em] text-sidebar-foreground/92 group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8"
+          class="inline-flex h-8.5 w-8.5 items-center justify-center rounded-full bg-[color-mix(in_oklab,var(--sidebar-accent)_70%,var(--sidebar)_30%)] text-[0.78rem] font-bold tracking-[0.06em] text-sidebar-foreground/92 group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8"
         >
           {{ userInitials() }}
         </span>
@@ -129,9 +129,9 @@
       <div class="flex min-w-0 flex-col gap-1.5">
         <p class="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">Current workspace</p>
         <div>
-          <h1 class="font-display text-[clamp(1.8rem,2vw,2.5rem)] leading-[0.96]">{{ activeItem().label }}</h1>
+          <h1 class="font-display text-[clamp(1.8rem,2vw,2.5rem)] leading-[1.02]">{{ activeItem().label }}</h1>
           <p class="text-[0.96rem] leading-relaxed text-muted-foreground">
-            Operational surface for approvals, servicing, and client context.
+            Operational workspace for account servicing, approvals, and customer activity.
           </p>
         </div>
       </div>

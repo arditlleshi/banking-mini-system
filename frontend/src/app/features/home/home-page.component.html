@@ -1,21 +1,21 @@
 <main class="quiet-dashboard min-h-screen px-4 py-8 sm:px-6 lg:px-10">
   <div class="mx-auto flex max-w-6xl flex-col gap-8">
-    <header class="quiet-hero rounded-[2rem] border border-border/70 bg-card/82 px-6 py-8 shadow-xl shadow-black/6 backdrop-blur-lg sm:px-8 lg:px-10">
+    <header class="quiet-hero rounded-lg border border-border/70 bg-card/88 px-6 py-8 shadow-xl shadow-black/6 backdrop-blur-lg sm:px-8 lg:px-10">
       <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div class="max-w-3xl space-y-4">
-          <p class="quiet-kicker">Executive overview</p>
+          <p class="quiet-kicker">Operations overview</p>
           <h1 class="font-display text-4xl tracking-tight text-foreground sm:text-5xl">
-            Private banking operations, presented with restraint.
+            Core banking activity in one controlled operating view.
           </h1>
           <p class="max-w-2xl text-base leading-7 text-muted-foreground">
-            The overview is now anchored by a dedicated banking shell, with live session status, backend reachability, and a clean path into core operating modules.
+            Monitor connectivity, session status, and the main operating areas from a cleaner banking workspace built for day-to-day use.
           </p>
         </div>
 
-        <div class="rounded-[1.5rem] border border-border/70 bg-background/65 px-5 py-4 backdrop-blur-sm">
+        <div class="rounded-lg border border-border/70 bg-background/70 px-5 py-4 backdrop-blur-sm">
           <p class="quiet-stat-label">Workspace</p>
           <p class="mt-2 max-w-xs text-sm leading-6 text-muted-foreground">
-            Navigate through accounts, customers, transactions, and settings from the new left rail.
+            Move between accounts, customers, transactions, and settings from the shared navigation rail.
           </p>
         </div>
       </div>
@@ -27,7 +27,7 @@
           <p class="quiet-stat-label">Connection</p>
           <h2 hlmCardTitle class="font-display text-3xl text-card-foreground">{{ status() }}</h2>
           <p hlmCardDescription class="text-sm leading-6 text-muted-foreground">
-            Public backend endpoint reached from the Angular client.
+            Frontend connectivity to the backend service from the Angular workspace.
           </p>
         </div>
       </section>
@@ -37,7 +37,7 @@
           <p class="quiet-stat-label">Session state</p>
           <h2 hlmCardTitle class="font-display text-3xl text-card-foreground">{{ sessionState() }}</h2>
           <p hlmCardDescription class="text-sm leading-6 text-muted-foreground">
-            Access token is present and route protection is active.
+            Authentication state and route protection for the current user session.
           </p>
         </div>
       </section>
@@ -47,7 +47,7 @@
           <p class="quiet-stat-label">Visible modules</p>
           <h2 hlmCardTitle class="font-display text-3xl text-card-foreground">{{ itemCount() }}</h2>
           <p hlmCardDescription class="text-sm leading-6 text-muted-foreground">
-            Placeholder banking surfaces currently supplied by the backend test endpoint.
+            Available modules currently returned by the backend test endpoint.
           </p>
         </div>
       </section>
@@ -56,23 +56,23 @@
     <section class="grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
       <section hlmCard class="quiet-panel border-border/70 bg-card/90">
         <div hlmCardHeader class="gap-3 p-6 sm:p-8">
-          <p class="quiet-kicker">Previewed modules</p>
-          <h2 hlmCardTitle class="font-display text-3xl text-card-foreground">Banking surfaces from the backend</h2>
+          <p class="quiet-kicker">Module preview</p>
+          <h2 hlmCardTitle class="font-display text-3xl text-card-foreground">Connected banking modules</h2>
           <p hlmCardDescription class="max-w-2xl text-sm leading-6 text-muted-foreground">
-            These entries are still sample data, but the layout is ready to evolve into accounts, client records, and transaction timelines.
+            These entries are still sample data, but the layout is ready to expand into production account, customer, and transaction workflows.
           </p>
         </div>
 
         <div hlmCardContent class="px-6 pb-6 sm:px-8 sm:pb-8">
           <div class="grid gap-4">
             @for (item of items(); track item.id) {
-              <article class="quiet-list-row rounded-[1.5rem] border border-border/70 bg-background/70 p-5 transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/5">
+              <article class="quiet-list-row rounded-lg border border-border/70 bg-background/74 p-5 transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/5">
                 <div class="flex items-start justify-between gap-4">
                   <div class="space-y-2">
                     <p class="quiet-stat-label">Module {{ item.id }}</p>
                     <h3 class="font-display text-2xl text-foreground">{{ item.name }}</h3>
                     <p class="text-sm leading-6 text-muted-foreground">
-                      Reserved for a premium client experience with clear balance views, controlled actions, and understated visual cues.
+                      Reserved for operational workflows with clear balances, controlled actions, and easier state visibility.
                     </p>
                   </div>
                   <span class="rounded-full border border-border/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
@@ -88,26 +88,26 @@
       <section hlmCard class="quiet-panel border-border/70 bg-card/90">
         <div hlmCardHeader class="gap-3 p-6">
           <p class="quiet-kicker">Design notes</p>
-          <h2 hlmCardTitle class="font-display text-3xl text-card-foreground">Quiet Wealth theme</h2>
+          <h2 hlmCardTitle class="font-display text-3xl text-card-foreground">Banking theme system</h2>
           <p hlmCardDescription class="text-sm leading-6 text-muted-foreground">
-            The interface now leans on restrained contrast, serif display moments, and soft glass surfaces instead of generic blue admin styling.
+            The interface now favors cleaner contrast, disciplined corners, and reusable banking surfaces over decorative styling.
           </p>
         </div>
 
         <div hlmCardContent class="flex flex-col gap-4 px-6 pb-6">
-          <div class="rounded-[1.5rem] border border-border/70 bg-background/70 p-4">
+          <div class="rounded-lg border border-border/70 bg-background/72 p-4">
             <p class="quiet-stat-label">Typography</p>
-            <p class="mt-2 text-sm leading-6 text-muted-foreground">Manrope for body copy, Cormorant Garamond for key headings.</p>
+            <p class="mt-2 text-sm leading-6 text-muted-foreground">A single corporate sans-serif keeps the interface clear and consistent.</p>
           </div>
           <hlm-separator decorative></hlm-separator>
-          <div class="rounded-[1.5rem] border border-border/70 bg-background/70 p-4">
+          <div class="rounded-lg border border-border/70 bg-background/72 p-4">
             <p class="quiet-stat-label">Palette</p>
-            <p class="mt-2 text-sm leading-6 text-muted-foreground">Soft stone backgrounds, deep evergreen actions, and muted gold highlights.</p>
+            <p class="mt-2 text-sm leading-6 text-muted-foreground">Slate and graphite surfaces are paired with a restrained teal action color.</p>
           </div>
           <hlm-separator decorative></hlm-separator>
-          <div class="rounded-[1.5rem] border border-border/70 bg-background/70 p-4">
+          <div class="rounded-lg border border-border/70 bg-background/72 p-4">
             <p class="quiet-stat-label">Mode support</p>
-            <p class="mt-2 text-sm leading-6 text-muted-foreground">Light and dark themes share the same tone, with dark mode staying warm rather than neon.</p>
+            <p class="mt-2 text-sm leading-6 text-muted-foreground">Light and dark mode now keep the same tone, with softer dark surfaces and clearer states.</p>
           </div>
         </div>
       </section>

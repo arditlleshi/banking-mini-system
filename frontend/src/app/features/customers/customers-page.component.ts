@@ -12,9 +12,9 @@ import { WorkspaceSectionShellComponent } from '../workspace/workspace-section-s
 export class CustomersPageComponent {
   protected readonly content: WorkspacePageContent = {
     section: 'Customers',
-    eyebrow: 'Client intelligence',
-    headline: 'Unified customer records for onboarding, due diligence, and relationship servicing.',
-    summary: 'Use this area for client profiles, household structures, risk documentation, and service history.',
+    eyebrow: 'Customer records',
+    headline: 'Unified customer profiles for onboarding, due diligence, and ongoing servicing.',
+    summary: 'Use this area for customer details, household structures, risk documentation, and service history.',
     highlights: ['Identity verification', 'Relationship hierarchy', 'Compliance notes']
   };
 }

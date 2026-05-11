@@ -17,7 +17,7 @@ export class HomePageComponent implements OnInit {
   private readonly authState = inject(AuthStateService);
 
   protected readonly items = signal<Array<{ id: number; name: string }>>([]);
-  protected readonly status = signal('Checking backend connection...');
+  protected readonly status = signal('Checking backend connection…');
   protected readonly itemCount = computed(() => this.items().length);
   protected readonly sessionState = computed(() => this.authState.isAuthenticated() ? 'Active' : 'Expired');
   protected readonly accessMode = computed(() => this.authState.isAuthenticated() ? 'Protected' : 'Guest');

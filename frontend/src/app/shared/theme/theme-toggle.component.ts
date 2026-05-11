@@ -8,7 +8,7 @@ import { HlmSwitch } from '../ui/spartan/switch';
   selector: 'app-theme-toggle',
   imports: [HlmLabel, HlmSwitch],
   template: `
-    <div class="quiet-theme-toggle rounded-full border border-border/70 bg-card/80 px-3 py-2 shadow-lg shadow-black/5 backdrop-blur-md">
+    <div class="quiet-theme-toggle rounded-lg border border-border/70 bg-card/88 px-3 py-2 shadow-lg shadow-black/5 backdrop-blur-md">
       <label hlmLabel for="theme-mode" class="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
         <span>Night mode</span>
         <hlm-switch

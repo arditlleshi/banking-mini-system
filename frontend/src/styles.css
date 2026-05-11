@@ -1,12 +1,10 @@
 @import '@fontsource-variable/manrope';
-@import '@fontsource/cormorant-garamond/600.css';
-@import '@fontsource/cormorant-garamond/700.css';
 @import 'tailwindcss';
 @import '@spartan-ng/brain/hlm-tailwind-preset.css';
 
 @theme inline {
   --font-sans: var(--font-manrope);
-  --font-display: var(--font-cormorant);
+  --font-display: var(--font-manrope);
 }
 
 :root {
@@ -17,77 +15,81 @@
     'Manrope',
     'Segoe UI',
     sans-serif;
-  --font-cormorant:
-    'Cormorant Garamond',
-    Georgia,
-    serif;
 
   --radius: 0.5rem;
-  --background: oklch(0.972 0.004 255);
-  --foreground: oklch(0.26 0.01 255);
-  --card: oklch(0.992 0.002 255);
-  --card-foreground: oklch(0.24 0.01 255);
-  --popover: oklch(0.994 0.002 255);
-  --popover-foreground: oklch(0.24 0.01 255);
-  --primary: oklch(0.29 0.016 255);
-  --primary-foreground: oklch(0.985 0.002 255);
-  --secondary: oklch(0.942 0.004 255);
-  --secondary-foreground: oklch(0.29 0.01 255);
-  --muted: oklch(0.944 0.003 255);
-  --muted-foreground: oklch(0.52 0.012 255);
-  --accent: oklch(0.915 0.01 250);
-  --accent-foreground: oklch(0.25 0.012 255);
+  --background: oklch(0.978 0.004 220);
+  --foreground: oklch(0.278 0.016 230);
+  --card: oklch(0.995 0.003 220);
+  --card-foreground: oklch(0.268 0.015 230);
+  --popover: oklch(0.994 0.003 220);
+  --popover-foreground: oklch(0.268 0.015 230);
+  --primary: oklch(0.43 0.065 211);
+  --primary-foreground: oklch(0.985 0.002 220);
+  --secondary: oklch(0.952 0.007 220);
+  --secondary-foreground: oklch(0.314 0.016 230);
+  --muted: oklch(0.958 0.005 220);
+  --muted-foreground: oklch(0.52 0.02 230);
+  --accent: oklch(0.936 0.018 214);
+  --accent-foreground: oklch(0.296 0.018 228);
   --destructive: oklch(0.58 0.22 27);
-  --border: oklch(0.872 0.003 255);
-  --input: oklch(0.912 0.003 255);
-  --ring: oklch(0.58 0.03 248);
-  --sidebar: oklch(0.967 0.003 255);
-  --sidebar-foreground: oklch(0.225 0.01 255);
-  --sidebar-primary: oklch(0.26 0.014 255);
-  --sidebar-primary-foreground: oklch(0.985 0.002 255);
-  --sidebar-accent: oklch(0.908 0.01 250);
-  --sidebar-accent-foreground: oklch(0.22 0.01 255);
-  --sidebar-border: oklch(0.845 0.004 255);
-  --sidebar-ring: oklch(0.59 0.028 248);
+  --border: oklch(0.888 0.007 220);
+  --input: oklch(0.922 0.005 220);
+  --ring: oklch(0.62 0.05 211);
+  --sidebar: oklch(0.956 0.006 220);
+  --sidebar-foreground: oklch(0.258 0.015 230);
+  --sidebar-primary: oklch(0.41 0.06 211);
+  --sidebar-primary-foreground: oklch(0.985 0.002 220);
+  --sidebar-accent: oklch(0.914 0.02 214);
+  --sidebar-accent-foreground: oklch(0.256 0.016 230);
+  --sidebar-border: oklch(0.856 0.01 220);
+  --sidebar-ring: oklch(0.62 0.05 211);
 
-  --quiet-gold: oklch(0.66 0.05 80);
-  --quiet-orb-left: color-mix(in oklab, oklch(0.8 0.012 245) 26%, transparent);
-  --quiet-orb-right: color-mix(in oklab, oklch(0.76 0.016 260) 24%, transparent);
+  --quiet-gold: oklch(0.73 0.038 85);
+  --quiet-orb-left: color-mix(in oklab, oklch(0.81 0.03 212) 24%, transparent);
+  --quiet-orb-right: color-mix(in oklab, oklch(0.77 0.022 225) 20%, transparent);
+  --surface-tint: color-mix(in oklab, var(--card) 92%, var(--accent) 8%);
+  --surface-elevated: color-mix(in oklab, var(--card) 97%, white 3%);
+  --surface-shadow: 0 22px 46px -34px rgba(15, 23, 42, 0.18);
+  --surface-shadow-strong: 0 26px 54px -34px rgba(15, 23, 42, 0.24);
 }
 
 :root.dark {
   color-scheme: dark;
 
-  --background: oklch(0.14 0.007 255);
-  --foreground: oklch(0.94 0.004 255);
-  --card: oklch(0.18 0.008 255);
-  --card-foreground: oklch(0.94 0.004 255);
-  --popover: oklch(0.185 0.008 255);
-  --popover-foreground: oklch(0.94 0.004 255);
-  --primary: oklch(0.95 0.003 255);
-  --primary-foreground: oklch(0.17 0.008 255);
-  --secondary: oklch(0.23 0.008 255);
-  --secondary-foreground: oklch(0.94 0.004 255);
-  --muted: oklch(0.215 0.007 255);
-  --muted-foreground: oklch(0.73 0.01 255);
-  --accent: oklch(0.26 0.009 250);
-  --accent-foreground: oklch(0.95 0.004 255);
+  --background: oklch(0.224 0.011 232);
+  --foreground: oklch(0.93 0.005 225);
+  --card: oklch(0.274 0.012 232);
+  --card-foreground: oklch(0.935 0.005 225);
+  --popover: oklch(0.286 0.012 232);
+  --popover-foreground: oklch(0.935 0.005 225);
+  --primary: oklch(0.71 0.078 205);
+  --primary-foreground: oklch(0.215 0.012 232);
+  --secondary: oklch(0.326 0.013 232);
+  --secondary-foreground: oklch(0.93 0.005 225);
+  --muted: oklch(0.31 0.012 232);
+  --muted-foreground: oklch(0.76 0.018 225);
+  --accent: oklch(0.36 0.02 214);
+  --accent-foreground: oklch(0.94 0.004 225);
   --destructive: oklch(0.7 0.18 25);
-  --border: oklch(1 0 0 / 9%);
-  --input: oklch(1 0 0 / 12%);
-  --ring: oklch(0.66 0.025 250);
-  --sidebar: oklch(0.175 0.008 255);
-  --sidebar-foreground: oklch(0.945 0.004 255);
-  --sidebar-primary: oklch(0.94 0.003 255);
-  --sidebar-primary-foreground: oklch(0.16 0.008 255);
-  --sidebar-accent: oklch(0.23 0.008 250);
-  --sidebar-accent-foreground: oklch(0.94 0.004 255);
-  --sidebar-border: oklch(1 0 0 / 12%);
-  --sidebar-ring: oklch(0.66 0.025 250);
+  --border: oklch(0.39 0.013 232);
+  --input: oklch(0.344 0.012 232);
+  --ring: oklch(0.7 0.06 205);
+  --sidebar: oklch(0.252 0.012 232);
+  --sidebar-foreground: oklch(0.936 0.005 225);
+  --sidebar-primary: oklch(0.71 0.078 205);
+  --sidebar-primary-foreground: oklch(0.215 0.012 232);
+  --sidebar-accent: oklch(0.338 0.024 214);
+  --sidebar-accent-foreground: oklch(0.942 0.005 225);
+  --sidebar-border: oklch(0.38 0.013 232);
+  --sidebar-ring: oklch(0.7 0.06 205);
 
-  --quiet-gold: oklch(0.72 0.06 80);
-  --quiet-orb-left: color-mix(in oklab, oklch(0.42 0.024 248) 22%, transparent);
-  --quiet-orb-right: color-mix(in oklab, oklch(0.38 0.022 262) 18%, transparent);
+  --quiet-gold: oklch(0.77 0.038 85);
+  --quiet-orb-left: color-mix(in oklab, oklch(0.54 0.046 208) 24%, transparent);
+  --quiet-orb-right: color-mix(in oklab, oklch(0.46 0.032 226) 18%, transparent);
+  --surface-tint: color-mix(in oklab, var(--card) 92%, var(--accent) 8%);
+  --surface-elevated: color-mix(in oklab, var(--card) 96%, white 4%);
+  --surface-shadow: 0 26px 54px -38px rgba(0, 0, 0, 0.34);
+  --surface-shadow-strong: 0 32px 64px -36px rgba(0, 0, 0, 0.42);
 }
 
 @layer base {
@@ -105,37 +107,36 @@
     background-image:
       radial-gradient(circle at 8% 4%, var(--quiet-orb-left), transparent 24rem),
       radial-gradient(circle at 92% 6%, var(--quiet-orb-right), transparent 24rem),
-      linear-gradient(180deg, color-mix(in oklab, var(--background) 94%, white 6%), var(--background));
+      linear-gradient(180deg, color-mix(in oklab, var(--background) 96%, white 4%), var(--background));
   }
 }
 
 @layer components {
   .font-display {
-    font-family: var(--font-cormorant);
+    font-family: var(--font-manrope);
+    font-weight: 700;
     letter-spacing: -0.03em;
   }
 
   .quiet-kicker {
-    @apply text-[0.72rem] font-semibold uppercase tracking-[0.28em] text-muted-foreground;
-  }
-
-  .quiet-stat-label {
     @apply text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground;
   }
 
+  .quiet-stat-label {
+    @apply text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground;
+  }
+
   .quiet-glass-panel {
-    background:
-      linear-gradient(180deg, color-mix(in oklab, var(--card) 92%, white 8%), color-mix(in oklab, var(--card) 96%, transparent));
-    border: 1px solid color-mix(in oklab, var(--border) 88%, transparent);
-    box-shadow: 0 20px 50px -42px rgba(6, 15, 30, 0.35);
+    background: linear-gradient(180deg, var(--surface-elevated), color-mix(in oklab, var(--card) 96%, transparent));
+    border: 1px solid color-mix(in oklab, var(--border) 92%, transparent);
+    box-shadow: var(--surface-shadow);
   }
 
   .quiet-auth-card,
   .quiet-panel,
   .quiet-metric-card,
   .quiet-hero {
-    background:
-      linear-gradient(160deg, color-mix(in oklab, var(--card) 96%, white 4%), color-mix(in oklab, var(--card) 90%, transparent));
+    background: linear-gradient(160deg, var(--surface-elevated), color-mix(in oklab, var(--card) 92%, transparent));
   }
 
   .quiet-auth-shell::before {
@@ -143,15 +144,15 @@
     position: absolute;
     inset: 2rem;
     border: 1px solid color-mix(in oklab, var(--border) 70%, transparent);
-    border-radius: 1rem;
+    border-radius: var(--radius);
     pointer-events: none;
   }
 
   .quiet-auth-orb {
     position: absolute;
     border-radius: 9999px;
-    filter: blur(30px);
-    opacity: 0.8;
+    filter: blur(40px);
+    opacity: 0.72;
   }
 
   .quiet-auth-orb-left {
@@ -171,6 +172,127 @@
   }
 
   .quiet-theme-toggle {
-    border-radius: 0.65rem;
+    border-radius: var(--radius);
+  }
+
+  .spartan-button {
+    @apply rounded-lg border font-semibold tracking-[-0.01em];
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.18) inset;
+  }
+
+  .spartan-button-variant-default {
+    @apply border-transparent bg-primary text-primary-foreground;
+    box-shadow: var(--surface-shadow);
+  }
+
+  .spartan-button-variant-default:hover,
+  .spartan-button-variant-default:focus-visible {
+    background: color-mix(in oklab, var(--primary) 92%, black 8%);
+  }
+
+  .spartan-button-variant-default:active {
+    background: color-mix(in oklab, var(--primary) 88%, black 12%);
+  }
+
+  .spartan-button-variant-outline {
+    @apply border-border bg-card text-foreground;
+    box-shadow: none;
+  }
+
+  .spartan-button-variant-outline:hover,
+  .spartan-button-variant-outline:focus-visible,
+  .spartan-button-variant-secondary:hover,
+  .spartan-button-variant-secondary:focus-visible,
+  .spartan-button-variant-ghost:hover,
+  .spartan-button-variant-ghost:focus-visible {
+    background: color-mix(in oklab, var(--accent) 72%, var(--card) 28%);
+    color: var(--accent-foreground);
+  }
+
+  .spartan-button-variant-secondary {
+    @apply border-border bg-secondary text-secondary-foreground;
+    box-shadow: none;
+  }
+
+  .spartan-button-variant-ghost {
+    @apply border-transparent bg-transparent text-foreground;
+    box-shadow: none;
+  }
+
+  .spartan-button-variant-destructive {
+    @apply border-transparent bg-destructive text-white;
+    box-shadow: var(--surface-shadow);
+  }
+
+  .spartan-button-variant-link {
+    @apply border-transparent bg-transparent p-0 text-primary;
+    box-shadow: none;
+  }
+
+  .spartan-button-size-default {
+    @apply h-10 px-4 py-2 text-sm;
+  }
+
+  .spartan-button-size-sm {
+    @apply h-9 px-3.5 py-2 text-sm;
+  }
+
+  .spartan-button-size-lg {
+    @apply h-11 px-5 py-2.5 text-sm;
+  }
+
+  .spartan-button-size-icon,
+  .spartan-button-size-icon-lg,
+  .spartan-button-size-icon-sm,
+  .spartan-button-size-icon-xs {
+    @apply rounded-lg;
+  }
+
+  .spartan-input {
+    @apply rounded-lg border border-input bg-background/82 px-4 py-2.5 text-sm text-foreground shadow-none transition-[border-color,box-shadow,background-color];
+  }
+
+  .spartan-input:hover {
+    background: color-mix(in oklab, var(--background) 86%, var(--card) 14%);
+  }
+
+  .spartan-input:focus-visible {
+    outline: none;
+    border-color: color-mix(in oklab, var(--ring) 70%, var(--border) 30%);
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--ring) 16%, transparent);
+  }
+
+  .spartan-card {
+    @apply rounded-lg border border-border bg-card text-card-foreground;
+    box-shadow: var(--surface-shadow);
+  }
+
+  [data-slot='dropdown-menu'],
+  [data-slot='dropdown-menu-sub'] {
+    @apply rounded-lg border border-border bg-popover p-1.5;
+    box-shadow: var(--surface-shadow-strong);
+  }
+
+  [data-slot='dialog-content'],
+  [data-slot='sheet-content'] {
+    @apply rounded-lg border border-border bg-card;
+    box-shadow: var(--surface-shadow-strong);
+  }
+
+  [data-slot='sidebar-inner'] {
+    box-shadow: var(--surface-shadow);
+  }
+
+  [data-slot='sidebar-inset'] {
+    background:
+      linear-gradient(180deg, color-mix(in oklab, var(--background) 96%, white 4%), var(--background));
+  }
+
+  [data-slot='button']:focus-visible,
+  [data-slot='dropdown-menu-item']:focus-visible,
+  [data-slot='dropdown-menu-checkbox-item']:focus-visible,
+  [data-slot='dropdown-menu-radio-item']:focus-visible,
+  [data-slot='sidebar-menu-button']:focus-visible {
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--ring) 16%, transparent);
   }
 }
