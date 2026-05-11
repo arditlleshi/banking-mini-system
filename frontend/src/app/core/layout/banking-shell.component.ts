@@ -40,7 +40,6 @@ import {
   HlmSidebarHeader,
   HlmSidebarInset,
   HlmSidebarMenu,
-  HlmSidebarMenuBadge,
   HlmSidebarMenuButton,
   HlmSidebarMenuItem,
   HlmSidebarTrigger,
@@ -53,7 +52,6 @@ type NavigationItem = {
   readonly path: string;
   readonly label: string;
   readonly icon: string;
-  readonly badge: string;
   readonly exact?: boolean;
 };
 
@@ -79,7 +77,6 @@ type NavigationItem = {
     HlmSidebarHeader,
     HlmSidebarInset,
     HlmSidebarMenu,
-    HlmSidebarMenuBadge,
     HlmSidebarMenuButton,
     HlmSidebarMenuItem,
     HlmSidebarTrigger,
@@ -120,32 +117,27 @@ export class BankingShellComponent {
       path: '/home',
       label: 'Overview',
       icon: 'lucideLayoutDashboard',
-      badge: '01',
       exact: true
     },
     {
       path: '/accounts',
       label: 'Accounts',
-      icon: 'lucideWalletCards',
-      badge: '02'
+      icon: 'lucideWalletCards'
     },
     {
       path: '/customers',
       label: 'Customers',
-      icon: 'lucideUsers',
-      badge: '03'
+      icon: 'lucideUsers'
     },
     {
       path: '/transactions',
       label: 'Transactions',
-      icon: 'lucideArrowLeftRight',
-      badge: '04'
+      icon: 'lucideArrowLeftRight'
     },
     {
       path: '/settings',
       label: 'Settings',
-      icon: 'lucideSettings2',
-      badge: '05'
+      icon: 'lucideSettings2'
     }
   ]);
   protected readonly activePath = signal(this.router.url);

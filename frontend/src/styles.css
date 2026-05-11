@@ -262,6 +262,17 @@
     box-shadow: 0 0 0 4px color-mix(in oklab, var(--ring) 16%, transparent);
   }
 
+  .spartan-input[type='number'] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
+  .spartan-input[type='number']::-webkit-outer-spin-button,
+  .spartan-input[type='number']::-webkit-inner-spin-button {
+    margin: 0;
+    -webkit-appearance: none;
+  }
+
   .spartan-card {
     @apply rounded-lg border border-border bg-card text-card-foreground;
     box-shadow: var(--surface-shadow);

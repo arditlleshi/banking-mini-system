@@ -15,7 +15,6 @@ import { CreateAccountDialogComponent } from './create-account-dialog.component'
 type AccountFormOption<T extends string> = {
   readonly value: T;
   readonly label: string;
-  readonly meta: string;
 };
 
 @Component({
@@ -45,16 +44,16 @@ export class AccountsPageComponent {
   protected readonly accounts = signal<AccountResponse[]>([]);
 
   protected readonly typeOptions: readonly AccountFormOption<AccountType>[] = [
-    { value: 'CURRENT', label: 'Current account', meta: 'Class 351' },
-    { value: 'SAVINGS', label: 'Savings account', meta: 'Class 380' },
-    { value: 'SAVINGS_PLAN', label: 'Savings plan', meta: 'Class 384' }
+    { value: 'CURRENT', label: 'Current account' },
+    { value: 'SAVINGS', label: 'Savings account' },
+    { value: 'SAVINGS_PLAN', label: 'Savings plan' }
   ];
 
   protected readonly currencyOptions: readonly AccountFormOption<AccountCurrency>[] = [
-    { value: 'EUR', label: 'Euro', meta: 'EUR' },
-    { value: 'USD', label: 'US Dollar', meta: 'USD' },
-    { value: 'GBP', label: 'British Pound', meta: 'GBP' },
-    { value: 'ALL', label: 'Albanian Lek', meta: 'ALL' }
+    { value: 'EUR', label: 'Euro (EUR)' },
+    { value: 'USD', label: 'US Dollar (USD)' },
+    { value: 'GBP', label: 'British Pound (GBP)' },
+    { value: 'ALL', label: 'Albanian Lek (ALL)' }
   ];
 
   constructor() {
@@ -105,14 +104,6 @@ export class AccountsPageComponent {
 
   protected activeAccountCount(): number {
     return this.accounts().filter((account) => account.status === 'ACTIVE').length;
-  }
-
-  protected formatSerialNumber(serialNumber: number | null): string {
-    return serialNumber === null ? 'N/A' : serialNumber.toString().padStart(2, '0');
-  }
-
-  protected accountTypeMeta(type: AccountType): string {
-    return this.typeOptions.find((option) => option.value === type)?.meta ?? '';
   }
 
   protected trackByAccountId(_: number, account: AccountResponse): number {

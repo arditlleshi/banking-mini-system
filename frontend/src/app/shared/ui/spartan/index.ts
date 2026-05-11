@@ -5,6 +5,7 @@ export * from './dropdown-menu/src';
 export * from './icon/src';
 export * from './input';
 export * from './label';
+export * from './select';
 export * from './separator';
 export * from './sheet/src';
 export * from './sidebar/src';

@@ -12,9 +12,6 @@ export type AccountResponse = {
   id: number;
   accountNumber: string;
   iban: string | null;
-  baseNumber: string | null;
-  accountClassCode: string | null;
-  serialNumber: number | null;
   type: AccountType;
   currency: AccountCurrency;
   name: string;

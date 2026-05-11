@@ -29,8 +29,8 @@ import { HlmDialogClose } from './hlm-dialog-close';
       <button
         hlmBtn
         variant="ghost"
-        size="icon-sm"
-        class="absolute right-4 top-4 rounded-lg"
+        aria-label="Close dialog"
+        class="absolute right-3 top-3 inline-flex size-10 rounded-lg border border-border/60 bg-background/70 p-2 hover:bg-background/90"
         hlmDialogClose
         type="button"
       >
