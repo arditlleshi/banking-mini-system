@@ -118,6 +118,30 @@
     letter-spacing: -0.03em;
   }
 
+  .banking-shell-title {
+    @apply font-display text-xl leading-tight tracking-tight text-foreground text-balance sm:text-2xl;
+  }
+
+  .banking-page-title {
+    @apply font-display text-2xl leading-[1.08] tracking-tight text-foreground text-balance sm:text-3xl;
+  }
+
+  .banking-card-title {
+    @apply font-display text-xl leading-tight tracking-tight text-card-foreground text-balance sm:text-2xl;
+  }
+
+  .banking-metric-title {
+    @apply font-display text-2xl leading-none tracking-tight text-card-foreground sm:text-3xl;
+  }
+
+  .banking-subsection-title {
+    @apply font-display text-xl leading-tight tracking-tight text-foreground text-balance sm:text-2xl;
+  }
+
+  .banking-dialog-title {
+    @apply font-display text-lg leading-tight tracking-tight text-card-foreground text-balance sm:text-xl;
+  }
+
   .quiet-kicker {
     @apply text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground;
   }

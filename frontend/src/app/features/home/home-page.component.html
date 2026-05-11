@@ -4,7 +4,7 @@
       <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div class="max-w-3xl space-y-4">
           <p class="quiet-kicker">Operations overview</p>
-          <h1 class="font-display text-4xl tracking-tight text-foreground sm:text-5xl">
+          <h1 class="banking-page-title">
             Core banking activity in one controlled operating view.
           </h1>
           <p class="max-w-2xl text-base leading-7 text-muted-foreground">
@@ -25,7 +25,7 @@
       <section hlmCard class="quiet-metric-card border-border/70 bg-card/88">
         <div hlmCardHeader class="gap-3 p-6">
           <p class="quiet-stat-label">Connection</p>
-          <h2 hlmCardTitle class="font-display text-3xl text-card-foreground">{{ status() }}</h2>
+          <h2 hlmCardTitle class="banking-metric-title">{{ status() }}</h2>
           <p hlmCardDescription class="text-sm leading-6 text-muted-foreground">
             Frontend connectivity to the backend service from the Angular workspace.
           </p>
@@ -35,7 +35,7 @@
       <section hlmCard class="quiet-metric-card border-border/70 bg-card/88">
         <div hlmCardHeader class="gap-3 p-6">
           <p class="quiet-stat-label">Session state</p>
-          <h2 hlmCardTitle class="font-display text-3xl text-card-foreground">{{ sessionState() }}</h2>
+          <h2 hlmCardTitle class="banking-metric-title">{{ sessionState() }}</h2>
           <p hlmCardDescription class="text-sm leading-6 text-muted-foreground">
             Authentication state and route protection for the current user session.
           </p>
@@ -45,7 +45,7 @@
       <section hlmCard class="quiet-metric-card border-border/70 bg-card/88">
         <div hlmCardHeader class="gap-3 p-6">
           <p class="quiet-stat-label">Visible modules</p>
-          <h2 hlmCardTitle class="font-display text-3xl text-card-foreground">{{ itemCount() }}</h2>
+          <h2 hlmCardTitle class="banking-metric-title">{{ itemCount() }}</h2>
           <p hlmCardDescription class="text-sm leading-6 text-muted-foreground">
             Available modules currently returned by the backend test endpoint.
           </p>
@@ -57,7 +57,7 @@
       <section hlmCard class="quiet-panel border-border/70 bg-card/90">
         <div hlmCardHeader class="gap-3 p-6 sm:p-8">
           <p class="quiet-kicker">Module preview</p>
-          <h2 hlmCardTitle class="font-display text-3xl text-card-foreground">Connected banking modules</h2>
+          <h2 hlmCardTitle class="banking-card-title">Connected banking modules</h2>
           <p hlmCardDescription class="max-w-2xl text-sm leading-6 text-muted-foreground">
             These entries are still sample data, but the layout is ready to expand into production account, customer, and transaction workflows.
           </p>
@@ -70,7 +70,7 @@
                 <div class="flex items-start justify-between gap-4">
                   <div class="space-y-2">
                     <p class="quiet-stat-label">Module {{ item.id }}</p>
-                    <h3 class="font-display text-2xl text-foreground">{{ item.name }}</h3>
+                    <h3 class="banking-subsection-title">{{ item.name }}</h3>
                     <p class="text-sm leading-6 text-muted-foreground">
                       Reserved for operational workflows with clear balances, controlled actions, and easier state visibility.
                     </p>
@@ -88,7 +88,7 @@
       <section hlmCard class="quiet-panel border-border/70 bg-card/90">
         <div hlmCardHeader class="gap-3 p-6">
           <p class="quiet-kicker">Design notes</p>
-          <h2 hlmCardTitle class="font-display text-3xl text-card-foreground">Banking theme system</h2>
+          <h2 hlmCardTitle class="banking-card-title">Banking theme system</h2>
           <p hlmCardDescription class="text-sm leading-6 text-muted-foreground">
             The interface now favors cleaner contrast, disciplined corners, and reusable banking surfaces over decorative styling.
           </p>

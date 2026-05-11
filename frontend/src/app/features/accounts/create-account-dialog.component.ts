@@ -53,7 +53,7 @@ type AccountFormOption<T extends string> = {
       >
         <div class="flex min-h-0 flex-col">
           <div hlmDialogHeader class="gap-3 border-b border-border/70 px-6 py-6 sm:px-8">
-            <h2 hlmDialogTitle class="font-display text-4xl tracking-tight text-card-foreground">Create a new account</h2>
+            <h2 hlmDialogTitle class="banking-dialog-title">Create a new account</h2>
             <p hlmDialogDescription class="max-w-xl text-sm leading-6 text-muted-foreground">
               Add a clear account name, choose the product type and currency, and set the opening amount.
             </p>
