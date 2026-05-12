@@ -32,3 +32,10 @@ banking:
       base-number-length: ${BANKING_ACCOUNT_BASE_NUMBER_LENGTH:6}
       serial-length: ${BANKING_ACCOUNT_SERIAL_LENGTH:2}
 
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha

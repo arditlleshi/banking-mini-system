@@ -134,6 +134,18 @@
                       <p class="mt-2 text-xs font-medium text-foreground">{{ account.openedAt | date: 'dd MMM yyyy' }}</p>
                     </div>
                   </div>
+
+                  <div class="flex justify-end">
+                    <a
+                      hlmBtn
+                      variant="outline"
+                      size="sm"
+                      class="h-8 rounded-lg px-3 text-xs"
+                      [routerLink]="['/accounts', account.accountNumber]"
+                    >
+                      View details
+                    </a>
+                  </div>
                 </div>
               </article>
             }

@@ -31,6 +31,35 @@ export type CreateAccountRequest = {
   initialDeposit: number;
 };
 
+export type AccountTransactionResponse = {
+  id: number;
+  transactionReference: string;
+  externalReference: string | null;
+  type: string;
+  status: string;
+  direction: 'DEBIT' | 'CREDIT';
+  currency: AccountCurrency;
+  amount: number;
+  description: string;
+  counterpartyName: string | null;
+  counterpartyAccount: string | null;
+  bookingTimestamp: string;
+  valueDate: string;
+  balanceAfter: number;
+  fxRate: number | null;
+  fxReferenceAmount: number | null;
+  fxReferenceCurrency: AccountCurrency | null;
+};
+
+export type AccountDetailsResponse = {
+  account: AccountResponse;
+  transactionCount: number;
+  totalCredits: number;
+  totalDebits: number;
+  netMovement: number;
+  transactions: AccountTransactionResponse[];
+};
+
 @Injectable({ providedIn: 'root' })
 export class AccountApiService {
   private readonly http = inject(HttpClient);
@@ -42,5 +71,9 @@ export class AccountApiService {
 
   createAccount(payload: CreateAccountRequest): Observable<AccountResponse> {
     return this.http.post<AccountResponse>(`${this.baseUrl}/accounts`, payload);
+  }
+
+  getAccountDetails(accountNumber: string): Observable<AccountDetailsResponse> {
+    return this.http.get<AccountDetailsResponse>(`${this.baseUrl}/accounts/${accountNumber}/details`);
   }
 }

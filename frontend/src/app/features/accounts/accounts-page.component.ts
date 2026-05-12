@@ -1,6 +1,7 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { AccountApiService, type AccountCurrency, type AccountResponse, type AccountType } from '../../core/services/account-api.service';
 import { HlmButton } from '../../shared/ui/spartan/button';
 import {
@@ -22,6 +23,7 @@ type AccountFormOption<T extends string> = {
   imports: [
     DatePipe,
     DecimalPipe,
+    RouterLink,
     HlmButton,
     HlmCard,
     HlmCardContent,

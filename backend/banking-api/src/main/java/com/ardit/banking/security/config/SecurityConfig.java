@@ -35,7 +35,16 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authenticationProvider(authenticationProvider)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/login", "/api/auth/refresh", "/api/auth/logout", "/api/test", "/actuator/health").permitAll()
+                .requestMatchers(
+                    "/api/auth/login",
+                    "/api/auth/refresh",
+                    "/api/auth/logout",
+                    "/api/test",
+                    "/actuator/health",
+                    "/v3/api-docs/**",
+                    "/swagger-ui/**",
+                    "/swagger-ui.html"
+                ).permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .anyRequest().authenticated()
             )
@@ -61,4 +70,3 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
-

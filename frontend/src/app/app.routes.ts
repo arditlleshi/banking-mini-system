@@ -20,7 +20,13 @@ export const routes: Routes = [
       },
       {
         path: 'accounts',
+        pathMatch: 'full',
         loadComponent: () => import('./features/accounts/accounts-page.component').then((module) => module.AccountsPageComponent)
+      },
+      {
+        path: 'accounts/:accountNumber',
+        loadComponent: () =>
+          import('./features/accounts/account-details-page.component').then((module) => module.AccountDetailsPageComponent)
       },
       {
         path: 'customers',
