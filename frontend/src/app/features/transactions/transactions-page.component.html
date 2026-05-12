@@ -1,0 +1,198 @@
+<main class="min-h-screen px-4 py-8 sm:px-6 lg:px-10">
+  <div class="mx-auto flex max-w-6xl flex-col gap-6">
+    <section class="overflow-hidden rounded-lg border border-border/70 bg-card/88 px-6 py-8 shadow-xl shadow-black/6 backdrop-blur-lg sm:px-8 lg:px-10">
+      <div class="space-y-4">
+        <p class="quiet-kicker">Money transfer</p>
+        <h1 class="banking-page-title">Move money between your accounts with built-in currency conversion.</h1>
+        <p class="max-w-3xl text-base leading-7 text-muted-foreground">
+          Choose debit and credit accounts, enter the amount in the debit currency, review the exchange rate preview, and add a transfer description.
+        </p>
+      </div>
+    </section>
+
+    <section hlmCard class="border-border/70 bg-card/90">
+      <div hlmCardHeader class="gap-3 border-b border-border/70 p-6 sm:p-8">
+        <p class="quiet-kicker">Transfer form</p>
+        <h2 hlmCardTitle class="banking-card-title">Create account-to-account transfer</h2>
+        <p hlmCardDescription class="max-w-3xl text-sm leading-6 text-muted-foreground">
+          Backend rules are enforced here, including account ownership, amount validation, and transfer booking.
+        </p>
+      </div>
+
+      <div hlmCardContent class="px-6 pb-6 pt-6 sm:px-8 sm:pb-8">
+        @if (loading()) {
+          <div class="grid gap-4 lg:grid-cols-2">
+            @for (item of [1, 2, 3, 4]; track item) {
+              <article class="min-h-24 animate-pulse rounded-lg border border-border/70 bg-card/88 p-6"></article>
+            }
+          </div>
+        } @else if (accountsLoadError()) {
+          <p class="rounded-lg border border-red-500/20 bg-red-500/8 px-4 py-3 text-sm font-medium text-red-700 dark:text-red-300">
+            {{ accountsLoadError() }}
+          </p>
+        } @else if (accounts().length < 2) {
+          <article class="rounded-lg border border-dashed border-border/80 bg-background/68 p-8 text-center">
+            <p class="quiet-kicker">Not enough accounts</p>
+            <h3 class="mt-3 banking-subsection-title">At least two accounts are required to make a transfer.</h3>
+          </article>
+        } @else {
+          <form [formGroup]="form" (ngSubmit)="submitTransfer()" class="grid gap-6">
+            <div class="grid gap-5 md:grid-cols-2">
+              <div class="flex flex-col gap-2">
+                <label hlmLabel for="source-account" class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase">Debit account</label>
+                <div
+                  hlmSelect
+                  [value]="form.controls.sourceAccountId.value"
+                  [itemToString]="accountValueToLabel"
+                  (valueChange)="handleSourceAccountChange($any($event))"
+                >
+                  <hlm-select-trigger buttonId="source-account" [class]="compactControlClass">
+                    <span hlmSelectValue placeholder="Choose debit account"></span>
+                  </hlm-select-trigger>
+                  <hlm-select-content *hlmSelectPortal>
+                    @for (option of accountOptions(); track option.value) {
+                      <hlm-select-item [value]="option.value">
+                        {{ option.label }}
+                      </hlm-select-item>
+                    }
+                  </hlm-select-content>
+                </div>
+                <div class="rounded-lg border border-border/60 bg-background/60 px-3 py-2">
+                  <p class="quiet-stat-label">Available balance</p>
+                  <p class="mt-1 text-sm font-semibold text-foreground">
+                    {{ sourceAccount()?.availableBalance | number: '1.2-2' }} {{ sourceAccount()?.currency ?? '' }}
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex flex-col gap-2">
+                <label hlmLabel for="target-account" class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase">Credit account</label>
+                <div
+                  hlmSelect
+                  [value]="form.controls.targetAccountId.value"
+                  [itemToString]="accountValueToLabel"
+                  (valueChange)="handleTargetAccountChange($any($event))"
+                >
+                  <hlm-select-trigger buttonId="target-account" [class]="compactControlClass">
+                    <span hlmSelectValue placeholder="Choose credit account"></span>
+                  </hlm-select-trigger>
+                  <hlm-select-content *hlmSelectPortal>
+                    @for (option of targetAccountOptions(); track option.value) {
+                      <hlm-select-item [value]="option.value">
+                        {{ option.label }}
+                      </hlm-select-item>
+                    }
+                  </hlm-select-content>
+                </div>
+                <div class="rounded-lg border border-border/60 bg-background/60 px-3 py-2">
+                  <p class="quiet-stat-label">Available balance</p>
+                  <p class="mt-1 text-sm font-semibold text-foreground">
+                    {{ targetAccount()?.availableBalance | number: '1.2-2' }} {{ targetAccount()?.currency ?? '' }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid gap-5 md:grid-cols-[0.8fr_1.2fr]">
+              <div class="flex flex-col gap-2">
+                <label hlmLabel for="transfer-amount" class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase">Amount</label>
+                <input
+                  id="transfer-amount"
+                  hlmInput
+                  type="number"
+                  min="0.01"
+                  step="0.01"
+                  formControlName="amount"
+                  class="spartan-input h-10 rounded-lg border-border/80 bg-background/70 px-4 text-sm text-foreground shadow-sm transition focus-visible:ring-4 focus-visible:ring-ring/20"
+                />
+              </div>
+
+              <div class="flex flex-col gap-2">
+                <label hlmLabel for="transfer-description" class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase">Description</label>
+                <input
+                  id="transfer-description"
+                  hlmInput
+                  type="text"
+                  formControlName="description"
+                  maxlength="280"
+                  class="spartan-input h-10 rounded-lg border-border/80 bg-background/70 px-4 text-sm text-foreground shadow-sm transition focus-visible:ring-4 focus-visible:ring-ring/20"
+                  placeholder="e.g. Monthly savings transfer"
+                />
+              </div>
+            </div>
+
+            <section class="grid gap-4 md:grid-cols-2">
+              <article class="rounded-lg border border-border/70 bg-background/72 p-4">
+                <p class="quiet-stat-label">Debit currency</p>
+                <p class="mt-3 text-lg font-semibold text-foreground">{{ sourceAccount()?.currency ?? '-' }}</p>
+              </article>
+              <article class="rounded-lg border border-border/70 bg-background/72 p-4">
+                <p class="quiet-stat-label">Credit currency</p>
+                <p class="mt-3 text-lg font-semibold text-foreground">{{ targetAccount()?.currency ?? '-' }}</p>
+              </article>
+              <article class="rounded-lg border border-border/70 bg-background/72 p-4">
+                <p class="quiet-stat-label">Exchange rate</p>
+                @if (fxPreview()) {
+                  <p class="mt-3 text-lg font-semibold text-foreground">{{ fxPreview()!.rate | number: '1.4-8' }}</p>
+                  <p class="mt-2 text-xs text-muted-foreground">{{ fxPreview()!.note }}</p>
+                } @else {
+                  <p class="mt-3 text-sm font-medium text-amber-700 dark:text-amber-300">Not available</p>
+                }
+              </article>
+            </section>
+
+            @if (fxPreview()) {
+              <article class="rounded-lg border border-border/70 bg-background/72 p-4">
+                <p class="quiet-stat-label">Estimated credit amount</p>
+                <p class="mt-2 text-base font-semibold text-foreground">
+                  {{ fxPreview()!.targetAmount | number: '1.2-2' }} {{ targetAccount()?.currency ?? '' }}
+                </p>
+              </article>
+            }
+
+            @if (exchangeRateLoadWarning()) {
+              <p class="rounded-lg border border-amber-500/20 bg-amber-500/8 px-4 py-3 text-sm font-medium text-amber-700 dark:text-amber-300">
+                {{ exchangeRateLoadWarning() }}
+              </p>
+            }
+
+            @if (transferError()) {
+              <p class="rounded-lg border border-red-500/20 bg-red-500/8 px-4 py-3 text-sm font-medium text-red-700 dark:text-red-300">
+                {{ transferError() }}
+              </p>
+            }
+            @if (sameAccountSelected()) {
+              <p class="rounded-lg border border-amber-500/20 bg-amber-500/8 px-4 py-3 text-sm font-medium text-amber-700 dark:text-amber-300">
+                Debit and credit accounts must be different.
+              </p>
+            }
+            @if (insufficientFunds()) {
+              <p class="rounded-lg border border-amber-500/20 bg-amber-500/8 px-4 py-3 text-sm font-medium text-amber-700 dark:text-amber-300">
+                Transfer amount cannot be greater than the available balance of the debit account.
+              </p>
+            }
+
+            @if (successTransfer()) {
+              <article class="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm text-emerald-800 dark:text-emerald-200">
+                <p class="font-semibold">Transfer booked successfully.</p>
+                <p class="mt-2">Reference: {{ successTransfer()!.transferReference }}</p>
+                <p class="mt-1">
+                  {{ successTransfer()!.sourceAmount | number: '1.2-2' }} {{ successTransfer()!.sourceCurrency }}
+                  to
+                  {{ successTransfer()!.targetAmount | number: '1.2-2' }} {{ successTransfer()!.targetCurrency }}
+                </p>
+                <p class="mt-1">Booked at {{ successTransfer()!.bookedAt | date: 'dd MMM yyyy, HH:mm' }}</p>
+              </article>
+            }
+
+            <div class="flex justify-end">
+              <button hlmBtn type="submit" class="h-10 rounded-lg px-5 text-sm" [disabled]="submitting() || insufficientFunds() || sameAccountSelected()">
+                {{ submitting() ? 'Submitting...' : 'Transfer funds' }}
+              </button>
+            </div>
+          </form>
+        }
+      </div>
+    </section>
+  </div>
+</main>

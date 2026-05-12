@@ -19,7 +19,6 @@ import com.ardit.banking.exchange.service.ExchangeRateService;
 
 @RestController
 @RequestMapping("/api/admin/exchange-rates")
-@PreAuthorize("hasRole('ADMIN')")
 public class ExchangeRateAdminController {
 
     private final ExchangeRateService exchangeRateService;
@@ -35,6 +34,7 @@ public class ExchangeRateAdminController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
     public ExchangeRateResponse createExchangeRate(@Valid @RequestBody UpsertExchangeRateRequest request) {
         return exchangeRateService.createExchangeRate(request);
     }

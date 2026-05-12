@@ -48,6 +48,10 @@ public class TransferService {
         AccountEntity targetAccount = getOwnedAccount(owner.getId(), request.targetAccountId());
 
         BigDecimal amount = request.amount().setScale(2, java.math.RoundingMode.HALF_EVEN);
+        if (amount.compareTo(sourceAccount.getAvailableBalance()) > 0) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Insufficient available balance");
+        }
+
         Instant bookedAt = Instant.now();
         LocalDate valueDate = LocalDate.now();
         String transferReference = UUID.randomUUID().toString();
