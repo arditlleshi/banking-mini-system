@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { provideIcons } from '@ng-icons/core';
 import {
-  lucideArrowLeftRight,
   lucideBadgeEuro,
   lucideBuilding2,
   lucideChevronUp,
   lucideChevronRight,
+  lucideCreditCard,
   lucideLayoutDashboard,
   lucideLogOut,
   lucideSettings2,
@@ -85,11 +85,11 @@ type NavigationItem = {
   ],
   providers: [
     provideIcons({
-      lucideArrowLeftRight,
       lucideBadgeEuro,
       lucideBuilding2,
       lucideChevronUp,
       lucideChevronRight,
+      lucideCreditCard,
       lucideLayoutDashboard,
       lucideLogOut,
       lucideSettings2,
@@ -130,9 +130,9 @@ export class BankingShellComponent {
       icon: 'lucideUsers'
     },
     {
-      path: '/transactions',
-      label: 'Transactions',
-      icon: 'lucideArrowLeftRight'
+      path: '/payments',
+      label: 'Payments',
+      icon: 'lucideCreditCard'
     },
     {
       path: '/settings',

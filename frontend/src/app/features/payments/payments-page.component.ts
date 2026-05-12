@@ -3,6 +3,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { provideIcons } from '@ng-icons/core';
+import { lucideBuilding2, lucideCreditCard, lucideHistory, lucideLandmark, lucideSmartphone, lucideZap } from '@ng-icons/lucide';
 import { startWith } from 'rxjs';
 
 import { AccountApiService, type AccountCurrency, type AccountResponse } from '../../core/services/account-api.service';
@@ -10,6 +12,7 @@ import { ExchangeRateApiService, type ExchangeRateResponse } from '../../core/se
 import { TransferApiService, type TransferResponse } from '../../core/services/transfer-api.service';
 import { HlmButton } from '../../shared/ui/spartan/button';
 import { HlmCard, HlmCardContent, HlmCardDescription, HlmCardHeader, HlmCardTitle } from '../../shared/ui/spartan/card';
+import { HlmIconImports } from '@spartan/icon';
 import { HlmInput } from '../../shared/ui/spartan/input';
 import { HlmLabel } from '../../shared/ui/spartan/label';
 import { HlmSelect, HlmSelectContent, HlmSelectItem, HlmSelectPortal, HlmSelectTrigger, HlmSelectValue } from '../../shared/ui/spartan/select';
@@ -19,8 +22,16 @@ type AccountOption = {
   readonly label: string;
 };
 
+type PaymentAction = {
+  readonly id: 'own-accounts' | 'bank-account' | 'utilities' | 'mobile-top-up' | 'credit-card';
+  readonly label: string;
+  readonly description: string;
+  readonly icon: string;
+  readonly available: boolean;
+};
+
 @Component({
-  selector: 'app-transactions-page',
+  selector: 'app-payments-page',
   imports: [
     DatePipe,
     DecimalPipe,
@@ -31,6 +42,7 @@ type AccountOption = {
     HlmCardDescription,
     HlmCardHeader,
     HlmCardTitle,
+    HlmIconImports,
     HlmInput,
     HlmLabel,
     HlmSelect,
@@ -40,10 +52,20 @@ type AccountOption = {
     HlmSelectTrigger,
     HlmSelectValue
   ],
+  providers: [
+    provideIcons({
+      lucideBuilding2,
+      lucideCreditCard,
+      lucideHistory,
+      lucideLandmark,
+      lucideSmartphone,
+      lucideZap
+    })
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './transactions-page.component.html'
+  templateUrl: './payments-page.component.html'
 })
-export class TransactionsPageComponent {
+export class PaymentsPageComponent {
   private readonly fb = new FormBuilder();
   private readonly accountApi = inject(AccountApiService);
   private readonly exchangeRateApi = inject(ExchangeRateApiService);
@@ -61,6 +83,44 @@ export class TransactionsPageComponent {
   protected readonly exchangeRates = signal<ExchangeRateResponse[]>([]);
   protected readonly compactControlClass =
     'h-10 rounded-lg border-border/80 bg-background/70 px-4 text-sm text-foreground shadow-sm focus-visible:ring-4 focus-visible:ring-ring/20';
+  protected readonly activePaymentAction = signal<PaymentAction['id']>('own-accounts');
+  protected readonly paymentActions: readonly PaymentAction[] = [
+    {
+      id: 'own-accounts',
+      label: 'Own Accounts',
+      description: 'Move money between your eligible bank accounts.',
+      icon: 'lucideLandmark',
+      available: true
+    },
+    {
+      id: 'bank-account',
+      label: 'Another Account',
+      description: 'Send money to a saved or new bank beneficiary.',
+      icon: 'lucideBuilding2',
+      available: false
+    },
+    {
+      id: 'utilities',
+      label: 'Utilities',
+      description: 'Pay household bills from approved providers.',
+      icon: 'lucideZap',
+      available: false
+    },
+    {
+      id: 'mobile-top-up',
+      label: 'Mobile Top-Up',
+      description: 'Reload a phone number from your account balance.',
+      icon: 'lucideSmartphone',
+      available: false
+    },
+    {
+      id: 'credit-card',
+      label: 'Credit Card',
+      description: 'Pay your card balance or a selected statement.',
+      icon: 'lucideCreditCard',
+      available: false
+    }
+  ];
 
   protected readonly form = this.fb.nonNullable.group({
     sourceAccountId: [0, [Validators.required, Validators.min(1)]],
@@ -218,6 +278,26 @@ export class TransactionsPageComponent {
 
   protected trackByAccountId(_: number, account: AccountResponse): number {
     return account.id;
+  }
+
+  protected selectPaymentAction(action: PaymentAction): void {
+    if (!action.available) {
+      return;
+    }
+
+    this.activePaymentAction.set(action.id);
+  }
+
+  protected paymentActionClass(action: PaymentAction): string {
+    const base =
+      'group flex min-h-28 w-full min-w-0 items-start gap-3 rounded-lg border px-4 py-4 text-left transition-[border-color,background-color,box-shadow] focus-visible:ring-4 focus-visible:ring-ring/20';
+    if (!action.available) {
+      return `${base} cursor-not-allowed border-border/55 bg-background/45 text-muted-foreground opacity-72`;
+    }
+    if (this.activePaymentAction() === action.id) {
+      return `${base} border-primary/45 bg-primary/8 text-foreground shadow-[0_18px_40px_-34px_rgba(15,23,42,0.42)]`;
+    }
+    return `${base} border-border/70 bg-card/82 text-foreground hover:border-primary/30 hover:bg-accent/40`;
   }
 
   private loadData(): void {

@@ -15,6 +15,9 @@ export class HlmCard {
   readonly size = input<HlmCardConfig['size']>(this.defaultConfig.size);
 
   constructor() {
-    classes(() => 'spartan-card group/card flex flex-col');
+    classes(
+      () =>
+        'group/card flex flex-col rounded-lg border border-border bg-card text-card-foreground shadow-[var(--surface-shadow)]',
+    );
   }
 }

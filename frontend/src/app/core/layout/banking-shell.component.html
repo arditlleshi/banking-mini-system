@@ -5,7 +5,6 @@
   >
     Skip to main content
   </a>
-
   <hlm-sidebar
     variant="sidebar"
     collapsible="icon"
@@ -21,32 +20,37 @@
         >
           <ng-icon hlm name="lucideBuilding2" size="sm"></ng-icon>
         </div>
-
         <div class="min-w-0 group-data-[collapsible=icon]:hidden">
           <p class="text-base font-bold leading-tight text-sidebar-foreground">Acme Bank</p>
           <p class="mt-0.5 text-sm leading-tight text-sidebar-foreground/85">Enterprise desk</p>
         </div>
-
         <button
           hlmSidebarTrigger
           type="button"
           class="ml-auto rounded-lg border border-sidebar-border/70 bg-sidebar/78 text-sidebar-foreground/80 shadow-none group-data-[collapsible=icon]:ml-0 group-data-[collapsible=icon]:size-9 group-data-[collapsible=icon]:p-0"
           aria-label="Toggle sidebar"
-        >
-        </button>
+        ></button>
       </section>
     </div>
-
     <div hlmSidebarContent class="gap-1 p-1.5 pt-4">
       <section hlmSidebarGroup class="p-0">
-        <div hlmSidebarGroupLabel class="px-3.5 pb-2.5 text-[0.92rem] font-bold normal-case tracking-normal text-sidebar-foreground/65">
+        <div
+          hlmSidebarGroupLabel
+          class="px-3.5 pb-2.5 text-[0.92rem] font-bold normal-case tracking-normal text-sidebar-foreground/65"
+        >
           Platform
         </div>
-
         <div hlmSidebarGroupContent>
-          <ul hlmSidebarMenu class="flex flex-col gap-1 group-data-[collapsible=icon]:items-center" aria-label="Platform">
+          <ul
+            hlmSidebarMenu
+            class="flex flex-col gap-1 group-data-[collapsible=icon]:items-center"
+            aria-label="Platform"
+          >
             @for (item of navigation(); track item.path) {
-              <li hlmSidebarMenuItem class="group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
+              <li
+                hlmSidebarMenuItem
+                class="group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center"
+              >
                 <a
                   hlmSidebarMenuButton
                   [routerLink]="item.path"
@@ -63,8 +67,10 @@
         </div>
       </section>
     </div>
-
-    <div hlmSidebarFooter class="p-3 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-1 group-data-[collapsible=icon]:py-2">
+    <div
+      hlmSidebarFooter
+      class="p-3 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-1 group-data-[collapsible=icon]:py-2"
+    >
       <button
         hlmBtn
         type="button"
@@ -80,23 +86,32 @@
         >
           {{ userInitials() }}
         </span>
-
-        <span class="inline-flex min-w-0 flex-col items-start gap-0.5 group-data-[collapsible=icon]:hidden">
-          <span class="text-base font-bold leading-tight text-sidebar-foreground">Ardit Lleshi</span>
+        <span
+          class="inline-flex min-w-0 flex-col items-start gap-0.5 group-data-[collapsible=icon]:hidden"
+        >
+          <span class="text-base font-bold leading-tight text-sidebar-foreground"
+            >Ardit Lleshi</span
+          >
         </span>
-
-        <span aria-hidden="true" class="ml-auto text-sidebar-foreground/65 group-data-[collapsible=icon]:hidden">
+        <span
+          aria-hidden="true"
+          class="ml-auto text-sidebar-foreground/65 group-data-[collapsible=icon]:hidden"
+        >
           <ng-icon hlm name="lucideChevronUp" size="sm"></ng-icon>
         </span>
       </button>
-
       <ng-template #profileMenu>
         <div hlmDropdownMenu class="min-w-64">
-          <div hlmDropdownMenuLabel class="text-[0.74rem] uppercase tracking-[0.12em]">Account controls</div>
+          <div hlmDropdownMenuLabel class="text-[0.74rem] uppercase tracking-[0.12em]">
+            Account controls
+          </div>
           <div hlmDropdownMenuSeparator></div>
-
           <div hlmDropdownMenuItem class="cursor-default">
-            <label hlmLabel for="sidebar-theme-mode" class="flex w-full items-center justify-between gap-4">
+            <label
+              hlmLabel
+              for="sidebar-theme-mode"
+              class="flex w-full items-center justify-between gap-4"
+            >
               <span class="inline-flex flex-col gap-0.5">
                 <span class="text-sm font-semibold">Theme</span>
                 <span class="text-xs text-muted-foreground">Switch appearance</span>
@@ -109,35 +124,41 @@
               />
             </label>
           </div>
-
           <div hlmDropdownMenuSeparator></div>
-
           <button hlmDropdownMenuItem type="button" variant="destructive" (triggered)="logout()">
-            <ng-icon hlm name="lucideLogOut" size="sm"></ng-icon>
-            Sign out
+            <ng-icon hlm name="lucideLogOut" size="sm"></ng-icon> Sign out
           </button>
         </div>
       </ng-template>
     </div>
   </hlm-sidebar>
-
   <main id="main-content" hlmSidebarInset class="min-w-0" tabindex="-1">
     <header
-      class="sticky top-0 z-30 flex items-center gap-4 bg-[linear-gradient(180deg,color-mix(in_oklab,var(--background)_92%,transparent),transparent_86%)] px-4 pt-4 backdrop-blur-[10px] max-lg:px-3.5 max-lg:pt-3.5"
+      class="sticky top-0 z-30 px-4 py-2 backdrop-blur-[14px] sm:px-6 lg:px-10 max-lg:py-1.5"
+      style="
+        background: linear-gradient(
+          180deg,
+          color-mix(in oklab, var(--background) 93%, var(--card) 7%),
+          color-mix(in oklab, var(--background) 89%, transparent)
+        );
+      "
     >
-      <div class="flex min-w-0 flex-col gap-1.5">
-        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">Current workspace</p>
-        <div>
-          <p class="banking-shell-title">{{ activeItem().label }}</p>
-          <p class="text-[0.96rem] leading-relaxed text-muted-foreground">
-            Operational workspace for account servicing, approvals, and customer activity.
+      <div class="mx-auto max-w-6xl">
+        <div class="flex min-h-9 w-full min-w-0 items-center gap-2.5">
+          <p
+            class="min-w-0 text-[1rem] font-semibold leading-tight tracking-tight text-foreground text-pretty sm:text-[1.06rem]"
+            translate="no"
+          >
+            {{ activeItem().label }}
+          </p>
+          <p
+            class="hidden min-w-0 truncate text-[0.79rem] leading-tight text-muted-foreground lg:block"
+          >
+            Operational workspace for account servicing, approvals, & customer activity.
           </p>
         </div>
       </div>
     </header>
-
-    <div class="min-w-0 p-4 max-lg:p-3.5">
-      <router-outlet />
-    </div>
+    <div class="min-w-0 p-3.5 max-lg:p-3"><router-outlet /></div>
   </main>
 </div>

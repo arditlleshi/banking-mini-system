@@ -1,81 +1,139 @@
 <main class="quiet-dashboard min-h-screen px-4 py-8 sm:px-6 lg:px-10">
   <div class="mx-auto flex max-w-6xl flex-col gap-8">
-    <header class="quiet-hero rounded-lg border border-border/70 bg-card/88 px-6 py-8 shadow-xl shadow-black/6 backdrop-blur-lg sm:px-8 lg:px-10">
+    <header
+      class="bg-[linear-gradient(160deg,var(--surface-elevated),color-mix(in_oklab,var(--card)_92%,transparent))] rounded-lg border border-border/70 bg-card/88 px-6 py-8 shadow-xl shadow-black/6 backdrop-blur-lg sm:px-8 lg:px-10"
+    >
       <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div class="max-w-3xl space-y-4">
-          <p class="quiet-kicker">Operations overview</p>
-          <h1 class="banking-page-title">
+          <p class="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+            Operations overview
+          </p>
+          <h1
+            class="font-[var(--font-manrope)] font-bold tracking-[-0.03em] text-2xl leading-[1.08] tracking-tight text-foreground text-balance sm:text-3xl"
+          >
             Core banking activity in one controlled operating view.
           </h1>
           <p class="max-w-2xl text-base leading-7 text-muted-foreground">
-            Monitor connectivity, session status, and the main operating areas from a cleaner banking workspace built for day-to-day use.
+            Monitor connectivity, session status, and the main operating areas from a cleaner
+            banking workspace built for day-to-day use.
           </p>
         </div>
-
         <div class="rounded-lg border border-border/70 bg-background/70 px-5 py-4 backdrop-blur-sm">
-          <p class="quiet-stat-label">Workspace</p>
+          <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Workspace
+          </p>
           <p class="mt-2 max-w-xs text-sm leading-6 text-muted-foreground">
-            Move between accounts, customers, transactions, and settings from the shared navigation rail.
+            Move between accounts, customers, payments, and settings from the shared navigation
+            rail.
           </p>
         </div>
       </div>
     </header>
-
     <section class="grid gap-4 md:grid-cols-3">
-      <section hlmCard class="quiet-metric-card border-border/70 bg-card/88">
+      <section
+        hlmCard
+        class="bg-[linear-gradient(160deg,var(--surface-elevated),color-mix(in_oklab,var(--card)_92%,transparent))] border-border/70 bg-card/88"
+      >
         <div hlmCardHeader class="gap-3 p-6">
-          <p class="quiet-stat-label">Connection</p>
-          <h2 hlmCardTitle class="banking-metric-title">{{ status() }}</h2>
+          <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Connection
+          </p>
+          <h2
+            hlmCardTitle
+            class="font-[var(--font-manrope)] font-bold tracking-[-0.03em] text-2xl leading-none tracking-tight text-card-foreground sm:text-3xl"
+          >
+            {{ status() }}
+          </h2>
           <p hlmCardDescription class="text-sm leading-6 text-muted-foreground">
             Frontend connectivity to the backend service from the Angular workspace.
           </p>
         </div>
       </section>
-
-      <section hlmCard class="quiet-metric-card border-border/70 bg-card/88">
+      <section
+        hlmCard
+        class="bg-[linear-gradient(160deg,var(--surface-elevated),color-mix(in_oklab,var(--card)_92%,transparent))] border-border/70 bg-card/88"
+      >
         <div hlmCardHeader class="gap-3 p-6">
-          <p class="quiet-stat-label">Session state</p>
-          <h2 hlmCardTitle class="banking-metric-title">{{ sessionState() }}</h2>
+          <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Session state
+          </p>
+          <h2
+            hlmCardTitle
+            class="font-[var(--font-manrope)] font-bold tracking-[-0.03em] text-2xl leading-none tracking-tight text-card-foreground sm:text-3xl"
+          >
+            {{ sessionState() }}
+          </h2>
           <p hlmCardDescription class="text-sm leading-6 text-muted-foreground">
             Authentication state and route protection for the current user session.
           </p>
         </div>
       </section>
-
-      <section hlmCard class="quiet-metric-card border-border/70 bg-card/88">
+      <section
+        hlmCard
+        class="bg-[linear-gradient(160deg,var(--surface-elevated),color-mix(in_oklab,var(--card)_92%,transparent))] border-border/70 bg-card/88"
+      >
         <div hlmCardHeader class="gap-3 p-6">
-          <p class="quiet-stat-label">Visible modules</p>
-          <h2 hlmCardTitle class="banking-metric-title">{{ itemCount() }}</h2>
+          <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Visible modules
+          </p>
+          <h2
+            hlmCardTitle
+            class="font-[var(--font-manrope)] font-bold tracking-[-0.03em] text-2xl leading-none tracking-tight text-card-foreground sm:text-3xl"
+          >
+            {{ itemCount() }}
+          </h2>
           <p hlmCardDescription class="text-sm leading-6 text-muted-foreground">
             Available modules currently returned by the backend test endpoint.
           </p>
         </div>
       </section>
     </section>
-
     <section class="grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
-      <section hlmCard class="quiet-panel border-border/70 bg-card/90">
+      <section
+        hlmCard
+        class="bg-[linear-gradient(160deg,var(--surface-elevated),color-mix(in_oklab,var(--card)_92%,transparent))] border-border/70 bg-card/90"
+      >
         <div hlmCardHeader class="gap-3 p-6 sm:p-8">
-          <p class="quiet-kicker">Module preview</p>
-          <h2 hlmCardTitle class="banking-card-title">Connected banking modules</h2>
+          <p class="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+            Module preview
+          </p>
+          <h2
+            hlmCardTitle
+            class="font-[var(--font-manrope)] font-bold tracking-[-0.03em] text-xl leading-tight tracking-tight text-card-foreground text-balance sm:text-2xl"
+          >
+            Connected banking modules
+          </h2>
           <p hlmCardDescription class="max-w-2xl text-sm leading-6 text-muted-foreground">
-            These entries are still sample data, but the layout is ready to expand into production account, customer, and transaction workflows.
+            These entries are still sample data, but the layout is ready to expand into production
+            account, customer, and payment workflows.
           </p>
         </div>
-
         <div hlmCardContent class="px-6 pb-6 sm:px-8 sm:pb-8">
           <div class="grid gap-4">
             @for (item of items(); track item.id) {
-              <article class="quiet-list-row rounded-lg border border-border/70 bg-background/74 p-5 transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/5">
+              <article
+                class="quiet-list-row rounded-lg border border-border/70 bg-background/74 p-5 transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/5"
+              >
                 <div class="flex items-start justify-between gap-4">
                   <div class="space-y-2">
-                    <p class="quiet-stat-label">Module {{ item.id }}</p>
-                    <h3 class="banking-subsection-title">{{ item.name }}</h3>
+                    <p
+                      class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                    >
+                      Module {{ item.id }}
+                    </p>
+                    <h3
+                      class="font-[var(--font-manrope)] font-bold tracking-[-0.03em] text-xl leading-tight tracking-tight text-foreground text-balance sm:text-2xl"
+                    >
+                      {{ item.name }}
+                    </h3>
                     <p class="text-sm leading-6 text-muted-foreground">
-                      Reserved for operational workflows with clear balances, controlled actions, and easier state visibility.
+                      Reserved for operational workflows with clear balances, controlled actions,
+                      and easier state visibility.
                     </p>
                   </div>
-                  <span class="rounded-full border border-border/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  <span
+                    class="rounded-full border border-border/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                  >
                     {{ accessMode() }}
                   </span>
                 </div>
@@ -84,30 +142,58 @@
           </div>
         </div>
       </section>
-
-      <section hlmCard class="quiet-panel border-border/70 bg-card/90">
+      <section
+        hlmCard
+        class="bg-[linear-gradient(160deg,var(--surface-elevated),color-mix(in_oklab,var(--card)_92%,transparent))] border-border/70 bg-card/90"
+      >
         <div hlmCardHeader class="gap-3 p-6">
-          <p class="quiet-kicker">Design notes</p>
-          <h2 hlmCardTitle class="banking-card-title">Banking theme system</h2>
+          <p class="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+            Design notes
+          </p>
+          <h2
+            hlmCardTitle
+            class="font-[var(--font-manrope)] font-bold tracking-[-0.03em] text-xl leading-tight tracking-tight text-card-foreground text-balance sm:text-2xl"
+          >
+            Banking theme system
+          </h2>
           <p hlmCardDescription class="text-sm leading-6 text-muted-foreground">
-            The interface now favors cleaner contrast, disciplined corners, and reusable banking surfaces over decorative styling.
+            The interface now favors cleaner contrast, disciplined corners, and reusable banking
+            surfaces over decorative styling.
           </p>
         </div>
-
         <div hlmCardContent class="flex flex-col gap-4 px-6 pb-6">
           <div class="rounded-lg border border-border/70 bg-background/72 p-4">
-            <p class="quiet-stat-label">Typography</p>
-            <p class="mt-2 text-sm leading-6 text-muted-foreground">A single corporate sans-serif keeps the interface clear and consistent.</p>
+            <p
+              class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+            >
+              Typography
+            </p>
+            <p class="mt-2 text-sm leading-6 text-muted-foreground">
+              A single corporate sans-serif keeps the interface clear and consistent.
+            </p>
           </div>
           <hlm-separator decorative></hlm-separator>
           <div class="rounded-lg border border-border/70 bg-background/72 p-4">
-            <p class="quiet-stat-label">Palette</p>
-            <p class="mt-2 text-sm leading-6 text-muted-foreground">Slate and graphite surfaces are paired with a restrained teal action color.</p>
+            <p
+              class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+            >
+              Palette
+            </p>
+            <p class="mt-2 text-sm leading-6 text-muted-foreground">
+              Slate and graphite surfaces are paired with a restrained teal action color.
+            </p>
           </div>
           <hlm-separator decorative></hlm-separator>
           <div class="rounded-lg border border-border/70 bg-background/72 p-4">
-            <p class="quiet-stat-label">Mode support</p>
-            <p class="mt-2 text-sm leading-6 text-muted-foreground">Light and dark mode now keep the same tone, with softer dark surfaces and clearer states.</p>
+            <p
+              class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+            >
+              Mode support
+            </p>
+            <p class="mt-2 text-sm leading-6 text-muted-foreground">
+              Light and dark mode now keep the same tone, with softer dark surfaces and clearer
+              states.
+            </p>
           </div>
         </div>
       </section>

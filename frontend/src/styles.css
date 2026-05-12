@@ -10,11 +10,7 @@
 :root {
   color-scheme: light;
 
-  --font-manrope:
-    'Manrope Variable',
-    'Manrope',
-    'Segoe UI',
-    sans-serif;
+  --font-manrope: 'Manrope Variable', 'Manrope', 'Segoe UI', sans-serif;
 
   --radius: 0.5rem;
   --background: oklch(0.978 0.004 220);
@@ -107,201 +103,15 @@
     background-image:
       radial-gradient(circle at 8% 4%, var(--quiet-orb-left), transparent 24rem),
       radial-gradient(circle at 92% 6%, var(--quiet-orb-right), transparent 24rem),
-      linear-gradient(180deg, color-mix(in oklab, var(--background) 96%, white 4%), var(--background));
+      linear-gradient(
+        180deg,
+        color-mix(in oklab, var(--background) 96%, white 4%),
+        var(--background)
+      );
   }
 }
 
 @layer components {
-  .font-display {
-    font-family: var(--font-manrope);
-    font-weight: 700;
-    letter-spacing: -0.03em;
-  }
-
-  .banking-shell-title {
-    @apply font-display text-xl leading-tight tracking-tight text-foreground text-balance sm:text-2xl;
-  }
-
-  .banking-page-title {
-    @apply font-display text-2xl leading-[1.08] tracking-tight text-foreground text-balance sm:text-3xl;
-  }
-
-  .banking-card-title {
-    @apply font-display text-xl leading-tight tracking-tight text-card-foreground text-balance sm:text-2xl;
-  }
-
-  .banking-metric-title {
-    @apply font-display text-2xl leading-none tracking-tight text-card-foreground sm:text-3xl;
-  }
-
-  .banking-subsection-title {
-    @apply font-display text-xl leading-tight tracking-tight text-foreground text-balance sm:text-2xl;
-  }
-
-  .banking-dialog-title {
-    @apply font-display text-lg leading-tight tracking-tight text-card-foreground text-balance sm:text-xl;
-  }
-
-  .quiet-kicker {
-    @apply text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground;
-  }
-
-  .quiet-stat-label {
-    @apply text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground;
-  }
-
-  .quiet-glass-panel {
-    background: linear-gradient(180deg, var(--surface-elevated), color-mix(in oklab, var(--card) 96%, transparent));
-    border: 1px solid color-mix(in oklab, var(--border) 92%, transparent);
-    box-shadow: var(--surface-shadow);
-  }
-
-  .quiet-auth-card,
-  .quiet-panel,
-  .quiet-metric-card,
-  .quiet-hero {
-    background: linear-gradient(160deg, var(--surface-elevated), color-mix(in oklab, var(--card) 92%, transparent));
-  }
-
-  .quiet-auth-shell::before {
-    content: '';
-    position: absolute;
-    inset: 2rem;
-    border: 1px solid color-mix(in oklab, var(--border) 70%, transparent);
-    border-radius: var(--radius);
-    pointer-events: none;
-  }
-
-  .quiet-auth-orb {
-    position: absolute;
-    border-radius: 9999px;
-    filter: blur(40px);
-    opacity: 0.72;
-  }
-
-  .quiet-auth-orb-left {
-    left: 5%;
-    top: 10%;
-    height: 18rem;
-    width: 18rem;
-    background: var(--quiet-orb-left);
-  }
-
-  .quiet-auth-orb-right {
-    right: 4%;
-    bottom: 14%;
-    height: 22rem;
-    width: 22rem;
-    background: var(--quiet-orb-right);
-  }
-
-  .quiet-theme-toggle {
-    border-radius: var(--radius);
-  }
-
-  .spartan-button {
-    @apply rounded-lg border font-semibold tracking-[-0.01em];
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.18) inset;
-  }
-
-  .spartan-button-variant-default {
-    @apply border-transparent bg-primary text-primary-foreground;
-    box-shadow: var(--surface-shadow);
-  }
-
-  .spartan-button-variant-default:hover,
-  .spartan-button-variant-default:focus-visible {
-    background: color-mix(in oklab, var(--primary) 92%, black 8%);
-  }
-
-  .spartan-button-variant-default:active {
-    background: color-mix(in oklab, var(--primary) 88%, black 12%);
-  }
-
-  .spartan-button-variant-outline {
-    @apply border-border bg-card text-foreground;
-    box-shadow: none;
-  }
-
-  .spartan-button-variant-outline:hover,
-  .spartan-button-variant-outline:focus-visible,
-  .spartan-button-variant-secondary:hover,
-  .spartan-button-variant-secondary:focus-visible,
-  .spartan-button-variant-ghost:hover,
-  .spartan-button-variant-ghost:focus-visible {
-    background: color-mix(in oklab, var(--accent) 72%, var(--card) 28%);
-    color: var(--accent-foreground);
-  }
-
-  .spartan-button-variant-secondary {
-    @apply border-border bg-secondary text-secondary-foreground;
-    box-shadow: none;
-  }
-
-  .spartan-button-variant-ghost {
-    @apply border-transparent bg-transparent text-foreground;
-    box-shadow: none;
-  }
-
-  .spartan-button-variant-destructive {
-    @apply border-transparent bg-destructive text-white;
-    box-shadow: var(--surface-shadow);
-  }
-
-  .spartan-button-variant-link {
-    @apply border-transparent bg-transparent p-0 text-primary;
-    box-shadow: none;
-  }
-
-  .spartan-button-size-default {
-    @apply h-10 px-4 py-2 text-sm;
-  }
-
-  .spartan-button-size-sm {
-    @apply h-9 px-3.5 py-2 text-sm;
-  }
-
-  .spartan-button-size-lg {
-    @apply h-11 px-5 py-2.5 text-sm;
-  }
-
-  .spartan-button-size-icon,
-  .spartan-button-size-icon-lg,
-  .spartan-button-size-icon-sm,
-  .spartan-button-size-icon-xs {
-    @apply rounded-lg;
-  }
-
-  .spartan-input {
-    @apply rounded-lg border border-input bg-background/82 px-4 py-2.5 text-sm text-foreground shadow-none transition-[border-color,box-shadow,background-color];
-  }
-
-  .spartan-input:hover {
-    background: color-mix(in oklab, var(--background) 86%, var(--card) 14%);
-  }
-
-  .spartan-input:focus-visible {
-    outline: none;
-    border-color: color-mix(in oklab, var(--ring) 70%, var(--border) 30%);
-    box-shadow: 0 0 0 4px color-mix(in oklab, var(--ring) 16%, transparent);
-  }
-
-  .spartan-input[type='number'] {
-    -moz-appearance: textfield;
-    appearance: textfield;
-  }
-
-  .spartan-input[type='number']::-webkit-outer-spin-button,
-  .spartan-input[type='number']::-webkit-inner-spin-button {
-    margin: 0;
-    -webkit-appearance: none;
-  }
-
-  .spartan-card {
-    @apply rounded-lg border border-border bg-card text-card-foreground;
-    box-shadow: var(--surface-shadow);
-  }
-
   [data-slot='dropdown-menu'],
   [data-slot='dropdown-menu-sub'] {
     @apply rounded-lg border border-border bg-popover p-1.5;
@@ -319,8 +129,11 @@
   }
 
   [data-slot='sidebar-inset'] {
-    background:
-      linear-gradient(180deg, color-mix(in oklab, var(--background) 96%, white 4%), var(--background));
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--background) 96%, white 4%),
+      var(--background)
+    );
   }
 
   [data-slot='button']:focus-visible,

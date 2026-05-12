@@ -33,8 +33,8 @@ export const routes: Routes = [
         loadComponent: () => import('./features/customers/customers-page.component').then((module) => module.CustomersPageComponent)
       },
       {
-        path: 'transactions',
-        loadComponent: () => import('./features/transactions/transactions-page.component').then((module) => module.TransactionsPageComponent)
+        path: 'payments',
+        loadComponent: () => import('./features/payments/payments-page.component').then((module) => module.PaymentsPageComponent)
       },
       {
         path: 'settings',
