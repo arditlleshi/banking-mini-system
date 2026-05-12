@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ardit.banking.account.dto.AccountResponse;
+import com.ardit.banking.account.dto.AccountDetailsResponse;
 import com.ardit.banking.account.dto.CreateAccountRequest;
 import com.ardit.banking.account.dto.UpdateAccountRequest;
 import com.ardit.banking.account.service.AccountService;
@@ -49,6 +50,11 @@ public class AccountController {
     @GetMapping("/{accountId}")
     public AccountResponse getMyAccountById(@AuthenticationPrincipal UserDetails user, @PathVariable Long accountId) {
         return accountService.getAccountForUsername(user.getUsername(), accountId);
+    }
+
+    @GetMapping("/{accountNumber}/details")
+    public AccountDetailsResponse getMyAccountByNumber(@AuthenticationPrincipal UserDetails user, @PathVariable String accountNumber) {
+        return accountService.getAccountDetailsByNumberForUsername(user.getUsername(), accountNumber);
     }
 
     @PutMapping("/{accountId}")

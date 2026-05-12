@@ -1,28 +1,28 @@
 <main class="min-h-screen px-4 py-8 sm:px-6 lg:px-10">
   <div class="mx-auto flex max-w-6xl flex-col gap-6">
-    <section class="overflow-hidden rounded-lg border border-border/70 bg-card/88 px-6 py-8 shadow-xl shadow-black/6 backdrop-blur-lg sm:px-8 lg:px-10">
-      <div class="grid gap-8 lg:grid-cols-[1.25fr_0.75fr] lg:items-end">
-        <div class="space-y-4">
+    <section class="overflow-hidden rounded-lg border border-border/70 bg-card/88 px-6 py-7 shadow-xl shadow-black/6 backdrop-blur-lg sm:px-8 lg:px-10">
+      <div class="grid gap-6 lg:grid-cols-[1.25fr_0.75fr] lg:items-end">
+        <div class="space-y-3">
           <p class="quiet-kicker">Account operations</p>
-          <h1 class="banking-page-title">
+          <h1 class="text-2xl font-semibold leading-tight tracking-[-0.02em] text-foreground text-balance md:text-[1.75rem]">
             Structured account views built for day-to-day banking operations.
           </h1>
-          <p class="max-w-2xl text-base leading-7 text-muted-foreground">
+          <p class="max-w-2xl text-sm leading-6 text-muted-foreground">
             Open and review current, savings, and savings-plan accounts from one workspace with clean balance and status visibility.
           </p>
         </div>
 
-        <div class="flex flex-col gap-3 rounded-lg border border-border/70 bg-background/70 p-5 backdrop-blur-sm">
+        <div class="flex flex-col gap-3 rounded-lg border border-border/70 bg-background/70 p-4 backdrop-blur-sm">
           <p class="quiet-stat-label">Workflow entry</p>
-          <p class="text-sm leading-6 text-muted-foreground">
+          <p class="text-xs leading-5 text-muted-foreground">
             Open a new account with product type, currency, initial funding, and generated numbering handled by the backend.
           </p>
 
           <button
             hlmBtn
             type="button"
-            size="lg"
-            class="mt-2 w-full rounded-lg bg-primary text-primary-foreground shadow-lg shadow-primary/15 transition hover:-translate-y-0.5"
+            size="sm"
+            class="mt-2 h-9 w-full rounded-lg bg-primary text-sm text-primary-foreground shadow-lg shadow-primary/15 transition hover:-translate-y-0.5"
             (click)="openCreateSheet()"
           >
             Create Account
@@ -35,8 +35,8 @@
       <section hlmCard class="quiet-metric-card border-border/70 bg-card/88">
         <div hlmCardHeader class="gap-2 p-5">
           <p class="quiet-stat-label">Accounts</p>
-          <h2 hlmCardTitle class="banking-metric-title">{{ accounts().length }}</h2>
-          <p hlmCardDescription class="text-sm leading-6 text-muted-foreground">
+          <h2 hlmCardTitle class="text-2xl font-semibold leading-none text-foreground [font-variant-numeric:tabular-nums]">{{ accounts().length }}</h2>
+          <p hlmCardDescription class="text-xs leading-5 text-muted-foreground">
             {{ activeAccountCount() }} active accounts currently visible in this workspace.
           </p>
         </div>
@@ -45,8 +45,8 @@
       <section hlmCard class="quiet-metric-card border-border/70 bg-card/88">
         <div hlmCardHeader class="gap-2 p-5">
           <p class="quiet-stat-label">Booked balance</p>
-          <h2 hlmCardTitle class="banking-metric-title">{{ totalCurrentBalance() | number: '1.2-2' }}</h2>
-          <p hlmCardDescription class="text-sm leading-6 text-muted-foreground">
+          <h2 hlmCardTitle class="text-2xl font-semibold leading-none text-foreground [font-variant-numeric:tabular-nums]">{{ totalCurrentBalance() | number: '1.2-2' }}</h2>
+          <p hlmCardDescription class="text-xs leading-5 text-muted-foreground">
             Total booked balance across the visible account set before currency segmentation.
           </p>
         </div>
@@ -55,8 +55,8 @@
       <section hlmCard class="quiet-metric-card border-border/70 bg-card/88">
         <div hlmCardHeader class="gap-2 p-5">
           <p class="quiet-stat-label">Available balance</p>
-          <h2 hlmCardTitle class="banking-metric-title">{{ totalAvailableBalance() | number: '1.2-2' }}</h2>
-          <p hlmCardDescription class="text-sm leading-6 text-muted-foreground">
+          <h2 hlmCardTitle class="text-2xl font-semibold leading-none text-foreground [font-variant-numeric:tabular-nums]">{{ totalAvailableBalance() | number: '1.2-2' }}</h2>
+          <p hlmCardDescription class="text-xs leading-5 text-muted-foreground">
             Available liquidity view based on balances returned by the backend.
           </p>
         </div>
@@ -66,8 +66,8 @@
     <section hlmCard class="border-border/70 bg-card/90">
       <div hlmCardHeader class="gap-3 border-b border-border/70 p-6 sm:p-8">
         <p class="quiet-kicker">Account desk</p>
-        <h2 hlmCardTitle class="banking-card-title">Managed account inventory</h2>
-        <p hlmCardDescription class="max-w-3xl text-sm leading-6 text-muted-foreground">
+        <h2 hlmCardTitle class="text-xl font-semibold leading-tight tracking-[-0.01em] text-foreground">Managed account inventory</h2>
+        <p hlmCardDescription class="max-w-3xl text-xs leading-5 text-muted-foreground">
           Each row focuses on customer-facing account details, balances, and lifecycle status.
         </p>
       </div>
@@ -96,11 +96,11 @@
           <div class="grid gap-4 xl:grid-cols-2">
             @for (account of accounts(); track trackByAccountId($index, account)) {
               <article class="rounded-lg border border-border/70 bg-card/88 p-6">
-                <div class="flex flex-col gap-5">
+                <div class="flex flex-col gap-4">
                   <div class="flex flex-wrap items-start justify-between gap-4">
-                    <div class="space-y-2">
-                      <h3 class="banking-subsection-title leading-none">{{ account.name }}</h3>
-                      <p class="text-sm leading-6 text-muted-foreground">
+                    <div class="space-y-1.5">
+                      <h3 class="text-base font-semibold leading-tight tracking-[-0.01em] text-foreground">{{ account.name }}</h3>
+                      <p class="text-xs leading-5 text-muted-foreground">
                         {{ account.type.replaceAll('_', ' ') }} - {{ account.currency }}
                       </p>
                     </div>
@@ -112,26 +112,26 @@
                   <div class="grid gap-4 sm:grid-cols-2">
                     <div class="min-w-0 rounded-lg border border-border/70 bg-background/72 p-4">
                       <p class="quiet-stat-label">Account number</p>
-                      <p class="mt-3 overflow-hidden text-ellipsis font-mono text-lg text-foreground">{{ account.accountNumber }}</p>
+                      <p class="mt-2 overflow-hidden text-ellipsis font-mono text-sm text-foreground [font-variant-numeric:tabular-nums]">{{ account.accountNumber }}</p>
                     </div>
                     <div class="min-w-0 rounded-lg border border-border/70 bg-background/72 p-4">
                       <p class="quiet-stat-label">IBAN</p>
-                      <p class="mt-3 break-all font-mono text-lg leading-6 text-foreground">{{ account.iban ?? 'Pending' }}</p>
+                      <p class="mt-2 break-all font-mono text-sm leading-5 text-foreground [font-variant-numeric:tabular-nums]">{{ account.iban ?? 'Pending' }}</p>
                     </div>
                   </div>
 
                   <div class="grid gap-4 sm:grid-cols-3">
                     <div class="rounded-lg border border-border/70 bg-background/72 p-4">
                       <p class="quiet-stat-label">Booked</p>
-                      <p class="mt-3 banking-metric-title">{{ account.currentBalance | number: '1.2-2' }}</p>
+                      <p class="mt-2 text-xl font-semibold leading-none text-foreground [font-variant-numeric:tabular-nums]">{{ account.currentBalance | number: '1.2-2' }}</p>
                     </div>
                     <div class="rounded-lg border border-border/70 bg-background/72 p-4">
                       <p class="quiet-stat-label">Available</p>
-                      <p class="mt-3 banking-metric-title">{{ account.availableBalance | number: '1.2-2' }}</p>
+                      <p class="mt-2 text-xl font-semibold leading-none text-foreground [font-variant-numeric:tabular-nums]">{{ account.availableBalance | number: '1.2-2' }}</p>
                     </div>
                     <div class="rounded-lg border border-border/70 bg-background/72 p-4">
                       <p class="quiet-stat-label">Opened</p>
-                      <p class="mt-3 text-sm font-medium text-foreground">{{ account.openedAt | date: 'dd MMM yyyy' }}</p>
+                      <p class="mt-2 text-xs font-medium text-foreground">{{ account.openedAt | date: 'dd MMM yyyy' }}</p>
                     </div>
                   </div>
                 </div>
