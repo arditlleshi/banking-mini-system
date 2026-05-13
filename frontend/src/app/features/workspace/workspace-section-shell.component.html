@@ -1,7 +1,7 @@
 <main class="workspace-page min-h-screen px-4 py-8 sm:px-6 lg:px-10">
   <div class="mx-auto flex max-w-6xl flex-col gap-6">
     <header
-      class="workspace-hero rounded-lg border border-border/70 px-6 py-8 shadow-xl shadow-black/6 backdrop-blur-lg sm:px-8 lg:px-10"
+      class="rounded-lg border border-border/70 px-6 py-8 [background:var(--surface-hero)] [box-shadow:var(--surface-shadow)] backdrop-blur-lg sm:px-8 lg:px-10"
     >
       <div class="max-w-4xl space-y-4">
         <p class="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
@@ -17,7 +17,7 @@
     </header>
     <section class="grid gap-4 md:grid-cols-3">
       @for (highlight of content().highlights; track highlight) {
-        <section hlmCard class="workspace-panel border-border/70 bg-card/88">
+        <section hlmCard class="rounded-lg border border-border/70 [background:var(--surface-hero)]">
           <div hlmCardHeader class="gap-3 p-6">
             <p
               class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
@@ -38,7 +38,7 @@
         </section>
       }
     </section>
-    <section hlmCard class="workspace-panel border-border/70 bg-card/90">
+    <section hlmCard class="rounded-lg border border-border/70 [background:var(--surface-panel-strong)]">
       <div hlmCardHeader class="gap-3 p-6 sm:p-8">
         <p class="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
           Operational readiness
@@ -55,7 +55,7 @@
         </p>
       </div>
       <div hlmCardContent class="grid gap-4 px-6 pb-6 sm:grid-cols-2 sm:px-8 sm:pb-8">
-        <article class="workspace-note rounded-lg border border-border/70 bg-background/72 p-5">
+        <article class="rounded-lg border border-border/70 p-5 [background:var(--surface-inset)] [box-shadow:var(--surface-shadow-inline)]">
           <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             Surface direction
           </p>
@@ -64,7 +64,7 @@
             real forms, lists, and approvals.
           </p>
         </article>
-        <article class="workspace-note rounded-lg border border-border/70 bg-background/72 p-5">
+        <article class="rounded-lg border border-border/70 p-5 [background:var(--surface-inset)] [box-shadow:var(--surface-shadow-inline)]">
           <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             Next build step
           </p>

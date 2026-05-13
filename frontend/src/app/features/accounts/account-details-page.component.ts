@@ -56,8 +56,8 @@ export class AccountDetailsPageComponent {
 
   protected movementTone(transaction: AccountTransactionResponse): string {
     return transaction.direction === 'CREDIT'
-      ? 'text-emerald-700 dark:text-emerald-300'
-      : 'text-rose-700 dark:text-rose-300';
+      ? '[color:var(--status-inflow-foreground)]'
+      : '[color:var(--status-outflow-foreground)]';
   }
 
   protected senderLabel(details: AccountDetailsResponse, transaction: AccountTransactionResponse): string {

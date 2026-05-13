@@ -54,7 +54,7 @@ type AccountFormOption<T extends string> = { readonly value: T; readonly label: 
     <hlm-dialog [state]="open() ? 'open' : 'closed'" (stateChanged)="handleStateChanged($event)">
       <hlm-dialog-content
         *hlmDialogPortal="let ctx"
-        class="flex max-h-[min(88vh,42rem)] w-[calc(100vw-2rem)] max-w-2xl flex-col overflow-hidden rounded-lg border-border/70 bg-card/96 p-0 backdrop-blur-xl"
+        class="flex max-h-[min(88vh,42rem)] w-[calc(100vw-2rem)] max-w-2xl flex-col overflow-hidden rounded-lg border border-border/70 p-0 backdrop-blur-xl [background:var(--surface-panel-strong)]"
       >
         <div class="flex min-h-0 flex-col">
           <div hlmDialogHeader class="gap-3 border-b border-border/70 px-6 py-6 sm:px-8">
@@ -83,7 +83,7 @@ type AccountFormOption<T extends string> = { readonly value: T; readonly label: 
                   hlmInput
                   type="text"
                   formControlName="name"
-                  class="h-10 rounded-lg border-border/80 bg-background/70 px-4 text-sm text-foreground shadow-sm transition focus-visible:ring-4 focus-visible:ring-ring/20"
+                  class="h-10 rounded-lg border border-border/80 px-4 text-sm text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20 disabled:[background:var(--surface-control-disabled)]"
                   placeholder="e.g. Daily operating account…"
                 />
               </div>
@@ -153,14 +153,14 @@ type AccountFormOption<T extends string> = { readonly value: T; readonly label: 
                   min="0"
                   step="0.01"
                   formControlName="initialDeposit"
-                  class="h-10 rounded-lg border-border/80 bg-background/70 px-4 text-sm text-foreground shadow-sm transition focus-visible:ring-4 focus-visible:ring-ring/20"
+                  class="h-10 rounded-lg border border-border/80 px-4 text-sm text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20 disabled:[background:var(--surface-control-disabled)]"
                 />
               </div>
             </div>
             <div class="border-t border-border/70 px-6 py-5 sm:px-8">
               @if (submitErrorMessage()) {
                 <p
-                  class="mb-4 rounded-lg border border-red-500/20 bg-red-500/8 px-4 py-3 text-sm font-medium text-red-700 dark:text-red-300"
+                  class="mb-4 rounded-lg border px-4 py-3 text-sm font-medium [border-color:var(--status-danger-border)] [background:var(--status-danger-surface)] [color:var(--status-danger-foreground)]"
                 >
                   {{ submitErrorMessage() }}
                 </p>
@@ -194,7 +194,7 @@ type AccountFormOption<T extends string> = { readonly value: T; readonly label: 
 export class CreateAccountDialogComponent {
   private readonly fb = new FormBuilder();
   protected readonly compactControlClass =
-    'h-10 rounded-lg border-border/80 bg-background/70 px-4 text-sm text-foreground shadow-sm focus-visible:ring-4 focus-visible:ring-ring/20';
+    'h-10 rounded-lg border border-border/80 px-4 text-sm text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20 disabled:[background:var(--surface-control-disabled)]';
   readonly open = input.required<boolean>();
   readonly submitting = input(false);
   readonly submitErrorMessage = input<string | null>(null);

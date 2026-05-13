@@ -40,13 +40,59 @@
   --sidebar-border: oklch(0.856 0.01 220);
   --sidebar-ring: oklch(0.62 0.05 211);
 
-  --quiet-gold: oklch(0.73 0.038 85);
-  --quiet-orb-left: color-mix(in oklab, oklch(0.81 0.03 212) 24%, transparent);
-  --quiet-orb-right: color-mix(in oklab, oklch(0.77 0.022 225) 20%, transparent);
   --surface-tint: color-mix(in oklab, var(--card) 92%, var(--accent) 8%);
   --surface-elevated: color-mix(in oklab, var(--card) 97%, white 3%);
+  --surface-hero: color-mix(in oklab, var(--surface-elevated) 88%, var(--accent) 12%);
+  --surface-panel: color-mix(in oklab, var(--card) 88%, transparent);
+  --surface-panel-strong: color-mix(in oklab, var(--card) 90%, transparent);
+  --surface-inset: color-mix(in oklab, var(--background) 74%, var(--card) 26%);
+  --surface-inset-strong: color-mix(in oklab, var(--background) 68%, var(--card) 32%);
+  --surface-control: color-mix(in oklab, var(--background) 70%, var(--card) 30%);
+  --surface-control-hover: color-mix(in oklab, var(--background) 64%, var(--card) 36%);
+  --surface-control-disabled: color-mix(in oklab, var(--background) 48%, var(--card) 52%);
+  --surface-selected: color-mix(in oklab, var(--primary) 8%, var(--card) 92%);
+  --surface-selected-hover: color-mix(in oklab, var(--accent) 40%, var(--card) 60%);
+  --surface-selected-border: color-mix(in oklab, var(--primary) 45%, var(--border) 55%);
+  --surface-scrim: color-mix(in oklab, var(--foreground) 20%, transparent);
+  --surface-scrim-strong: color-mix(in oklab, var(--foreground) 24%, transparent);
+  --surface-sidebar-shell: color-mix(in oklab, var(--sidebar) 92%, var(--sidebar-accent) 8%);
+  --surface-sidebar-badge: color-mix(in oklab, var(--sidebar-accent) 66%, var(--sidebar) 34%);
+  --surface-sidebar-avatar: color-mix(in oklab, var(--sidebar-accent) 70%, var(--sidebar) 30%);
+  --surface-sidebar-toggle: color-mix(in oklab, var(--sidebar) 78%, transparent);
+  --surface-inset-highlight: color-mix(in oklab, white 18%, transparent);
   --surface-shadow: 0 22px 46px -34px rgba(15, 23, 42, 0.18);
   --surface-shadow-strong: 0 26px 54px -34px rgba(15, 23, 42, 0.24);
+  --surface-shadow-inline: 0 24px 44px -38px rgba(15, 23, 42, 0.26);
+  --surface-shadow-selected: 0 18px 40px -34px rgba(15, 23, 42, 0.42);
+  --surface-shadow-skip-link: 0 18px 40px -30px rgba(15, 23, 42, 0.45);
+
+  --status-danger: oklch(0.63 0.19 24);
+  --status-danger-foreground: oklch(0.46 0.16 24);
+  --status-danger-surface: color-mix(in oklab, var(--status-danger) 12%, var(--card) 88%);
+  --status-danger-surface-strong: color-mix(in oklab, var(--status-danger) 18%, var(--card) 82%);
+  --status-danger-border: color-mix(in oklab, var(--status-danger) 28%, var(--border) 72%);
+  --status-danger-ring: color-mix(in oklab, var(--status-danger) 18%, transparent);
+  --status-warning: oklch(0.72 0.13 78);
+  --status-warning-foreground: oklch(0.52 0.1 78);
+  --status-warning-surface: color-mix(in oklab, var(--status-warning) 12%, var(--card) 88%);
+  --status-warning-border: color-mix(in oklab, var(--status-warning) 28%, var(--border) 72%);
+  --status-success: oklch(0.66 0.12 155);
+  --status-success-foreground: oklch(0.47 0.1 155);
+  --status-success-surface: color-mix(in oklab, var(--status-success) 12%, var(--card) 88%);
+  --status-success-border: color-mix(in oklab, var(--status-success) 30%, var(--border) 70%);
+  --status-inflow-foreground: var(--status-success-foreground);
+  --status-outflow-foreground: var(--status-danger-foreground);
+
+  --destructive-foreground: oklch(0.985 0.002 220);
+  --button-primary-hover: color-mix(in oklab, var(--primary) 92%, var(--foreground) 8%);
+  --button-primary-active: color-mix(in oklab, var(--primary) 88%, var(--foreground) 12%);
+  --button-destructive-hover: color-mix(in oklab, var(--destructive) 90%, var(--foreground) 10%);
+  --button-destructive-active: color-mix(in oklab, var(--destructive) 84%, var(--foreground) 16%);
+  --select-trigger-surface: color-mix(in oklab, var(--input) 54%, transparent);
+  --select-trigger-surface-hover: color-mix(in oklab, var(--input) 72%, transparent);
+  --switch-track-unchecked: color-mix(in oklab, var(--input) 88%, var(--card) 12%);
+  --switch-thumb-unchecked: var(--background);
+  --switch-thumb-checked: var(--primary-foreground);
 }
 
 :root.dark {
@@ -79,13 +125,59 @@
   --sidebar-border: oklch(0.38 0.013 232);
   --sidebar-ring: oklch(0.7 0.06 205);
 
-  --quiet-gold: oklch(0.77 0.038 85);
-  --quiet-orb-left: color-mix(in oklab, oklch(0.54 0.046 208) 24%, transparent);
-  --quiet-orb-right: color-mix(in oklab, oklch(0.46 0.032 226) 18%, transparent);
   --surface-tint: color-mix(in oklab, var(--card) 92%, var(--accent) 8%);
   --surface-elevated: color-mix(in oklab, var(--card) 96%, white 4%);
+  --surface-hero: color-mix(in oklab, var(--surface-elevated) 82%, var(--accent) 18%);
+  --surface-panel: color-mix(in oklab, var(--card) 88%, transparent);
+  --surface-panel-strong: color-mix(in oklab, var(--card) 92%, transparent);
+  --surface-inset: color-mix(in oklab, var(--background) 70%, var(--card) 30%);
+  --surface-inset-strong: color-mix(in oklab, var(--background) 64%, var(--card) 36%);
+  --surface-control: color-mix(in oklab, var(--input) 78%, var(--background) 22%);
+  --surface-control-hover: color-mix(in oklab, var(--input) 86%, var(--background) 14%);
+  --surface-control-disabled: color-mix(in oklab, var(--input) 62%, var(--background) 38%);
+  --surface-selected: color-mix(in oklab, var(--primary) 14%, var(--card) 86%);
+  --surface-selected-hover: color-mix(in oklab, var(--accent) 44%, var(--card) 56%);
+  --surface-selected-border: color-mix(in oklab, var(--primary) 52%, var(--border) 48%);
+  --surface-scrim: color-mix(in oklab, var(--foreground) 18%, transparent);
+  --surface-scrim-strong: color-mix(in oklab, var(--foreground) 24%, transparent);
+  --surface-sidebar-shell: color-mix(in oklab, var(--sidebar) 88%, var(--sidebar-accent) 12%);
+  --surface-sidebar-badge: color-mix(in oklab, var(--sidebar-accent) 64%, var(--sidebar) 36%);
+  --surface-sidebar-avatar: color-mix(in oklab, var(--sidebar-accent) 68%, var(--sidebar) 32%);
+  --surface-sidebar-toggle: color-mix(in oklab, var(--sidebar) 84%, transparent);
+  --surface-inset-highlight: color-mix(in oklab, white 10%, transparent);
   --surface-shadow: 0 26px 54px -38px rgba(0, 0, 0, 0.34);
   --surface-shadow-strong: 0 32px 64px -36px rgba(0, 0, 0, 0.42);
+  --surface-shadow-inline: 0 28px 52px -40px rgba(0, 0, 0, 0.34);
+  --surface-shadow-selected: 0 22px 48px -34px rgba(0, 0, 0, 0.44);
+  --surface-shadow-skip-link: 0 20px 42px -30px rgba(0, 0, 0, 0.46);
+
+  --status-danger: oklch(0.72 0.15 24);
+  --status-danger-foreground: oklch(0.82 0.11 24);
+  --status-danger-surface: color-mix(in oklab, var(--status-danger) 18%, var(--card) 82%);
+  --status-danger-surface-strong: color-mix(in oklab, var(--status-danger) 24%, var(--card) 76%);
+  --status-danger-border: color-mix(in oklab, var(--status-danger) 34%, var(--border) 66%);
+  --status-danger-ring: color-mix(in oklab, var(--status-danger) 28%, transparent);
+  --status-warning: oklch(0.78 0.11 78);
+  --status-warning-foreground: oklch(0.84 0.09 78);
+  --status-warning-surface: color-mix(in oklab, var(--status-warning) 18%, var(--card) 82%);
+  --status-warning-border: color-mix(in oklab, var(--status-warning) 34%, var(--border) 66%);
+  --status-success: oklch(0.76 0.1 155);
+  --status-success-foreground: oklch(0.84 0.08 155);
+  --status-success-surface: color-mix(in oklab, var(--status-success) 18%, var(--card) 82%);
+  --status-success-border: color-mix(in oklab, var(--status-success) 36%, var(--border) 64%);
+  --status-inflow-foreground: var(--status-success-foreground);
+  --status-outflow-foreground: var(--status-danger-foreground);
+
+  --destructive-foreground: oklch(0.94 0.004 225);
+  --button-primary-hover: color-mix(in oklab, var(--primary) 90%, var(--foreground) 10%);
+  --button-primary-active: color-mix(in oklab, var(--primary) 84%, var(--foreground) 16%);
+  --button-destructive-hover: color-mix(in oklab, var(--destructive) 88%, var(--foreground) 12%);
+  --button-destructive-active: color-mix(in oklab, var(--destructive) 82%, var(--foreground) 18%);
+  --select-trigger-surface: color-mix(in oklab, var(--input) 60%, transparent);
+  --select-trigger-surface-hover: color-mix(in oklab, var(--input) 78%, transparent);
+  --switch-track-unchecked: color-mix(in oklab, var(--input) 90%, var(--background) 10%);
+  --switch-thumb-unchecked: var(--foreground);
+  --switch-thumb-checked: var(--primary-foreground);
 }
 
 @layer base {
@@ -100,14 +192,7 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: var(--font-manrope);
-    background-image:
-      radial-gradient(circle at 8% 4%, var(--quiet-orb-left), transparent 24rem),
-      radial-gradient(circle at 92% 6%, var(--quiet-orb-right), transparent 24rem),
-      linear-gradient(
-        180deg,
-        color-mix(in oklab, var(--background) 96%, white 4%),
-        var(--background)
-      );
+    background-image: none;
   }
 }
 
@@ -129,11 +214,7 @@
   }
 
   [data-slot='sidebar-inset'] {
-    background: linear-gradient(
-      180deg,
-      color-mix(in oklab, var(--background) 96%, white 4%),
-      var(--background)
-    );
+    background: color-mix(in oklab, var(--background) 96%, var(--card) 4%);
   }
 
   [data-slot='button']:focus-visible,

@@ -1,7 +1,7 @@
 <div hlmSidebarWrapper class="relative min-h-screen">
   <a
     href="#main-content"
-    class="absolute left-4 top-4 z-80 translate-y-[-180%] rounded-lg bg-card px-4 py-2.5 text-foreground no-underline shadow-[0_18px_40px_-30px_rgba(15,23,42,0.45)] transition-transform duration-200 focus-visible:translate-y-0"
+    class="absolute left-4 top-4 z-80 translate-y-[-180%] rounded-lg bg-card px-4 py-2.5 text-foreground no-underline [box-shadow:var(--surface-shadow-skip-link)] transition-transform duration-200 focus-visible:translate-y-0"
   >
     Skip to main content
   </a>
@@ -16,7 +16,7 @@
       <section class="flex items-center gap-3 group-data-[collapsible=icon]:justify-center">
         <div
           aria-hidden="true"
-          class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[color-mix(in_oklab,var(--sidebar-accent)_66%,var(--sidebar)_34%)] text-sidebar-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] group-data-[collapsible=icon]:hidden"
+          class="inline-flex h-10 w-10 items-center justify-center rounded-lg text-sidebar-foreground [background:var(--surface-sidebar-badge)] [box-shadow:inset_0_1px_0_var(--surface-inset-highlight)] group-data-[collapsible=icon]:hidden"
         >
           <ng-icon hlm name="lucideBuilding2" size="sm"></ng-icon>
         </div>
@@ -27,7 +27,7 @@
         <button
           hlmSidebarTrigger
           type="button"
-          class="ml-auto rounded-lg border border-sidebar-border/70 bg-sidebar/78 text-sidebar-foreground/80 shadow-none group-data-[collapsible=icon]:ml-0 group-data-[collapsible=icon]:size-9 group-data-[collapsible=icon]:p-0"
+          class="ml-auto rounded-lg border border-sidebar-border/70 text-sidebar-foreground/80 shadow-none [background:var(--surface-sidebar-toggle)] group-data-[collapsible=icon]:ml-0 group-data-[collapsible=icon]:size-9 group-data-[collapsible=icon]:p-0"
           aria-label="Toggle sidebar"
         ></button>
       </section>
@@ -75,14 +75,14 @@
         hlmBtn
         type="button"
         variant="ghost"
-        class="w-full min-h-15 justify-start gap-3 rounded-lg border border-sidebar-border/65 bg-[linear-gradient(180deg,color-mix(in_oklab,var(--sidebar)_96%,white_4%),color-mix(in_oklab,var(--sidebar)_90%,transparent))] px-3 py-2.5 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:size-10 group-data-[collapsible=icon]:min-h-10 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:py-0"
+        class="w-full min-h-15 justify-start gap-3 rounded-lg border border-sidebar-border/65 px-3 py-2.5 [background:var(--surface-sidebar-shell)] group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:size-10 group-data-[collapsible=icon]:min-h-10 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:py-0"
         [hlmDropdownMenuTrigger]="profileMenu"
         side="top"
         align="start"
       >
         <span
           aria-hidden="true"
-          class="inline-flex h-8.5 w-8.5 items-center justify-center rounded-full bg-[color-mix(in_oklab,var(--sidebar-accent)_70%,var(--sidebar)_30%)] text-[0.78rem] font-bold tracking-[0.06em] text-sidebar-foreground/92 group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8"
+          class="inline-flex h-8.5 w-8.5 items-center justify-center rounded-full text-[0.78rem] font-bold tracking-[0.06em] text-sidebar-foreground/92 [background:var(--surface-sidebar-avatar)] group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8"
         >
           {{ userInitials() }}
         </span>
@@ -134,16 +134,9 @@
   </hlm-sidebar>
   <main id="main-content" hlmSidebarInset class="min-w-0" tabindex="-1">
     <header
-      class="sticky top-0 z-30 px-4 py-2 backdrop-blur-[14px] sm:px-6 lg:px-10 max-lg:py-1.5"
-      style="
-        background: linear-gradient(
-          180deg,
-          color-mix(in oklab, var(--background) 93%, var(--card) 7%),
-          color-mix(in oklab, var(--background) 89%, transparent)
-        );
-      "
+      class="sticky top-0 z-30 flex h-15 items-center border-b px-4 [background:color-mix(in_oklab,var(--background)_93%,var(--card)_7%)] backdrop-blur-[14px] sm:px-6 lg:px-10"
     >
-      <div class="mx-auto max-w-6xl">
+      <div class="flex h-full w-full items-center mx-auto max-w-6xl">
         <div class="flex min-h-9 w-full min-w-0 items-center gap-2.5">
           <p
             class="min-w-0 text-[1rem] font-semibold leading-tight tracking-tight text-foreground text-pretty sm:text-[1.06rem]"

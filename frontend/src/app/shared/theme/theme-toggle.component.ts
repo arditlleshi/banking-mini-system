@@ -7,7 +7,7 @@ import { HlmSwitch } from '../ui/spartan/switch';
   imports: [HlmLabel, HlmSwitch],
   template: `
     <div
-      class="rounded-lg border border-border/70 bg-card/88 px-3 py-2 shadow-lg shadow-black/5 backdrop-blur-md"
+      class="rounded-lg border border-border/70 px-3 py-2 backdrop-blur-md [background:var(--surface-panel)] [box-shadow:var(--surface-shadow)]"
     >
       <label
         hlmLabel

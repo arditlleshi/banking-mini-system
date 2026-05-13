@@ -3,14 +3,6 @@
 >
   <div class="absolute right-6 top-6 z-10 sm:right-10"><app-theme-toggle /></div>
   <div
-    class="absolute left-[5%] top-[10%] h-72 w-72 rounded-full opacity-72 blur-[40px] bg-[var(--quiet-orb-left)]"
-    aria-hidden="true"
-  ></div>
-  <div
-    class="absolute bottom-[14%] right-[4%] h-[22rem] w-[22rem] rounded-full opacity-72 blur-[40px] bg-[var(--quiet-orb-right)]"
-    aria-hidden="true"
-  ></div>
-  <div
     class="relative mx-auto grid min-h-[calc(100vh-5rem)] max-w-6xl items-center gap-10 lg:grid-cols-[1.15fr_0.85fr]"
   >
     <div class="space-y-8">
@@ -30,7 +22,7 @@
       </div>
       <div class="grid gap-4 sm:grid-cols-3">
         <article
-          class="border border-[color-mix(in_oklab,var(--border)_92%,transparent)] bg-[linear-gradient(180deg,var(--surface-elevated),color-mix(in_oklab,var(--card)_96%,transparent))] shadow-[var(--surface-shadow)] rounded-lg p-5"
+          class="rounded-lg border border-[color-mix(in_oklab,var(--border)_92%,transparent)] p-5 [background:var(--surface-elevated)] [box-shadow:var(--surface-shadow)]"
         >
           <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             Access control
@@ -45,7 +37,7 @@
           </p>
         </article>
         <article
-          class="border border-[color-mix(in_oklab,var(--border)_92%,transparent)] bg-[linear-gradient(180deg,var(--surface-elevated),color-mix(in_oklab,var(--card)_96%,transparent))] shadow-[var(--surface-shadow)] rounded-lg p-5"
+          class="rounded-lg border border-[color-mix(in_oklab,var(--border)_92%,transparent)] p-5 [background:var(--surface-elevated)] [box-shadow:var(--surface-shadow)]"
         >
           <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             Session security
@@ -60,7 +52,7 @@
           </p>
         </article>
         <article
-          class="border border-[color-mix(in_oklab,var(--border)_92%,transparent)] bg-[linear-gradient(180deg,var(--surface-elevated),color-mix(in_oklab,var(--card)_96%,transparent))] shadow-[var(--surface-shadow)] rounded-lg p-5"
+          class="rounded-lg border border-[color-mix(in_oklab,var(--border)_92%,transparent)] p-5 [background:var(--surface-elevated)] [box-shadow:var(--surface-shadow)]"
         >
           <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             Interface tone
@@ -79,7 +71,7 @@
     <form [formGroup]="form" (ngSubmit)="submit()" class="relative">
       <section
         hlmCard
-        class="bg-[linear-gradient(160deg,var(--surface-elevated),color-mix(in_oklab,var(--card)_92%,transparent))] border-border/70 bg-card/88 shadow-2xl shadow-black/10 backdrop-blur-xl"
+        class="rounded-lg border border-border/70 [background:var(--surface-hero)] [box-shadow:var(--surface-shadow)] backdrop-blur-xl"
       >
         <div hlmCardHeader class="gap-3 p-8 sm:p-10">
           <p class="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
@@ -107,7 +99,7 @@
               id="username"
               name="username"
               hlmInput
-              class="rounded-lg border border-border/80 bg-background/70 px-4 py-3 text-base text-foreground shadow-sm transition focus-visible:ring-4 focus-visible:ring-ring/20"
+              class="rounded-lg border border-border/80 px-4 py-3 text-base text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20 disabled:[background:var(--surface-control-disabled)]"
               type="text"
               formControlName="username"
               autocomplete="username"
@@ -124,16 +116,14 @@
               id="password"
               name="password"
               hlmInput
-              class="rounded-lg border border-border/80 bg-background/70 px-4 py-3 text-base text-foreground shadow-sm transition focus-visible:ring-4 focus-visible:ring-ring/20"
+              class="rounded-lg border border-border/80 px-4 py-3 text-base text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20 disabled:[background:var(--surface-control-disabled)]"
               type="password"
               formControlName="password"
               autocomplete="current-password"
             />
           </div>
           @if (errorMessage()) {
-            <p
-              class="rounded-lg border border-red-500/20 bg-red-500/8 px-4 py-3 text-sm font-medium text-red-700 dark:text-red-300"
-            >
+            <p class="rounded-lg border px-4 py-3 text-sm font-medium [border-color:var(--status-danger-border)] [background:var(--status-danger-surface)] [color:var(--status-danger-foreground)]">
               {{ errorMessage() }}
             </p>
           }

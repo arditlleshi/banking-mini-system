@@ -13,8 +13,7 @@ import { WorkspacePageContent } from './workspace-page-content';
   selector: 'app-workspace-section-shell',
   imports: [HlmCard, HlmCardContent, HlmCardDescription, HlmCardHeader, HlmCardTitle],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './workspace-section-shell.component.html',
-  styleUrl: './workspace-section-shell.component.css'
+  templateUrl: './workspace-section-shell.component.html'
 })
 export class WorkspaceSectionShellComponent {
   readonly content = input.required<WorkspacePageContent>();

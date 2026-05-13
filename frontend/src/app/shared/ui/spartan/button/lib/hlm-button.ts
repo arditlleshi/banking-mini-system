@@ -6,12 +6,12 @@ import type { ClassValue } from 'clsx';
 import { injectBrnButtonConfig } from './hlm-button.token';
 
 export const buttonVariants = cva(
-  'group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-lg border font-semibold tracking-[-0.01em] transition-[background-color,border-color,color,box-shadow,transform] outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_ng-icon]:pointer-events-none [&_ng-icon]:shrink-0 [box-shadow:0_1px_0_rgba(255,255,255,0.18)_inset]',
+  'group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-lg border font-semibold tracking-[-0.01em] transition-[background-color,border-color,color,box-shadow,transform] outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_ng-icon]:pointer-events-none [&_ng-icon]:shrink-0 [box-shadow:inset_0_1px_0_var(--surface-inset-highlight)]',
   {
     variants: {
       variant: {
         default:
-          'border-transparent bg-primary text-primary-foreground [box-shadow:var(--surface-shadow)] hover:bg-[color-mix(in_oklab,var(--primary)_92%,black_8%)] focus-visible:bg-[color-mix(in_oklab,var(--primary)_92%,black_8%)] active:bg-[color-mix(in_oklab,var(--primary)_88%,black_12%)]',
+          'border-transparent bg-primary text-primary-foreground [box-shadow:var(--surface-shadow)] hover:[background:var(--button-primary-hover)] focus-visible:[background:var(--button-primary-hover)] active:[background:var(--button-primary-active)]',
         outline:
           'border-border bg-card text-foreground shadow-none hover:bg-[color-mix(in_oklab,var(--accent)_72%,var(--card)_28%)] hover:text-accent-foreground focus-visible:bg-[color-mix(in_oklab,var(--accent)_72%,var(--card)_28%)] focus-visible:text-accent-foreground',
         secondary:
@@ -19,7 +19,7 @@ export const buttonVariants = cva(
         ghost:
           'border-transparent bg-transparent text-foreground shadow-none hover:bg-[color-mix(in_oklab,var(--accent)_72%,var(--card)_28%)] hover:text-accent-foreground focus-visible:bg-[color-mix(in_oklab,var(--accent)_72%,var(--card)_28%)] focus-visible:text-accent-foreground',
         destructive:
-          'border-transparent bg-destructive text-white [box-shadow:var(--surface-shadow)]',
+          'border-transparent bg-destructive [color:var(--destructive-foreground)] [box-shadow:var(--surface-shadow)] hover:[background:var(--button-destructive-hover)] focus-visible:[background:var(--button-destructive-hover)] active:[background:var(--button-destructive-active)]',
         link: 'border-transparent bg-transparent p-0 text-primary shadow-none',
       },
       size: {

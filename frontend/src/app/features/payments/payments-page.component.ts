@@ -82,7 +82,7 @@ export class PaymentsPageComponent {
   protected readonly accounts = signal<AccountResponse[]>([]);
   protected readonly exchangeRates = signal<ExchangeRateResponse[]>([]);
   protected readonly compactControlClass =
-    'h-10 rounded-lg border-border/80 bg-background/70 px-4 text-sm text-foreground shadow-sm focus-visible:ring-4 focus-visible:ring-ring/20';
+    'h-10 rounded-lg border border-border/80 px-4 text-sm text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20 disabled:[background:var(--surface-control-disabled)]';
   protected readonly activePaymentAction = signal<PaymentAction['id']>('own-accounts');
   protected readonly paymentActions: readonly PaymentAction[] = [
     {
@@ -292,12 +292,12 @@ export class PaymentsPageComponent {
     const base =
       'group flex min-h-28 w-full min-w-0 items-start gap-3 rounded-lg border px-4 py-4 text-left transition-[border-color,background-color,box-shadow] focus-visible:ring-4 focus-visible:ring-ring/20';
     if (!action.available) {
-      return `${base} cursor-not-allowed border-border/55 bg-background/45 text-muted-foreground opacity-72`;
+      return `${base} cursor-not-allowed border-border/55 text-muted-foreground opacity-72 [background:var(--surface-control-disabled)]`;
     }
     if (this.activePaymentAction() === action.id) {
-      return `${base} border-primary/45 bg-primary/8 text-foreground shadow-[0_18px_40px_-34px_rgba(15,23,42,0.42)]`;
+      return `${base} text-foreground [border-color:var(--surface-selected-border)] [background:var(--surface-selected)] [box-shadow:var(--surface-shadow-selected)]`;
     }
-    return `${base} border-border/70 bg-card/82 text-foreground hover:border-primary/30 hover:bg-accent/40`;
+    return `${base} border-border/70 text-foreground [background:var(--surface-panel)] hover:border-primary/30 hover:[background:var(--surface-selected-hover)]`;
   }
 
   private loadData(): void {

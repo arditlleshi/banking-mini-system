@@ -1,9 +1,0 @@
-.workspace-hero,
-.workspace-panel {
-  background:
-    linear-gradient(160deg, color-mix(in oklab, var(--card) 96%, white 4%), color-mix(in oklab, var(--card) 90%, transparent));
-}
-
-.workspace-note {
-  box-shadow: 0 24px 44px -38px rgba(15, 23, 42, 0.26);
-}

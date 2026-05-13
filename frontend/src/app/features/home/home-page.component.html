@@ -1,7 +1,7 @@
 <main class="quiet-dashboard min-h-screen px-4 py-8 sm:px-6 lg:px-10">
   <div class="mx-auto flex max-w-6xl flex-col gap-8">
     <header
-      class="bg-[linear-gradient(160deg,var(--surface-elevated),color-mix(in_oklab,var(--card)_92%,transparent))] rounded-lg border border-border/70 bg-card/88 px-6 py-8 shadow-xl shadow-black/6 backdrop-blur-lg sm:px-8 lg:px-10"
+      class="rounded-lg border border-border/70 px-6 py-8 [background:var(--surface-hero)] [box-shadow:var(--surface-shadow)] backdrop-blur-lg sm:px-8 lg:px-10"
     >
       <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div class="max-w-3xl space-y-4">
@@ -18,7 +18,7 @@
             banking workspace built for day-to-day use.
           </p>
         </div>
-        <div class="rounded-lg border border-border/70 bg-background/70 px-5 py-4 backdrop-blur-sm">
+        <div class="rounded-lg border border-border/70 px-5 py-4 [background:var(--surface-inset)] backdrop-blur-sm">
           <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             Workspace
           </p>
@@ -30,10 +30,7 @@
       </div>
     </header>
     <section class="grid gap-4 md:grid-cols-3">
-      <section
-        hlmCard
-        class="bg-[linear-gradient(160deg,var(--surface-elevated),color-mix(in_oklab,var(--card)_92%,transparent))] border-border/70 bg-card/88"
-      >
+      <section hlmCard class="rounded-lg border border-border/70 [background:var(--surface-hero)]">
         <div hlmCardHeader class="gap-3 p-6">
           <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             Connection
@@ -49,10 +46,7 @@
           </p>
         </div>
       </section>
-      <section
-        hlmCard
-        class="bg-[linear-gradient(160deg,var(--surface-elevated),color-mix(in_oklab,var(--card)_92%,transparent))] border-border/70 bg-card/88"
-      >
+      <section hlmCard class="rounded-lg border border-border/70 [background:var(--surface-hero)]">
         <div hlmCardHeader class="gap-3 p-6">
           <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             Session state
@@ -68,10 +62,7 @@
           </p>
         </div>
       </section>
-      <section
-        hlmCard
-        class="bg-[linear-gradient(160deg,var(--surface-elevated),color-mix(in_oklab,var(--card)_92%,transparent))] border-border/70 bg-card/88"
-      >
+      <section hlmCard class="rounded-lg border border-border/70 [background:var(--surface-hero)]">
         <div hlmCardHeader class="gap-3 p-6">
           <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             Visible modules
@@ -89,10 +80,7 @@
       </section>
     </section>
     <section class="grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
-      <section
-        hlmCard
-        class="bg-[linear-gradient(160deg,var(--surface-elevated),color-mix(in_oklab,var(--card)_92%,transparent))] border-border/70 bg-card/90"
-      >
+      <section hlmCard class="rounded-lg border border-border/70 [background:var(--surface-panel-strong)]">
         <div hlmCardHeader class="gap-3 p-6 sm:p-8">
           <p class="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
             Module preview
@@ -112,7 +100,7 @@
           <div class="grid gap-4">
             @for (item of items(); track item.id) {
               <article
-                class="quiet-list-row rounded-lg border border-border/70 bg-background/74 p-5 transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/5"
+                class="quiet-list-row rounded-lg border border-border/70 p-5 transition-[transform,box-shadow] hover:-translate-y-0.5 [background:var(--surface-inset)] hover:[box-shadow:var(--surface-shadow)]"
               >
                 <div class="flex items-start justify-between gap-4">
                   <div class="space-y-2">
@@ -142,10 +130,7 @@
           </div>
         </div>
       </section>
-      <section
-        hlmCard
-        class="bg-[linear-gradient(160deg,var(--surface-elevated),color-mix(in_oklab,var(--card)_92%,transparent))] border-border/70 bg-card/90"
-      >
+      <section hlmCard class="rounded-lg border border-border/70 [background:var(--surface-panel-strong)]">
         <div hlmCardHeader class="gap-3 p-6">
           <p class="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
             Design notes
@@ -162,7 +147,7 @@
           </p>
         </div>
         <div hlmCardContent class="flex flex-col gap-4 px-6 pb-6">
-          <div class="rounded-lg border border-border/70 bg-background/72 p-4">
+          <div class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]">
             <p
               class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
             >
@@ -173,7 +158,7 @@
             </p>
           </div>
           <hlm-separator decorative></hlm-separator>
-          <div class="rounded-lg border border-border/70 bg-background/72 p-4">
+          <div class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]">
             <p
               class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
             >
@@ -184,7 +169,7 @@
             </p>
           </div>
           <hlm-separator decorative></hlm-separator>
-          <div class="rounded-lg border border-border/70 bg-background/72 p-4">
+          <div class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]">
             <p
               class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
             >
