@@ -26,5 +26,17 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
         @Param("toDate") LocalDate toDate
     );
 
+    Optional<TransactionEntity> findTopByAccountIdAndValueDateLessThanOrderByValueDateDescBookingTimestampDescIdDesc(
+        Long accountId,
+        LocalDate valueDate
+    );
+
+    Optional<TransactionEntity> findTopByAccountIdAndValueDateLessThanEqualOrderByValueDateDescBookingTimestampDescIdDesc(
+        Long accountId,
+        LocalDate valueDate
+    );
+
+    Optional<TransactionEntity> findTopByAccountIdOrderByValueDateAscBookingTimestampAscIdAsc(Long accountId);
+
     Optional<TransactionEntity> findByIdAndAccountId(Long id, Long accountId);
 }

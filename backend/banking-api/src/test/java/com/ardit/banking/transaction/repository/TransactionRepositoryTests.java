@@ -3,6 +3,7 @@ package com.ardit.banking.transaction.repository;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -61,6 +62,28 @@ class TransactionRepositoryTests {
             .containsExactly(sameTimestampButLaterId.getId(), newer.getId(), older.getId());
     }
 
+    @Test
+    void findTopByAccountIdAndValueDateLessThanEqualReturnsLatestBalanceBeforeStatementEndDate() {
+        UserEntity owner = persistUser("balance-user");
+        AccountEntity account = persistAccount(owner, "123456STAT02");
+
+        persistTransaction(account, 1L, Instant.parse("2026-05-10T08:00:00Z"));
+        TransactionEntity expected = persistTransaction(account, 2L, Instant.parse("2026-05-12T08:00:00Z"));
+        persistTransaction(account, 3L, Instant.parse("2026-05-14T08:00:00Z"));
+
+        entityManager.flush();
+        entityManager.clear();
+
+        TransactionEntity transaction = transactionRepository
+            .findTopByAccountIdAndValueDateLessThanEqualOrderByValueDateDescBookingTimestampDescIdDesc(
+                account.getId(),
+                LocalDate.of(2026, 5, 12)
+            )
+            .orElseThrow();
+
+        assertThat(transaction.getId()).isEqualTo(expected.getId());
+    }
+
     private UserEntity persistUser(String username) {
         UserEntity user = new UserEntity();
         ReflectionTestUtils.setField(user, "username", username);
@@ -107,7 +130,7 @@ class TransactionRepositoryTests {
             null,
             null,
             bookingTimestamp,
-            LocalDate.of(2026, 5, 12),
+            bookingTimestamp.atZone(ZoneOffset.UTC).toLocalDate(),
             new BigDecimal("1010.00"),
             null,
             null,

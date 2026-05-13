@@ -31,6 +31,14 @@ banking:
       iban-account-number-length: ${BANKING_ACCOUNT_IBAN_NUMBER_LENGTH:16}
       base-number-length: ${BANKING_ACCOUNT_BASE_NUMBER_LENGTH:6}
       serial-length: ${BANKING_ACCOUNT_SERIAL_LENGTH:2}
+  statement:
+    institution-name: ${BANKING_STATEMENT_INSTITUTION_NAME:Banking Mini System}
+    institution-address-line: ${BANKING_STATEMENT_ADDRESS_LINE:Rruga e Bankes 1}
+    institution-city: ${BANKING_STATEMENT_CITY:Tirane}
+    institution-country: ${BANKING_STATEMENT_COUNTRY:Albania}
+    institution-bic: ${BANKING_STATEMENT_BIC:BMSIALTR}
+    support-email: ${BANKING_STATEMENT_SUPPORT_EMAIL:support@banking.local}
+    support-phone: ${BANKING_STATEMENT_SUPPORT_PHONE:+355 4 000 0000}
 
 springdoc:
   api-docs:

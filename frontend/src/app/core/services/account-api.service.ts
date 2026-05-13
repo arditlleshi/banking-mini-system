@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -60,6 +60,11 @@ export type AccountDetailsResponse = {
   transactions: AccountTransactionResponse[];
 };
 
+export type AccountStatementFilters = {
+  readonly fromDate?: string | null;
+  readonly toDate?: string | null;
+};
+
 @Injectable({ providedIn: 'root' })
 export class AccountApiService {
   private readonly http = inject(HttpClient);
@@ -75,5 +80,31 @@ export class AccountApiService {
 
   getAccountDetails(accountNumber: string): Observable<AccountDetailsResponse> {
     return this.http.get<AccountDetailsResponse>(`${this.baseUrl}/accounts/${accountNumber}/details`);
+  }
+
+  getAccountTransactions(accountId: number, filters: AccountStatementFilters = {}): Observable<AccountTransactionResponse[]> {
+    return this.http.get<AccountTransactionResponse[]>(`${this.baseUrl}/accounts/${accountId}/transactions`, {
+      params: this.buildStatementParams(filters)
+    });
+  }
+
+  downloadAccountStatement(accountId: number, filters: AccountStatementFilters = {}): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/accounts/${accountId}/statement`, {
+      params: this.buildStatementParams(filters),
+      responseType: 'blob'
+    });
+  }
+
+  private buildStatementParams(filters: AccountStatementFilters): HttpParams {
+    let params = new HttpParams();
+
+    if (filters.fromDate) {
+      params = params.set('fromDate', filters.fromDate);
+    }
+    if (filters.toDate) {
+      params = params.set('toDate', filters.toDate);
+    }
+
+    return params;
   }
 }

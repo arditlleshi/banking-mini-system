@@ -22,6 +22,7 @@ import com.ardit.banking.transaction.domain.TransactionStatus;
 import com.ardit.banking.transaction.domain.TransactionType;
 import com.ardit.banking.transaction.dto.TransactionResponse;
 import com.ardit.banking.transaction.repository.TransactionRepository;
+import com.ardit.banking.transaction.statement.StatementDateRange;
 
 @Service
 public class TransactionService {
@@ -97,7 +98,7 @@ public class TransactionService {
     @Transactional(readOnly = true)
     public List<TransactionResponse> getTransactionsForUsernameAndAccount(String username, Long accountId,
                                                                           LocalDate fromDate, LocalDate toDate) {
-        validateDateRange(fromDate, toDate);
+        StatementDateRange.of(fromDate, toDate);
         AccountEntity account = getOwnedAccount(username, accountId);
         return transactionRepository.findStatementEntries(account.getId(), fromDate, toDate).stream()
             .map(TransactionService::toResponse)
@@ -118,12 +119,6 @@ public class TransactionService {
 
         return accountRepository.findByIdAndOwnerId(accountId, owner.getId())
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
-    }
-
-    private static void validateDateRange(LocalDate fromDate, LocalDate toDate) {
-        if (fromDate != null && toDate != null && fromDate.isAfter(toDate)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "fromDate must be before or equal to toDate");
-        }
     }
 
     private static TransactionResponse toResponse(TransactionEntity transaction) {

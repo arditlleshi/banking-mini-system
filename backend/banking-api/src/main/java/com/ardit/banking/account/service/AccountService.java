@@ -21,10 +21,9 @@ import com.ardit.banking.account.dto.UpdateAccountRequest;
 import com.ardit.banking.account.repository.AccountRepository;
 import com.ardit.banking.security.user.domain.UserEntity;
 import com.ardit.banking.security.user.repository.UserRepository;
-import com.ardit.banking.transaction.domain.TransactionDirection;
-import com.ardit.banking.transaction.domain.TransactionEntity;
+import com.ardit.banking.transaction.statement.AccountStatement;
+import com.ardit.banking.transaction.statement.AccountStatementService;
 import com.ardit.banking.transaction.dto.TransactionResponse;
-import com.ardit.banking.transaction.repository.TransactionRepository;
 import com.ardit.banking.transaction.service.TransactionService;
 
 @Service
@@ -35,17 +34,17 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
     private final TransactionService transactionService;
-    private final TransactionRepository transactionRepository;
+    private final AccountStatementService accountStatementService;
     private final AccountNumberingProperties accountNumberingProperties;
     private final SecureRandom secureRandom = new SecureRandom();
 
     public AccountService(AccountRepository accountRepository, UserRepository userRepository,
-                          TransactionService transactionService, TransactionRepository transactionRepository,
+                          TransactionService transactionService, AccountStatementService accountStatementService,
                           AccountNumberingProperties accountNumberingProperties) {
         this.accountRepository = accountRepository;
         this.userRepository = userRepository;
         this.transactionService = transactionService;
-        this.transactionRepository = transactionRepository;
+        this.accountStatementService = accountStatementService;
         this.accountNumberingProperties = accountNumberingProperties;
     }
 
@@ -99,32 +98,23 @@ public class AccountService {
 
     @Transactional(readOnly = true)
     public AccountDetailsResponse getAccountDetailsByNumberForUsername(String username, String accountNumber) {
-        UserEntity owner = getOwnerByUsername(username);
-        AccountEntity account = accountRepository.findByAccountNumberAndOwnerId(accountNumber, owner.getId())
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
-
-        List<TransactionEntity> transactions = transactionRepository.findStatementEntries(account.getId(), null, null);
-        List<TransactionResponse> transactionResponses = transactions.stream()
-            .map(AccountService::toTransactionResponse)
+        AccountStatement statement = accountStatementService.getStatementForUsernameAndAccountNumber(
+            username,
+            accountNumber,
+            null,
+            null
+        );
+        AccountEntity account = getOwnedAccountByNumber(username, accountNumber);
+        List<TransactionResponse> transactionResponses = statement.transactions().stream()
+            .map(transaction -> transaction.toTransactionResponse())
             .toList();
-
-        BigDecimal totalCredits = transactions.stream()
-            .filter(transaction -> transaction.getDirection() == TransactionDirection.CREDIT)
-            .map(TransactionEntity::getAmount)
-            .reduce(BigDecimal.ZERO, BigDecimal::add)
-            .setScale(2, java.math.RoundingMode.HALF_EVEN);
-        BigDecimal totalDebits = transactions.stream()
-            .filter(transaction -> transaction.getDirection() == TransactionDirection.DEBIT)
-            .map(TransactionEntity::getAmount)
-            .reduce(BigDecimal.ZERO, BigDecimal::add)
-            .setScale(2, java.math.RoundingMode.HALF_EVEN);
 
         return new AccountDetailsResponse(
             toResponse(account),
-            transactionResponses.size(),
-            totalCredits,
-            totalDebits,
-            totalCredits.subtract(totalDebits).setScale(2, java.math.RoundingMode.HALF_EVEN),
+            statement.transactionCount(),
+            statement.totalCredits(),
+            statement.totalDebits(),
+            statement.netMovement(),
             transactionResponses
         );
     }
@@ -162,6 +152,12 @@ public class AccountService {
     private AccountEntity getOwnedAccount(String username, Long accountId) {
         UserEntity owner = getOwnerByUsername(username);
         return accountRepository.findByIdAndOwnerId(accountId, owner.getId())
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
+    }
+
+    private AccountEntity getOwnedAccountByNumber(String username, String accountNumber) {
+        UserEntity owner = getOwnerByUsername(username);
+        return accountRepository.findByAccountNumberAndOwnerId(accountNumber, owner.getId())
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
     }
 
@@ -269,28 +265,6 @@ public class AccountService {
             account.getAnnualInterestRate(),
             account.getOpenedAt(),
             account.getClosedAt()
-        );
-    }
-
-    private static TransactionResponse toTransactionResponse(TransactionEntity transaction) {
-        return new TransactionResponse(
-            transaction.getId(),
-            transaction.getTransactionReference(),
-            transaction.getExternalReference(),
-            transaction.getType().name(),
-            transaction.getStatus().name(),
-            transaction.getDirection().name(),
-            transaction.getCurrency().name(),
-            transaction.getAmount(),
-            transaction.getDescription(),
-            transaction.getCounterpartyName(),
-            transaction.getCounterpartyAccount(),
-            transaction.getBookingTimestamp(),
-            transaction.getValueDate(),
-            transaction.getBalanceAfter(),
-            transaction.getFxRate(),
-            transaction.getFxReferenceAmount(),
-            transaction.getFxReferenceCurrency() == null ? null : transaction.getFxReferenceCurrency().name()
         );
     }
 }
