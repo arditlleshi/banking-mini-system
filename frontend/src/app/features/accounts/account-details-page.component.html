@@ -24,7 +24,7 @@
         }
       </div>
     } @else if (errorMessage()) {
-      <p class="rounded-lg border px-4 py-3 text-sm font-medium [border-color:var(--status-danger-border)] [background:var(--status-danger-surface)] [color:var(--status-danger-foreground)]">
+      <p class="rounded-lg border px-4 py-3 text-sm font-medium border-(--status-danger-border) [background:var(--status-danger-surface)] text-(--status-danger-foreground)">
         {{ errorMessage() }}
       </p>
     } @else if (details(); as detailsData) {

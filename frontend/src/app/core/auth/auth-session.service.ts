@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, catchError, finalize, map, of, shareReplay, throwError } from 'rxjs';
+import { Observable, catchError, finalize, of, shareReplay, throwError, tap } from 'rxjs';
 
 import { AuthApiService, AuthTokens } from './auth-api.service';
 import { AuthStateService } from './auth-state.service';
@@ -19,9 +19,8 @@ export class AuthSessionService {
     }
 
     this.refreshInFlight$ = this.authApi.refresh().pipe(
-      map((tokens) => {
+      tap((tokens) => {
         this.authState.setTokens(tokens);
-        return tokens;
       }),
       catchError((error) => {
         this.authState.clear();
@@ -30,7 +29,7 @@ export class AuthSessionService {
       finalize(() => {
         this.refreshInFlight$ = null;
       }),
-      shareReplay(1)
+      shareReplay({ bufferSize: 1, refCount: false })
     );
 
     return this.refreshInFlight$;

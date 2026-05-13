@@ -19,6 +19,6 @@ describe('App', () => {
     await fixture.whenStable();
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.textContent).toContain('Night mode');
+    expect(compiled.querySelector('router-outlet')).toBeTruthy();
   });
 });

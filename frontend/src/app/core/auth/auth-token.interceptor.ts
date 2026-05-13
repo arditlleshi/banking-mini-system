@@ -7,16 +7,20 @@ import { AuthSessionService } from './auth-session.service';
 import { SKIP_AUTH_INTERCEPTOR } from './auth-http-context';
 import { AuthStateService } from './auth-state.service';
 
+const AUTH_FAILURE_STATUSES = new Set([401, 403]);
+
 export const authTokenInterceptor: HttpInterceptorFn = (req, next) => {
   const authState = inject(AuthStateService);
   const authSession = inject(AuthSessionService);
   const router = inject(Router);
 
-  if (req.context.get(SKIP_AUTH_INTERCEPTOR)) {
+  const skipAuthHandling = req.context.get(SKIP_AUTH_INTERCEPTOR);
+  const accessToken = authState.getAccessToken();
+
+  if (skipAuthHandling) {
     return next(req);
   }
 
-  const accessToken = authState.getAccessToken();
   const authReq = accessToken
     ? req.clone({
         setHeaders: {
@@ -28,7 +32,7 @@ export const authTokenInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status !== 401 || req.url.includes('/auth/')) {
+      if (!accessToken || !AUTH_FAILURE_STATUSES.has(error.status) || req.url.includes('/auth/')) {
         return throwError(() => error);
       }
 
