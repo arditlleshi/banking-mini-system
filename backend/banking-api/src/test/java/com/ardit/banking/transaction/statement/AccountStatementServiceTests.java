@@ -44,22 +44,12 @@ class AccountStatementServiceTests {
     private AccountStatementService accountStatementService;
 
     @Test
-    void buildsStatementWithOpeningAndClosingBalancesForRequestedPeriod() {
+    void buildsStatementWithTransactionsAndTotalsForRequestedPeriod() {
         UserEntity user = createUser(11L, "statement-user", "Statement User");
         AccountEntity account = createAccount(7L, user, "123456STD01", new BigDecimal("1150.00"));
         LocalDate fromDate = LocalDate.of(2026, 5, 3);
         LocalDate toDate = LocalDate.of(2026, 5, 4);
 
-        TransactionEntity priorTransaction = createTransaction(
-            1L,
-            account,
-            "ref-before",
-            TransactionDirection.CREDIT,
-            new BigDecimal("250.00"),
-            new BigDecimal("1000.00"),
-            LocalDate.of(2026, 5, 2),
-            Instant.parse("2026-05-02T09:00:00Z")
-        );
         TransactionEntity latestInRange = createTransaction(
             3L,
             account,
@@ -85,10 +75,6 @@ class AccountStatementServiceTests {
         when(accountRepository.findByIdAndOwnerId(7L, 11L)).thenReturn(Optional.of(account));
         when(transactionRepository.findStatementEntries(7L, fromDate, toDate))
             .thenReturn(List.of(latestInRange, oldestInRange));
-        when(transactionRepository.findTopByAccountIdAndValueDateLessThanOrderByValueDateDescBookingTimestampDescIdDesc(7L, fromDate))
-            .thenReturn(Optional.of(priorTransaction));
-        when(transactionRepository.findTopByAccountIdAndValueDateLessThanEqualOrderByValueDateDescBookingTimestampDescIdDesc(7L, toDate))
-            .thenReturn(Optional.of(latestInRange));
 
         AccountStatement statement = accountStatementService.getStatementForUsernameAndAccount(
             "statement-user",
@@ -101,10 +87,8 @@ class AccountStatementServiceTests {
         assertThat(statement.totalCredits()).isEqualByComparingTo("200.00");
         assertThat(statement.totalDebits()).isEqualByComparingTo("50.00");
         assertThat(statement.netMovement()).isEqualByComparingTo("150.00");
-        assertThat(statement.openingBalance()).isEqualByComparingTo("1000.00");
-        assertThat(statement.closingBalance()).isEqualByComparingTo("1150.00");
         assertThat(statement.transactions()).extracting(AccountStatementTransaction::transactionReference)
-            .containsExactly("ref-debit", "ref-credit");
+            .containsExactly("ref-credit", "ref-debit");
     }
 
     private static UserEntity createUser(Long id, String username, String fullName) {

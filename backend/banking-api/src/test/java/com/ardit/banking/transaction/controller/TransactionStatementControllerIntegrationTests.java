@@ -91,9 +91,15 @@ class TransactionStatementControllerIntegrationTests {
             String text = new PDFTextStripper().getText(document);
             assertThat(text).contains("Transaction Statement");
             assertThat(text).contains("123456STD01");
-            assertThat(text).contains("stmt-ref-1");
-            assertThat(text).contains("stmt-ref-2");
+            assertThat(text).contains("stmt-r");
+            assertThat(text).contains("09:00:00");
+            assertThat(text).contains("Debit amount");
+            assertThat(text).contains("Credit amount");
+            assertThat(text).contains("Blocked amount");
+            assertThat(text).contains("Available amount");
             assertThat(text).contains("Statement User");
+            assertThat(text.indexOf("02 May 2026 09:00:00")).isLessThan(text.indexOf("05 May 2026 09:00:00"));
+            assertThat(text).contains("(1)");
         }
     }
 

@@ -17,6 +17,7 @@ public record AccountStatement(
     BigDecimal availableBalance,
     String customerName,
     String username,
+    Instant accountOpenedAt,
     LocalDate fromDate,
     LocalDate toDate,
     Instant generatedAt,
@@ -24,8 +25,6 @@ public record AccountStatement(
     BigDecimal totalCredits,
     BigDecimal totalDebits,
     BigDecimal netMovement,
-    BigDecimal openingBalance,
-    BigDecimal closingBalance,
     List<AccountStatementTransaction> transactions
 ) {
 }

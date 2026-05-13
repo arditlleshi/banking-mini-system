@@ -98,13 +98,13 @@ public class AccountService {
 
     @Transactional(readOnly = true)
     public AccountDetailsResponse getAccountDetailsByNumberForUsername(String username, String accountNumber) {
-        AccountStatement statement = accountStatementService.getStatementForUsernameAndAccountNumber(
+        AccountEntity account = getOwnedAccountByNumber(username, accountNumber);
+        AccountStatement statement = accountStatementService.getStatementForAccount(
+            account,
             username,
-            accountNumber,
             null,
             null
         );
-        AccountEntity account = getOwnedAccountByNumber(username, accountNumber);
         List<TransactionResponse> transactionResponses = statement.transactions().stream()
             .map(transaction -> transaction.toTransactionResponse())
             .toList();

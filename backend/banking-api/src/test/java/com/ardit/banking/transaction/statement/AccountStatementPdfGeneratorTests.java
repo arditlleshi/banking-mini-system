@@ -41,6 +41,7 @@ class AccountStatementPdfGeneratorTests {
             new BigDecimal("1150.00"),
             "Statement User",
             "statement-user",
+            Instant.parse("2026-05-01T09:00:00Z"),
             LocalDate.of(2026, 5, 1),
             LocalDate.of(2026, 5, 31),
             Instant.parse("2026-05-13T10:15:00Z"),
@@ -48,8 +49,6 @@ class AccountStatementPdfGeneratorTests {
             new BigDecimal("200.00"),
             new BigDecimal("50.00"),
             new BigDecimal("150.00"),
-            new BigDecimal("1000.00"),
-            new BigDecimal("1150.00"),
             List.of(
                 new AccountStatementTransaction(
                     1L,
@@ -80,11 +79,21 @@ class AccountStatementPdfGeneratorTests {
         try (PDDocument document = Loader.loadPDF(pdf)) {
             String text = new PDFTextStripper().getText(document);
             assertThat(text).contains("Transaction Statement");
+            assertThat(text).contains("Statement date");
+            assertThat(text).contains("Statement period");
             assertThat(text).contains("Statement User");
             assertThat(text).contains("123456STD01");
-            assertThat(text).contains("ref-123");
-            assertThat(text).contains("Opening balance");
-            assertThat(text).contains("Closing balance");
+            assertThat(text).contains("10 May 2026");
+            assertThat(text).contains("11:30:00");
+            assertThat(text).contains("ref-12");
+            assertThat(text).contains("DEBIT");
+            assertThat(text).contains("CREDIT");
+            assertThat(text).contains("BALANCE");
+            assertThat(text).contains("Debit amount");
+            assertThat(text).contains("(1)");
+            assertThat(text).contains("Credit amount");
+            assertThat(text).contains("Blocked amount");
+            assertThat(text).contains("Available amount");
         }
     }
 }

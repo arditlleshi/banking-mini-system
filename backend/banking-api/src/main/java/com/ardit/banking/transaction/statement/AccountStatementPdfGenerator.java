@@ -5,9 +5,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Locale;
+import java.util.List;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -31,9 +34,14 @@ public class AccountStatementPdfGenerator {
     private static final float SMALL_FONT_SIZE = 8f;
     private static final float TITLE_FONT_SIZE = 18f;
     private static final float LINE_GAP = 12f;
+    private static final float TABLE_FONT_SIZE = 7f;
+    private static final float TABLE_LINE_HEIGHT = 9f;
+    private static final float CELL_TEXT_PADDING = 2f;
+    private static final float MONEY_CELL_PADDING = 12f;
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd MMM uuuu");
-    private static final DateTimeFormatter TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("dd MMM uuuu HH:mm")
+    private static final DateTimeFormatter TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("dd MMM uuuu HH:mm:ss")
         .withZone(ZoneId.systemDefault());
+    private static final float[] TRANSACTION_COLUMN_WIDTHS = new float[] {84f, 128f, 58f, 62f, 52f, 52f, 77f};
 
     private final StatementDocumentProperties properties;
 
@@ -46,8 +54,8 @@ public class AccountStatementPdfGenerator {
             PageWriter writer = new PageWriter(document);
 
             drawHeader(writer, statement);
-            drawStatementSummary(writer, statement);
             drawTransactions(writer, statement);
+            drawStatementSummary(writer, statement);
 
             writer.close();
             document.save(outputStream);
@@ -87,7 +95,7 @@ public class AccountStatementPdfGenerator {
 
         writer.drawDivider(706f);
 
-        writer.writeLabelValue("Generated", formatTimestamp(statement.generatedAt()), PAGE_MARGIN, 688f, 120f);
+        writer.writeLabelValue("Statement date", formatDate(statement.generatedAt()), PAGE_MARGIN, 688f, 120f);
         writer.writeLabelValue("Statement period", formatPeriod(statement), PAGE_MARGIN, 674f, 120f);
         writer.writeLabelValue("Customer name", statement.customerName(), PAGE_MARGIN, 660f, 120f);
         writer.writeLabelValue("Username", statement.username(), PAGE_MARGIN, 646f, 120f);
@@ -104,20 +112,13 @@ public class AccountStatementPdfGenerator {
             100f
         );
 
-        writer.moveCursorTo(612f);
+        writer.moveCursorTo(610f);
     }
 
     private void drawStatementSummary(PageWriter writer, AccountStatement statement) throws IOException {
+        writer.space(18f);
         writer.sectionTitle("Statement Summary");
-        writer.detailRow("Transactions", Integer.toString(statement.transactionCount()));
-        writer.detailRow("Opening balance", formatMoney(statement.openingBalance(), statement.accountCurrency()));
-        writer.detailRow("Total money in", formatMoney(statement.totalCredits(), statement.accountCurrency()));
-        writer.detailRow("Total money out", formatMoney(statement.totalDebits(), statement.accountCurrency()));
-        writer.detailRow("Net movement", formatMoney(statement.netMovement(), statement.accountCurrency()));
-        writer.detailRow("Closing balance", formatMoney(statement.closingBalance(), statement.accountCurrency()));
-        writer.detailRow("Current balance", formatMoney(statement.currentBalance(), statement.accountCurrency()));
-        writer.detailRow("Available balance", formatMoney(statement.availableBalance(), statement.accountCurrency()));
-        writer.space(6f);
+        writer.drawSummaryBlock(statement);
     }
 
     private void drawTransactions(PageWriter writer, AccountStatement statement) throws IOException {
@@ -127,52 +128,37 @@ public class AccountStatementPdfGenerator {
             return;
         }
 
-        int index = 1;
+        writer.ensureSpace(24f);
+        writer.drawTransactionHeader();
         for (AccountStatementTransaction transaction : statement.transactions()) {
-            writer.ensureSpace(96f);
-            writer.writeText(
-                index + ". " + transaction.type() + " / " + transaction.direction(),
-                PAGE_MARGIN,
-                writer.currentY(),
-                FONT_BOLD,
-                10f,
-                Color.BLACK
+            List<String> bookingDateLines = wrapText(
+                formatTimestamp(transaction.bookingTimestamp()),
+                TRANSACTION_COLUMN_WIDTHS[0] - 2f,
+                FONT_REGULAR,
+                TABLE_FONT_SIZE
             );
-            writer.writeText(
-                formatMoney(transaction.amount(), transaction.currency()),
-                410f,
-                writer.currentY(),
-                FONT_BOLD,
-                10f,
-                transaction.direction().equals("CREDIT") ? new Color(0, 102, 51) : new Color(153, 0, 0)
+            List<String> descriptionLines = wrapText(
+                combineDescription(transaction),
+                TRANSACTION_COLUMN_WIDTHS[1] - 2f,
+                FONT_REGULAR,
+                TABLE_FONT_SIZE
             );
-            writer.moveCursor(-14f);
-
-            writer.detailRow("Booking time", formatTimestamp(transaction.bookingTimestamp()));
-            writer.detailRow("Value date", formatDate(transaction.valueDate()));
-            writer.detailRow("Reference", transaction.transactionReference());
-            writer.detailRow("External reference", nullSafe(transaction.externalReference()));
-            writer.detailRow("Status", transaction.status());
-            writer.detailRow("Description", transaction.description());
-            writer.detailRow("Counterparty", joinCounterparty(transaction.counterpartyName(), transaction.counterpartyAccount()));
-            writer.detailRow(
-                "Balance after",
-                formatMoney(transaction.balanceAfter(), transaction.currency())
+            float rowHeight = Math.max(
+                TABLE_LINE_HEIGHT + 4f,
+                Math.max(bookingDateLines.size(), descriptionLines.size()) * TABLE_LINE_HEIGHT + 6f
             );
-
-            if (transaction.fxRate() != null && transaction.fxReferenceAmount() != null && transaction.fxReferenceCurrency() != null) {
-                writer.detailRow(
-                    "FX details",
-                    "Rate " + transaction.fxRate().toPlainString()
-                        + " against "
-                        + formatMoney(transaction.fxReferenceAmount(), transaction.fxReferenceCurrency())
-                );
-            }
-
-            writer.drawDivider(writer.currentY() - 2f);
-            writer.moveCursor(-10f);
-            index++;
+            writer.ensureSpace(rowHeight + 6f);
+            writer.drawTransactionRow(transaction, bookingDateLines, descriptionLines, rowHeight);
         }
+    }
+
+    private static String combineDescription(AccountStatementTransaction transaction) {
+        String description = nullSafe(transaction.description());
+        String counterparty = joinCounterparty(transaction.counterpartyName(), transaction.counterpartyAccount());
+        if ("-".equals(counterparty)) {
+            return description;
+        }
+        return description + " / " + counterparty;
     }
 
     private static String joinCounterparty(String name, String account) {
@@ -185,8 +171,8 @@ public class AccountStatementPdfGenerator {
     }
 
     private static String formatPeriod(AccountStatement statement) {
-        String from = statement.fromDate() == null ? "Account opening" : formatDate(statement.fromDate());
-        String to = statement.toDate() == null ? "Latest booked transaction" : formatDate(statement.toDate());
+        String from = statement.fromDate() == null ? formatDate(statement.accountOpenedAt()) : formatDate(statement.fromDate().atStartOfDay(ZoneId.systemDefault()).toInstant());
+        String to = statement.toDate() == null ? formatDate(statement.generatedAt()) : formatDate(statement.toDate().atStartOfDay(ZoneId.systemDefault()).toInstant());
         return from + " to " + to;
     }
 
@@ -194,15 +180,34 @@ public class AccountStatementPdfGenerator {
         return TIMESTAMP_FORMAT.format(timestamp);
     }
 
-    private static String formatDate(java.time.LocalDate date) {
+    private static String formatDate(LocalDate date) {
         return DATE_FORMAT.format(date);
     }
 
-    private static String formatMoney(BigDecimal amount, String currency) {
+    private static String formatDate(java.time.Instant timestamp) {
+        return DATE_FORMAT.format(timestamp.atZone(ZoneId.systemDefault()).toLocalDate());
+    }
+
+    private static String formatAmount(BigDecimal amount) {
         NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
         numberFormat.setMinimumFractionDigits(2);
         numberFormat.setMaximumFractionDigits(2);
-        return numberFormat.format(amount) + " " + currency;
+        return numberFormat.format(amount);
+    }
+
+    private static BigDecimal blockedAmount(AccountStatement statement) {
+        BigDecimal blocked = statement.currentBalance().subtract(statement.availableBalance());
+        return blocked.signum() < 0 ? BigDecimal.ZERO : blocked;
+    }
+
+    private static int countTransactions(AccountStatement statement, String direction) {
+        int count = 0;
+        for (AccountStatementTransaction transaction : statement.transactions()) {
+            if (direction.equals(transaction.direction())) {
+                count++;
+            }
+        }
+        return count;
     }
 
     private static String nullSafe(String value) {
@@ -210,6 +215,48 @@ public class AccountStatementPdfGenerator {
             return "-";
         }
         return value.trim();
+    }
+
+    private static String shortReference(String value) {
+        String reference = nullSafe(value);
+        if ("-".equals(reference) || reference.length() <= 6) {
+            return reference;
+        }
+        return reference.substring(0, 6);
+    }
+
+    private static List<String> wrapText(String value, float maxWidth, PDFont font, float fontSize) throws IOException {
+        String normalized = nullSafe(value);
+        if ("-".equals(normalized)) {
+            return List.of("-");
+        }
+
+        String[] words = normalized.split("\\s+");
+        List<String> lines = new ArrayList<>();
+        StringBuilder currentLine = new StringBuilder();
+
+        for (String word : words) {
+            String candidate = currentLine.isEmpty() ? word : currentLine + " " + word;
+            if (textWidth(candidate, font, fontSize) <= maxWidth || currentLine.isEmpty()) {
+                if (!currentLine.isEmpty()) {
+                    currentLine.append(' ');
+                }
+                currentLine.append(word);
+            } else {
+                lines.add(currentLine.toString());
+                currentLine = new StringBuilder(word);
+            }
+        }
+
+        if (!currentLine.isEmpty()) {
+            lines.add(currentLine.toString());
+        }
+
+        return lines;
+    }
+
+    private static float textWidth(String text, PDFont font, float fontSize) throws IOException {
+        return font.getStringWidth(text) / 1000f * fontSize;
     }
 
     private static final class PageWriter {
@@ -223,14 +270,6 @@ public class AccountStatementPdfGenerator {
         private PageWriter(PDDocument document) throws IOException {
             this.document = document;
             addPage();
-        }
-
-        float currentY() {
-            return currentY;
-        }
-
-        void moveCursor(float deltaY) {
-            currentY += deltaY;
         }
 
         void moveCursorTo(float y) {
@@ -254,6 +293,48 @@ public class AccountStatementPdfGenerator {
             writeText(label + ":", PAGE_MARGIN, currentY, FONT_BOLD, BODY_FONT_SIZE, Color.DARK_GRAY);
             writeText(value, PAGE_MARGIN + 92f, currentY, FONT_REGULAR, BODY_FONT_SIZE, Color.BLACK);
             currentY -= LINE_GAP;
+        }
+
+        void drawSummaryBlock(AccountStatement statement) throws IOException {
+            String debitCount = "(" + countTransactions(statement, "DEBIT") + ")";
+            String creditCount = "(" + countTransactions(statement, "CREDIT") + ")";
+            String debitAmount = formatAmount(statement.totalDebits());
+            String creditAmount = formatAmount(statement.totalCredits());
+            String blockedAmount = formatAmount(blockedAmount(statement));
+            String availableAmount = formatAmount(statement.availableBalance());
+
+            float labelColumnWidth = maxTextWidth(FONT_BOLD, BODY_FONT_SIZE, "Debit amount:", "Credit amount:", "Blocked amount:", "Available amount:");
+            float countColumnWidth = maxTextWidth(FONT_REGULAR, BODY_FONT_SIZE, debitCount, creditCount);
+            float amountColumnWidth = maxTextWidth(FONT_REGULAR, BODY_FONT_SIZE, debitAmount, creditAmount, blockedAmount, availableAmount);
+            float blockPaddingX = 10f;
+            float blockPaddingY = 8f;
+            float labelGap = 12f;
+            float countGap = 14f;
+            float blockWidth = blockPaddingX * 2f + labelColumnWidth + labelGap + countColumnWidth + countGap + amountColumnWidth;
+            float blockHeight = (3f * LINE_GAP) + (blockPaddingY * 2f);
+
+            ensureSpace(blockHeight + 4f);
+
+            float firstRowY = currentY;
+            float labelX = PAGE_MARGIN + blockPaddingX;
+            float countRightX = labelX + labelColumnWidth + labelGap + countColumnWidth;
+            float amountRightX = PAGE_MARGIN + blockWidth - blockPaddingX;
+
+            writeText("Debit amount:", labelX, firstRowY, FONT_BOLD, BODY_FONT_SIZE, Color.DARK_GRAY);
+            writeRightAlignedText(debitCount, countRightX, firstRowY, FONT_REGULAR, BODY_FONT_SIZE, Color.DARK_GRAY);
+            writeRightAlignedText(debitAmount, amountRightX, firstRowY, FONT_REGULAR, BODY_FONT_SIZE, Color.BLACK);
+
+            writeText("Credit amount:", labelX, firstRowY - LINE_GAP, FONT_BOLD, BODY_FONT_SIZE, Color.DARK_GRAY);
+            writeRightAlignedText(creditCount, countRightX, firstRowY - LINE_GAP, FONT_REGULAR, BODY_FONT_SIZE, Color.DARK_GRAY);
+            writeRightAlignedText(creditAmount, amountRightX, firstRowY - LINE_GAP, FONT_REGULAR, BODY_FONT_SIZE, Color.BLACK);
+
+            writeText("Blocked amount:", labelX, firstRowY - (2f * LINE_GAP), FONT_BOLD, BODY_FONT_SIZE, Color.DARK_GRAY);
+            writeRightAlignedText(blockedAmount, amountRightX, firstRowY - (2f * LINE_GAP), FONT_REGULAR, BODY_FONT_SIZE, Color.BLACK);
+
+            writeText("Available amount:", labelX, firstRowY - (3f * LINE_GAP), FONT_BOLD, BODY_FONT_SIZE, Color.DARK_GRAY);
+            writeRightAlignedText(availableAmount, amountRightX, firstRowY - (3f * LINE_GAP), FONT_REGULAR, BODY_FONT_SIZE, Color.BLACK);
+
+            currentY = firstRowY - (4f * LINE_GAP) - 8f;
         }
 
         void writeLabelValue(String label, String value, float x, float y, float labelWidth) throws IOException {
@@ -282,6 +363,169 @@ public class AccountStatementPdfGenerator {
             stream.newLineAtOffset(x, y);
             stream.showText(text);
             stream.endText();
+        }
+
+        void writeRightAlignedText(String text, float rightEdgeX, float y, PDFont font, float fontSize, Color color)
+            throws IOException {
+            float x = rightEdgeX - textWidth(text, font, fontSize);
+            writeText(text, x, y, font, fontSize, color);
+        }
+
+        private float maxTextWidth(PDFont font, float fontSize, String... values) throws IOException {
+            float maxWidth = 0f;
+            for (String value : values) {
+                float width = textWidth(value, font, fontSize);
+                if (width > maxWidth) {
+                    maxWidth = width;
+                }
+            }
+            return maxWidth;
+        }
+
+        void drawTransactionHeader() throws IOException {
+            float top = currentY;
+            drawCellBackground(top + 4f, 20f, new Color(236, 239, 243));
+            writeTableHeaderCell("DATE", 0);
+            writeTableHeaderCell("DESCRIPTION", 1);
+            writeTableHeaderCell("REFERENCE", 2);
+            writeTableHeaderCell("VALUE DATE", 3);
+            writeTableHeaderCell("DEBIT", 4);
+            writeTableHeaderCell("CREDIT", 5);
+            writeTableHeaderCell("BALANCE", 6);
+            currentY -= 18f;
+            drawDivider(currentY + 4f);
+            currentY -= 4f;
+        }
+
+        void drawTransactionRow(
+            AccountStatementTransaction transaction,
+            List<String> bookingDateLines,
+            List<String> descriptionLines,
+            float rowHeight
+        ) throws IOException {
+            float top = currentY;
+            ensureSpace(rowHeight + 8f);
+
+            String debit = transaction.direction().equals("DEBIT") ? formatAmount(transaction.amount()) : "-";
+            String credit = transaction.direction().equals("CREDIT") ? formatAmount(transaction.amount()) : "-";
+            Color debitCreditColor = transaction.direction().equals("CREDIT") ? new Color(0, 102, 51) : new Color(153, 0, 0);
+
+            writeCenteredCell(bookingDateLines, 0, top, rowHeight, FONT_REGULAR, TABLE_FONT_SIZE, Color.DARK_GRAY);
+            writeWrappedCell(descriptionLines, 1, top, rowHeight, FONT_REGULAR, TABLE_FONT_SIZE, Color.BLACK);
+            writeCenteredCellText(shortReference(transaction.transactionReference()), 2, top, rowHeight, FONT_MONO, TABLE_FONT_SIZE, Color.BLACK);
+            writeCenteredCellText(formatDate(transaction.valueDate()), 3, top, rowHeight, FONT_REGULAR, TABLE_FONT_SIZE, Color.DARK_GRAY);
+            writeRightAlignedCellText(debit, 4, top, rowHeight, FONT_BOLD, TABLE_FONT_SIZE, debitCreditColor);
+            writeRightAlignedCellText(credit, 5, top, rowHeight, FONT_BOLD, TABLE_FONT_SIZE, debitCreditColor);
+            writeRightAlignedCellText(formatAmount(transaction.balanceAfter()), 6, top, rowHeight, FONT_BOLD, TABLE_FONT_SIZE, Color.BLACK);
+
+            currentY -= rowHeight + 4f;
+            drawDivider(currentY + 4f);
+        }
+
+        private void drawCellBackground(float y, float height, Color color) throws IOException {
+            stream.setNonStrokingColor(color);
+            stream.addRect(PAGE_MARGIN, y - height, CONTENT_WIDTH, height);
+            stream.fill();
+        }
+
+        private void writeTableHeaderCell(String text, int columnIndex) throws IOException {
+            float x = columnX(columnIndex);
+            float width = TRANSACTION_COLUMN_WIDTHS[columnIndex];
+            float y = currentY;
+            if (columnIndex == 1) {
+                writeText(text, x + CELL_TEXT_PADDING, y, FONT_BOLD, TABLE_FONT_SIZE, new Color(60, 70, 82));
+                return;
+            }
+
+            if (columnIndex >= 4) {
+                writeRightAlignedText(text, x + width - MONEY_CELL_PADDING, y, FONT_BOLD, TABLE_FONT_SIZE, new Color(60, 70, 82));
+                return;
+            }
+
+            float centeredX = x + (width - textWidth(text, FONT_BOLD, TABLE_FONT_SIZE)) / 2f;
+            writeText(text, centeredX, y, FONT_BOLD, TABLE_FONT_SIZE, new Color(60, 70, 82));
+        }
+
+        private void writeCenteredCell(
+            List<String> lines,
+            int columnIndex,
+            float top,
+            float rowHeight,
+            PDFont font,
+            float fontSize,
+            Color color
+        ) throws IOException {
+            float x = columnX(columnIndex);
+            float y = top - 10f;
+            int maxLines = Math.min(lines.size(), Math.max(1, (int) (rowHeight / TABLE_LINE_HEIGHT)));
+            for (int lineIndex = 0; lineIndex < maxLines; lineIndex++) {
+                String line = lines.get(lineIndex);
+                float lineY = y - (lineIndex * TABLE_LINE_HEIGHT);
+                float lineX = x + (TRANSACTION_COLUMN_WIDTHS[columnIndex] - textWidth(line, font, fontSize)) / 2f;
+                stream.beginText();
+                stream.setNonStrokingColor(color);
+                stream.setFont(font, fontSize);
+                stream.newLineAtOffset(lineX, lineY);
+                stream.showText(line);
+                stream.endText();
+            }
+        }
+
+        private void writeCenteredCellText(
+            String text,
+            int columnIndex,
+            float top,
+            float rowHeight,
+            PDFont font,
+            float fontSize,
+            Color color
+        ) throws IOException {
+            List<String> lines = wrapText(text, TRANSACTION_COLUMN_WIDTHS[columnIndex] - 2f, font, fontSize);
+            writeCenteredCell(lines, columnIndex, top, rowHeight, font, fontSize, color);
+        }
+
+        private void writeRightAlignedCellText(
+            String text,
+            int columnIndex,
+            float top,
+            float rowHeight,
+            PDFont font,
+            float fontSize,
+            Color color
+        ) throws IOException {
+            float x = columnX(columnIndex);
+            float y = top - 10f;
+            float lineX = x + TRANSACTION_COLUMN_WIDTHS[columnIndex] - textWidth(text, font, fontSize) - MONEY_CELL_PADDING;
+            stream.beginText();
+            stream.setNonStrokingColor(color);
+            stream.setFont(font, fontSize);
+            stream.newLineAtOffset(lineX, y);
+            stream.showText(text);
+            stream.endText();
+        }
+
+        private void writeWrappedCell(List<String> lines, int columnIndex, float top, float rowHeight, PDFont font, float fontSize, Color color)
+            throws IOException {
+            float x = columnX(columnIndex);
+            float y = top - 10f;
+            int maxLines = Math.min(lines.size(), Math.max(1, (int) (rowHeight / TABLE_LINE_HEIGHT)));
+            for (int lineIndex = 0; lineIndex < maxLines; lineIndex++) {
+                float lineY = y - (lineIndex * TABLE_LINE_HEIGHT);
+                stream.beginText();
+                stream.setNonStrokingColor(color);
+                stream.setFont(font, fontSize);
+                stream.newLineAtOffset(x, lineY);
+                stream.showText(lines.get(lineIndex));
+                stream.endText();
+            }
+        }
+
+        private float columnX(int columnIndex) {
+            float x = PAGE_MARGIN;
+            for (int index = 0; index < columnIndex; index++) {
+                x += TRANSACTION_COLUMN_WIDTHS[index];
+            }
+            return x;
         }
 
         void close() throws IOException {

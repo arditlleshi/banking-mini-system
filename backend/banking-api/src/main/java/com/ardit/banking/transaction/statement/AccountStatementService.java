@@ -4,7 +4,10 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -21,8 +24,6 @@ import com.ardit.banking.transaction.repository.TransactionRepository;
 
 @Service
 public class AccountStatementService {
-
-    private static final BigDecimal ZERO_MONEY = new BigDecimal("0.00");
 
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
@@ -44,6 +45,13 @@ public class AccountStatementService {
     }
 
     @Transactional(readOnly = true)
+    public AccountStatement getStatementForAccount(AccountEntity account, String username,
+                                                   LocalDate fromDate, LocalDate toDate) {
+        StatementDateRange dateRange = StatementDateRange.of(fromDate, toDate);
+        return buildStatement(account, username, dateRange);
+    }
+
+    @Transactional(readOnly = true)
     public AccountStatement getStatementForUsernameAndAccountNumber(String username, String accountNumber,
                                                                     LocalDate fromDate, LocalDate toDate) {
         StatementDateRange dateRange = StatementDateRange.of(fromDate, toDate);
@@ -60,12 +68,11 @@ public class AccountStatementService {
 
         List<AccountStatementTransaction> transactions = statementEntries.stream()
             .map(AccountStatementService::toStatementTransaction)
-            .toList();
+            .collect(Collectors.toCollection(ArrayList::new));
+        Collections.reverse(transactions);
 
         BigDecimal totalCredits = sumTransactions(statementEntries, TransactionDirection.CREDIT);
         BigDecimal totalDebits = sumTransactions(statementEntries, TransactionDirection.DEBIT);
-        BigDecimal openingBalance = resolveOpeningBalance(account, statementEntries, dateRange);
-        BigDecimal closingBalance = resolveClosingBalance(account, openingBalance, dateRange);
 
         return new AccountStatement(
             account.getId(),
@@ -79,6 +86,7 @@ public class AccountStatementService {
             normalizeMoney(account.getAvailableBalance()),
             account.getOwner().getFullName(),
             username,
+            account.getOpenedAt(),
             dateRange.fromDate(),
             dateRange.toDate(),
             Instant.now(),
@@ -86,8 +94,6 @@ public class AccountStatementService {
             totalCredits,
             totalDebits,
             normalizeMoney(totalCredits.subtract(totalDebits)),
-            openingBalance,
-            closingBalance,
             transactions
         );
     }
@@ -107,49 +113,6 @@ public class AccountStatementService {
     private UserEntity getOwnerByUsername(String username) {
         return userRepository.findByUsername(username)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authenticated user not found"));
-    }
-
-    private BigDecimal resolveOpeningBalance(AccountEntity account, List<TransactionEntity> statementEntries,
-                                             StatementDateRange dateRange) {
-        if (dateRange.fromDate() != null) {
-            return transactionRepository
-                .findTopByAccountIdAndValueDateLessThanOrderByValueDateDescBookingTimestampDescIdDesc(
-                    account.getId(),
-                    dateRange.fromDate()
-                )
-                .map(TransactionEntity::getBalanceAfter)
-                .map(AccountStatementService::normalizeMoney)
-                .orElse(ZERO_MONEY);
-        }
-
-        if (!statementEntries.isEmpty()) {
-            TransactionEntity oldestTransaction = statementEntries.get(statementEntries.size() - 1);
-            return deriveBalanceBefore(oldestTransaction);
-        }
-
-        return normalizeMoney(account.getCurrentBalance());
-    }
-
-    private BigDecimal resolveClosingBalance(AccountEntity account, BigDecimal openingBalance, StatementDateRange dateRange) {
-        if (dateRange.toDate() == null) {
-            return normalizeMoney(account.getCurrentBalance());
-        }
-
-        return transactionRepository
-            .findTopByAccountIdAndValueDateLessThanEqualOrderByValueDateDescBookingTimestampDescIdDesc(
-                account.getId(),
-                dateRange.toDate()
-            )
-            .map(TransactionEntity::getBalanceAfter)
-            .map(AccountStatementService::normalizeMoney)
-            .orElse(openingBalance);
-    }
-
-    private static BigDecimal deriveBalanceBefore(TransactionEntity transaction) {
-        BigDecimal balanceBefore = transaction.getDirection() == TransactionDirection.CREDIT
-            ? transaction.getBalanceAfter().subtract(transaction.getAmount())
-            : transaction.getBalanceAfter().add(transaction.getAmount());
-        return normalizeMoney(balanceBefore);
     }
 
     private static BigDecimal sumTransactions(List<TransactionEntity> transactions, TransactionDirection direction) {
