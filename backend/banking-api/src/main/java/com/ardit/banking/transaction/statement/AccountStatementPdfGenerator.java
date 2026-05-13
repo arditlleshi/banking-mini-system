@@ -122,7 +122,7 @@ public class AccountStatementPdfGenerator {
     }
 
     private void drawTransactions(PageWriter writer, AccountStatement statement) throws IOException {
-        writer.sectionTitle("Booked Transactions");
+        writer.sectionTitle("Transactions");
         if (statement.transactions().isEmpty()) {
             writer.detailRow("Status", "No booked transactions were found for the selected period.");
             return;
@@ -137,12 +137,7 @@ public class AccountStatementPdfGenerator {
                 FONT_REGULAR,
                 TABLE_FONT_SIZE
             );
-            List<String> descriptionLines = wrapText(
-                combineDescription(transaction),
-                TRANSACTION_COLUMN_WIDTHS[1] - 2f,
-                FONT_REGULAR,
-                TABLE_FONT_SIZE
-            );
+            List<String> descriptionLines = buildDescriptionLines(transaction);
             float rowHeight = Math.max(
                 TABLE_LINE_HEIGHT + 4f,
                 Math.max(bookingDateLines.size(), descriptionLines.size()) * TABLE_LINE_HEIGHT + 6f
@@ -152,13 +147,15 @@ public class AccountStatementPdfGenerator {
         }
     }
 
-    private static String combineDescription(AccountStatementTransaction transaction) {
-        String description = nullSafe(transaction.description());
-        String counterparty = joinCounterparty(transaction.counterpartyName(), transaction.counterpartyAccount());
-        if ("-".equals(counterparty)) {
-            return description;
-        }
-        return description + " / " + counterparty;
+    private static List<String> buildDescriptionLines(AccountStatementTransaction transaction) throws IOException {
+        List<String> lines = new ArrayList<>();
+
+        String fromLine = "From: " + joinCounterparty(transaction.counterpartyName(), transaction.counterpartyAccount());
+        String detailsLine = "Details: " + nullSafe(transaction.description());
+
+        lines.addAll(wrapText(fromLine, TRANSACTION_COLUMN_WIDTHS[1] - 2f, FONT_REGULAR, TABLE_FONT_SIZE));
+        lines.addAll(wrapText(detailsLine, TRANSACTION_COLUMN_WIDTHS[1] - 2f, FONT_REGULAR, TABLE_FONT_SIZE));
+        return lines;
     }
 
     private static String joinCounterparty(String name, String account) {

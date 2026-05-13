@@ -86,6 +86,10 @@ class AccountStatementPdfGeneratorTests {
             assertThat(text).contains("10 May 2026");
             assertThat(text).contains("11:30:00");
             assertThat(text).contains("ref-12");
+            assertThat(text).contains("From:");
+            assertThat(text).contains("Details:");
+            assertThat(text).contains("Power Utility");
+            assertThat(text).contains("Utility bill payment");
             assertThat(text).contains("DEBIT");
             assertThat(text).contains("CREDIT");
             assertThat(text).contains("BALANCE");
