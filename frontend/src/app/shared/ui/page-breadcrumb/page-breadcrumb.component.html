@@ -1,0 +1,20 @@
+<nav hlmBreadcrumb [aria-label]="ariaLabel()" class="inline-flex max-w-full self-start">
+  <ol hlmBreadcrumbList class="flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground">
+    @for (item of items(); track $index; let last = $last) {
+      <li hlmBreadcrumbItem>
+        @if (last) {
+          <span hlmBreadcrumbPage class="text-foreground">{{ item.label }}</span>
+        } @else if (item.link) {
+          <a hlmBreadcrumbLink [link]="item.link" class="transition-colors hover:text-foreground">
+            {{ item.label }}
+          </a>
+        } @else {
+          <span>{{ item.label }}</span>
+        }
+      </li>
+      @if (!last) {
+        <li hlmBreadcrumbSeparator></li>
+      }
+    }
+  </ol>
+</nav>

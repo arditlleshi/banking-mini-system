@@ -1,8 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { catchError, distinctUntilChanged, EMPTY, finalize, map, startWith, switchMap, tap } from 'rxjs';
 
 import {
@@ -10,11 +10,11 @@ import {
   type AccountDetailsResponse,
   type AccountStatementFilters,
   type AccountTransactionResponse
-} from '../../core/services/account-api.service';
-import { HlmButton } from '../../shared/ui/spartan/button';
-import { HlmCard, HlmCardContent, HlmCardDescription, HlmCardHeader, HlmCardTitle } from '../../shared/ui/spartan/card';
-import { HlmInput } from '../../shared/ui/spartan/input';
-import { HlmLabel } from '../../shared/ui/spartan/label';
+} from '../../../core/services/account-api.service';
+import { PageBreadcrumbComponent, type PageBreadcrumbItem } from '../../../shared/ui/page-breadcrumb';
+import { HlmButton } from '../../../shared/ui/spartan/button';
+import { HlmCard, HlmCardContent, HlmCardDescription, HlmCardHeader, HlmCardTitle } from '../../../shared/ui/spartan/card';
+import { AccountStatementDialogComponent } from './account-statement-dialog.component';
 
 type StatementSummary = {
   readonly transactionCount: number;
@@ -23,18 +23,27 @@ type StatementSummary = {
   readonly netMovement: number;
 };
 
+type StatementFiltersForm = FormGroup<{
+  fromDate: FormControl<Date | null>;
+  toDate: FormControl<Date | null>;
+}>;
+
 @Component({
   selector: 'app-account-details-page',
-  imports: [ReactiveFormsModule, RouterLink, HlmButton, HlmCard, HlmCardContent, HlmCardDescription, HlmCardHeader, HlmCardTitle, HlmInput, HlmLabel],
+  imports: [
+    PageBreadcrumbComponent,
+    HlmButton,
+    HlmCard,
+    HlmCardContent,
+    HlmCardDescription,
+    HlmCardHeader,
+    HlmCardTitle,
+    AccountStatementDialogComponent
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './account-details-page.component.html'
 })
 export class AccountDetailsPageComponent {
-  private static readonly dateFormatter = new Intl.DateTimeFormat(undefined, {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric'
-  });
   private static readonly dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
     day: '2-digit',
     month: 'short',
@@ -49,22 +58,24 @@ export class AccountDetailsPageComponent {
 
   private readonly fb = new FormBuilder();
   private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
   private readonly accountApi = inject(AccountApiService);
 
   protected readonly loading = signal(true);
-  protected readonly statementLoading = signal(false);
   protected readonly downloadingStatement = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly statementErrorMessage = signal<string | null>(null);
   protected readonly statementSuccessMessage = signal<string | null>(null);
   protected readonly details = signal<AccountDetailsResponse | null>(null);
   protected readonly statementTransactions = signal<AccountTransactionResponse[]>([]);
-  protected readonly compactControlClass =
-    'h-10 rounded-lg border border-border/80 px-4 text-sm text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20 disabled:[background:var(--surface-control-disabled)]';
-  protected readonly statementFiltersForm = this.fb.nonNullable.group({
-    fromDate: [''],
-    toDate: ['']
+  protected readonly statementDialogOpen = signal(false);
+  protected readonly breadcrumbItems = computed<readonly PageBreadcrumbItem[]>(() => [
+    { label: 'Home', link: '/home' },
+    { label: 'Accounts', link: '/accounts' },
+    { label: this.details()?.account.name ?? this.route.snapshot.paramMap.get('accountNumber') ?? 'Account details' }
+  ]);
+  protected readonly statementFiltersForm: StatementFiltersForm = this.fb.group({
+    fromDate: this.fb.control<Date | null>(null),
+    toDate: this.fb.control<Date | null>(null)
   });
 
   private readonly fromDateValue = toSignal(
@@ -81,7 +92,7 @@ export class AccountDetailsPageComponent {
     const fromDate = this.fromDateValue();
     const toDate = this.toDateValue();
 
-    if (fromDate && toDate && fromDate > toDate) {
+    if (fromDate && toDate && fromDate.getTime() > toDate.getTime()) {
       return 'The start date must be before or equal to the end date.';
     }
 
@@ -102,18 +113,6 @@ export class AccountDetailsPageComponent {
       totalDebits,
       netMovement: totalCredits - totalDebits
     };
-  });
-  protected readonly statementRangeLabel = computed(() => {
-    const fromDate = this.fromDateValue();
-    const toDate = this.toDateValue();
-
-    if (!fromDate && !toDate) {
-      return 'Full booked history';
-    }
-
-    const fromLabel = fromDate ? this.formatDateValue(fromDate) : 'Account opening';
-    const toLabel = toDate ? this.formatDateValue(toDate) : 'Latest booking';
-    return `${fromLabel} to ${toLabel}`;
   });
 
   constructor() {
@@ -138,63 +137,22 @@ export class AccountDetailsPageComponent {
           this.statementTransactions.set(details.transactions);
           this.loading.set(false);
           this.errorMessage.set(null);
-          if (this.hasDateFilters()) {
-            this.applyStatementFilters();
-          }
-        }
-      });
-  }
-
-  protected applyStatementFilters(): void {
-    if (this.statementLoading() || this.downloadingStatement()) {
-      return;
-    }
-
-    const rangeError = this.statementRangeError();
-    if (rangeError) {
-      this.statementErrorMessage.set(rangeError);
-      this.statementSuccessMessage.set(null);
-      return;
-    }
-
-    const accountId = this.details()?.account.id;
-    if (!accountId) {
-      return;
-    }
-
-    this.statementLoading.set(true);
-    this.statementErrorMessage.set(null);
-    this.statementSuccessMessage.set(null);
-
-    const filters = this.currentStatementFilters();
-    this.updateStatementQueryParams(filters);
-    this.accountApi
-      .getAccountTransactions(accountId, filters)
-      .pipe(finalize(() => this.statementLoading.set(false)))
-      .subscribe({
-        next: (transactions) => {
-          this.statementTransactions.set(transactions);
-        },
-        error: (error: HttpErrorResponse) => {
-          this.statementErrorMessage.set(this.resolveStatementErrorMessage(error));
         }
       });
   }
 
   protected resetStatementFilters(): void {
-    if (this.statementLoading() || this.downloadingStatement()) {
+    if (this.downloadingStatement()) {
       return;
     }
 
-    this.statementFiltersForm.reset({ fromDate: '', toDate: '' });
-    this.updateStatementQueryParams({ fromDate: null, toDate: null });
+    this.statementFiltersForm.reset({ fromDate: null, toDate: null });
     this.statementErrorMessage.set(null);
     this.statementSuccessMessage.set(null);
-    this.statementTransactions.set(this.details()?.transactions ?? []);
   }
 
   protected downloadStatement(): void {
-    if (this.downloadingStatement() || this.statementLoading()) {
+    if (this.downloadingStatement()) {
       return;
     }
 
@@ -227,6 +185,14 @@ export class AccountDetailsPageComponent {
           this.statementErrorMessage.set(this.resolveStatementErrorMessage(error));
         }
       });
+  }
+
+  protected openStatementDialog(): void {
+    this.statementDialogOpen.set(true);
+  }
+
+  protected handleStatementDialogStateChanged(open: boolean): void {
+    this.statementDialogOpen.set(open);
   }
 
   protected trackByTransactionId(_: number, transaction: AccountTransactionResponse): number {
@@ -266,6 +232,13 @@ export class AccountDetailsPageComponent {
     return currency ? `${formattedNumber} ${currency}` : formattedNumber;
   }
 
+  protected formatAccountType(value: string): string {
+    return value
+      .split('_')
+      .map((part) => part.charAt(0) + part.slice(1).toLowerCase())
+      .join(' ');
+  }
+
   protected shortReference(reference: string): string {
     return reference.slice(0, 8);
   }
@@ -278,20 +251,8 @@ export class AccountDetailsPageComponent {
     this.details.set(null);
     this.statementTransactions.set([]);
     this.statementFiltersForm.reset({
-      fromDate: this.route.snapshot.queryParamMap.get('fromDate') ?? '',
-      toDate: this.route.snapshot.queryParamMap.get('toDate') ?? ''
-    });
-  }
-
-  private updateStatementQueryParams(filters: AccountStatementFilters): void {
-    void this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: {
-        fromDate: filters.fromDate ?? null,
-        toDate: filters.toDate ?? null
-      },
-      queryParamsHandling: 'merge',
-      replaceUrl: true
+      fromDate: this.parseStatementDate(this.route.snapshot.queryParamMap.get('fromDate')),
+      toDate: this.parseStatementDate(this.route.snapshot.queryParamMap.get('toDate'))
     });
   }
 
@@ -311,8 +272,8 @@ export class AccountDetailsPageComponent {
   private currentStatementFilters(): AccountStatementFilters {
     const rawValue = this.statementFiltersForm.getRawValue();
     return {
-      fromDate: rawValue.fromDate || null,
-      toDate: rawValue.toDate || null
+      fromDate: this.formatStatementDate(rawValue.fromDate),
+      toDate: this.formatStatementDate(rawValue.toDate)
     };
   }
 
@@ -332,16 +293,48 @@ export class AccountDetailsPageComponent {
     return `statement-${accountNumber}-${fromDate}-to-${toDate}.pdf`;
   }
 
+  private parseStatementDate(value: string | null): Date | null {
+    if (!value) {
+      return null;
+    }
+
+    const [yearText, monthText, dayText] = value.split('-');
+    const year = Number(yearText);
+    const month = Number(monthText);
+    const day = Number(dayText);
+
+    if (!Number.isInteger(year) || !Number.isInteger(month) || !Number.isInteger(day)) {
+      return null;
+    }
+
+    const parsed = new Date(year, month - 1, day);
+    if (parsed.getFullYear() !== year || parsed.getMonth() !== month - 1 || parsed.getDate() !== day) {
+      return null;
+    }
+
+    return parsed;
+  }
+
+  private formatStatementDate(value: Date | null): string | null {
+    if (!value) {
+      return null;
+    }
+
+    const year = value.getFullYear();
+    const month = String(value.getMonth() + 1).padStart(2, '0');
+    const day = String(value.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
   private saveStatementFile(statementFile: Blob, fileName: string): void {
     const objectUrl = URL.createObjectURL(statementFile);
     const downloadLink = document.createElement('a');
     downloadLink.href = objectUrl;
     downloadLink.download = fileName;
+    downloadLink.style.display = 'none';
+    document.body.appendChild(downloadLink);
     downloadLink.click();
-    URL.revokeObjectURL(objectUrl);
-  }
-
-  private formatDateValue(value: string): string {
-    return AccountDetailsPageComponent.dateFormatter.format(new Date(`${value}T00:00:00`));
+    downloadLink.remove();
+    window.setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
   }
 }

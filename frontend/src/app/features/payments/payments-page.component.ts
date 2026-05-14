@@ -10,6 +10,7 @@ import { startWith } from 'rxjs';
 import { AccountApiService, type AccountCurrency, type AccountResponse } from '../../core/services/account-api.service';
 import { ExchangeRateApiService, type ExchangeRateResponse } from '../../core/services/exchange-rate-api.service';
 import { TransferApiService, type TransferResponse } from '../../core/services/transfer-api.service';
+import { PageBreadcrumbComponent, type PageBreadcrumbItem } from '../../shared/ui/page-breadcrumb';
 import { HlmButton } from '../../shared/ui/spartan/button';
 import { HlmCard, HlmCardContent, HlmCardDescription, HlmCardHeader, HlmCardTitle } from '../../shared/ui/spartan/card';
 import { HlmIconImports } from '@spartan/icon';
@@ -36,6 +37,7 @@ type PaymentAction = {
     DatePipe,
     DecimalPipe,
     ReactiveFormsModule,
+    PageBreadcrumbComponent,
     HlmButton,
     HlmCard,
     HlmCardContent,
@@ -81,6 +83,10 @@ export class PaymentsPageComponent {
   protected readonly successTransfer = signal<TransferResponse | null>(null);
   protected readonly accounts = signal<AccountResponse[]>([]);
   protected readonly exchangeRates = signal<ExchangeRateResponse[]>([]);
+  protected readonly breadcrumbItems: readonly PageBreadcrumbItem[] = [
+    { label: 'Home', link: '/home' },
+    { label: 'Payments' }
+  ];
   protected readonly compactControlClass =
     'h-10 rounded-lg border border-border/80 px-4 text-sm text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20 disabled:[background:var(--surface-control-disabled)]';
   protected readonly activePaymentAction = signal<PaymentAction['id']>('own-accounts');

@@ -15,6 +15,10 @@ export class CustomersPageComponent {
     eyebrow: 'Customer records',
     headline: 'Unified customer profiles for onboarding, due diligence, and ongoing servicing.',
     summary: 'Use this area for customer details, household structures, risk documentation, and service history.',
-    highlights: ['Identity verification', 'Relationship hierarchy', 'Compliance notes']
+    highlights: ['Identity verification', 'Relationship hierarchy', 'Compliance notes'],
+    breadcrumb: [
+      { label: 'Home', link: '/home' },
+      { label: 'Customers' }
+    ]
   };
 }

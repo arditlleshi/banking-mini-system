@@ -16,8 +16,8 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
         select transaction
         from TransactionEntity transaction
         where transaction.account.id = :accountId
-          and (:fromDate is null or transaction.valueDate >= :fromDate)
-          and (:toDate is null or transaction.valueDate <= :toDate)
+          and transaction.valueDate >= coalesce(:fromDate, transaction.valueDate)
+          and transaction.valueDate <= coalesce(:toDate, transaction.valueDate)
         order by transaction.bookingTimestamp desc, transaction.id desc
         """)
     List<TransactionEntity> findStatementEntries(

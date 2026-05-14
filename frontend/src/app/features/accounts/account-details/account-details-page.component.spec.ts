@@ -7,7 +7,7 @@ import {
   AccountApiService,
   type AccountDetailsResponse,
   type AccountTransactionResponse
-} from '../../core/services/account-api.service';
+} from '../../../core/services/account-api.service';
 import { AccountDetailsPageComponent } from './account-details-page.component';
 
 describe('AccountDetailsPageComponent', () => {

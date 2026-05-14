@@ -26,7 +26,9 @@ export const routes: Routes = [
       {
         path: 'accounts/:accountNumber',
         loadComponent: () =>
-          import('./features/accounts/account-details-page.component').then((module) => module.AccountDetailsPageComponent)
+          import('./features/accounts/account-details/account-details-page.component').then(
+            (module) => module.AccountDetailsPageComponent
+          )
       },
       {
         path: 'customers',

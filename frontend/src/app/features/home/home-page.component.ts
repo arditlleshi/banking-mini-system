@@ -2,12 +2,13 @@ import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } 
 
 import { ApiService } from '../../core/services/api.service';
 import { AuthStateService } from '../../core/auth/auth-state.service';
+import { PageBreadcrumbComponent, type PageBreadcrumbItem } from '../../shared/ui/page-breadcrumb';
 import { HlmCard, HlmCardContent, HlmCardDescription, HlmCardHeader, HlmCardTitle } from '../../shared/ui/spartan/card';
 import { HlmSeparator } from '../../shared/ui/spartan/separator';
 
 @Component({
   selector: 'app-home-page',
-  imports: [HlmCard, HlmCardContent, HlmCardDescription, HlmCardHeader, HlmCardTitle, HlmSeparator],
+  imports: [PageBreadcrumbComponent, HlmCard, HlmCardContent, HlmCardDescription, HlmCardHeader, HlmCardTitle, HlmSeparator],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.css'
@@ -21,6 +22,7 @@ export class HomePageComponent implements OnInit {
   protected readonly itemCount = computed(() => this.items().length);
   protected readonly sessionState = computed(() => this.authState.isAuthenticated() ? 'Active' : 'Expired');
   protected readonly accessMode = computed(() => this.authState.isAuthenticated() ? 'Protected' : 'Guest');
+  protected readonly breadcrumbItems: readonly PageBreadcrumbItem[] = [{ label: 'Home' }];
 
   ngOnInit(): void {
     this.apiService.getTest().subscribe({

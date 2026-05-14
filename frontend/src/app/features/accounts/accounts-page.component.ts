@@ -3,6 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AccountApiService, type AccountCurrency, type AccountResponse, type AccountType } from '../../core/services/account-api.service';
+import { PageBreadcrumbComponent, type PageBreadcrumbItem } from '../../shared/ui/page-breadcrumb';
 import { HlmButton } from '../../shared/ui/spartan/button';
 import {
   HlmCard,
@@ -24,6 +25,7 @@ type AccountFormOption<T extends string> = {
     DatePipe,
     DecimalPipe,
     RouterLink,
+    PageBreadcrumbComponent,
     HlmButton,
     HlmCard,
     HlmCardContent,
@@ -44,6 +46,10 @@ export class AccountsPageComponent {
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly submitErrorMessage = signal<string | null>(null);
   protected readonly accounts = signal<AccountResponse[]>([]);
+  protected readonly breadcrumbItems: readonly PageBreadcrumbItem[] = [
+    { label: 'Home', link: '/home' },
+    { label: 'Accounts' }
+  ];
 
   protected readonly typeOptions: readonly AccountFormOption<AccountType>[] = [
     { value: 'CURRENT', label: 'Current account' },

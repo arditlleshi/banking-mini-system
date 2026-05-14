@@ -1,0 +1,89 @@
+<hlm-dialog [state]="open() ? 'open' : 'closed'" (stateChanged)="handleDialogStateChanged($event)">
+  <hlm-dialog-content
+    *hlmDialogPortal="let ctx"
+    class="flex max-h-[min(88vh,42rem)] w-[calc(100vw-2rem)] max-w-2xl flex-col overflow-hidden rounded-lg border border-border/70 p-0 backdrop-blur-xl [background:var(--surface-panel-strong)]"
+  >
+    <div class="flex min-h-0 flex-col">
+      <div hlmDialogHeader class="gap-3 border-b border-border/70 px-6 py-6 sm:px-8">
+        <h2 hlmDialogTitle class="text-xl font-bold tracking-[-0.03em] text-balance leading-tight text-card-foreground sm:text-xl">
+          Account statement
+        </h2>
+        <p hlmDialogDescription class="max-w-xl text-sm leading-6 text-muted-foreground">
+          Add a date range to focus the booked history and export a PDF from the selected period.
+        </p>
+      </div>
+
+      <form [formGroup]="statementFiltersForm()" (submit)="$event.preventDefault()" class="flex min-h-0 flex-1 flex-col">
+        <div class="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto px-6 py-6 sm:px-8">
+          <div class="grid gap-5 md:grid-cols-2">
+            <app-statement-date-picker-field
+              label="Date From"
+              buttonId="statement-from-date"
+              [value]="statementFiltersForm().controls.fromDate.value"
+              [max]="statementFiltersForm().controls.toDate.value"
+              (valueChange)="statementFiltersForm().controls.fromDate.setValue($event)"
+            />
+            <app-statement-date-picker-field
+              label="Date To"
+              buttonId="statement-to-date"
+              [value]="statementFiltersForm().controls.toDate.value"
+              [min]="statementFiltersForm().controls.fromDate.value"
+              (valueChange)="statementFiltersForm().controls.toDate.setValue($event)"
+            />
+          </div>
+        </div>
+
+        <div class="border-t border-border/70 px-6 py-5 sm:px-8">
+          @if (statementRangeError()) {
+            <p
+              aria-live="polite"
+              class="mb-4 rounded-lg border px-4 py-3 text-sm font-medium border-(--status-warning-border) [background:var(--status-warning-surface)] text-(--status-warning-foreground)"
+            >
+              {{ statementRangeError() }}
+            </p>
+          }
+
+          @if (statementErrorMessage()) {
+            <p
+              aria-live="polite"
+              class="mb-4 rounded-lg border px-4 py-3 text-sm font-medium border-(--status-danger-border) [background:var(--status-danger-surface)] text-(--status-danger-foreground)"
+            >
+              {{ statementErrorMessage() }}
+            </p>
+          }
+
+          @if (statementSuccessMessage()) {
+            <p
+              aria-live="polite"
+              class="mb-4 rounded-lg border px-4 py-3 text-sm font-medium border-(--status-success-border) [background:var(--status-success-surface)] text-(--status-success-foreground)"
+            >
+              {{ statementSuccessMessage() }}
+            </p>
+          }
+
+          <div hlmDialogFooter class="justify-end gap-3">
+            <button
+              hlmBtn
+              type="button"
+              variant="outline"
+              class="h-10 rounded-lg px-5 text-sm"
+              [disabled]="downloadingStatement() || !hasDateFilters()"
+              (click)="resetStatementFilters()"
+            >
+              Reset
+            </button>
+            <button
+              hlmBtn
+              type="button"
+              class="h-10 rounded-lg px-5 text-sm"
+              [disabled]="downloadingStatement()"
+              (click)="downloadStatement()"
+            >
+              {{ downloadingStatement() ? 'Preparing PDF...' : 'Download PDF' }}
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </hlm-dialog-content>
+</hlm-dialog>

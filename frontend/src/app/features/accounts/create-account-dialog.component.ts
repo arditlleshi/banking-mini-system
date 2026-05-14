@@ -60,7 +60,7 @@ type AccountFormOption<T extends string> = { readonly value: T; readonly label: 
           <div hlmDialogHeader class="gap-3 border-b border-border/70 px-6 py-6 sm:px-8">
             <h2
               hlmDialogTitle
-              class="font-[var(--font-manrope)] font-bold tracking-[-0.03em] text-lg leading-tight tracking-tight text-card-foreground text-balance sm:text-xl"
+              class="font-bold tracking-[-0.03em] text-lg leading-tight text-card-foreground text-balance sm:text-xl"
             >
               Create a new account
             </h2>
@@ -71,22 +71,6 @@ type AccountFormOption<T extends string> = { readonly value: T; readonly label: 
           </div>
           <form [formGroup]="form" (ngSubmit)="submit()" class="flex min-h-0 flex-1 flex-col">
             <div class="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto px-6 py-6 sm:px-8">
-              <div class="flex flex-col gap-2">
-                <label
-                  hlmLabel
-                  for="account-name"
-                  class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase"
-                  >Description</label
-                >
-                <input
-                  id="account-name"
-                  hlmInput
-                  type="text"
-                  formControlName="name"
-                  class="h-10 rounded-lg border border-border/80 px-4 text-sm text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20 disabled:[background:var(--surface-control-disabled)]"
-                  placeholder="e.g. Daily operating account…"
-                />
-              </div>
               <div class="grid gap-5 md:grid-cols-2">
                 <div class="flex flex-col gap-2">
                   <label
@@ -142,6 +126,23 @@ type AccountFormOption<T extends string> = { readonly value: T; readonly label: 
               <div class="flex flex-col gap-2">
                 <label
                   hlmLabel
+                  for="account-name"
+                  class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase"
+                  >Description</label
+                >
+                <input
+                  id="account-name"
+                  hlmInput
+                  type="text"
+                  formControlName="name"
+                  class="h-10 rounded-lg border border-border/80 px-4 text-sm text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20 disabled:[background:var(--surface-control-disabled)]"
+                  placeholder="e.g. Daily operating account…"
+                />
+              </div>
+
+              <div class="flex flex-col gap-2">
+                <label
+                  hlmLabel
                   for="initial-deposit"
                   class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase"
                   >Initial deposit</label
@@ -160,7 +161,7 @@ type AccountFormOption<T extends string> = { readonly value: T; readonly label: 
             <div class="border-t border-border/70 px-6 py-5 sm:px-8">
               @if (submitErrorMessage()) {
                 <p
-                  class="mb-4 rounded-lg border px-4 py-3 text-sm font-medium [border-color:var(--status-danger-border)] [background:var(--status-danger-surface)] [color:var(--status-danger-foreground)]"
+                  class="mb-4 rounded-lg border px-4 py-3 text-sm font-medium border-(--status-danger-border) [background:var(--status-danger-surface)] text-(--status-danger-foreground)"
                 >
                   {{ submitErrorMessage() }}
                 </p>
