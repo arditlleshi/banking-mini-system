@@ -59,5 +59,6 @@ export class AccountStatementDialogComponent {
 
   protected downloadStatement(): void {
     this.download.emit();
+    this.openChange.emit(false);
   }
 }
