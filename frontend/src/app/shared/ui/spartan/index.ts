@@ -1,4 +1,5 @@
 export * from './utils';
+export * from './accordion/src';
 export * from './button';
 export * from './card';
 export * from './dropdown-menu/src';

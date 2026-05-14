@@ -1,9 +1,18 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { provideIcons } from '@ng-icons/core';
+import { lucideArrowRight, lucideShare2 } from '@ng-icons/lucide';
 import { RouterLink } from '@angular/router';
-import { AccountApiService, type AccountCurrency, type AccountResponse, type AccountType } from '../../core/services/account-api.service';
+import {
+  AccountApiService,
+  type AccountCurrency,
+  type AccountResponse,
+  type AccountStatus,
+  type AccountType
+} from '../../core/services/account-api.service';
 import { PageBreadcrumbComponent, type PageBreadcrumbItem } from '../../shared/ui/page-breadcrumb';
+import { HlmAccordion, HlmAccordionContent, HlmAccordionItem, HlmAccordionTrigger } from '@spartan/accordion';
 import { HlmButton } from '../../shared/ui/spartan/button';
 import {
   HlmCard,
@@ -12,6 +21,7 @@ import {
   HlmCardHeader,
   HlmCardTitle
 } from '../../shared/ui/spartan/card';
+import { HlmIconImports } from '@spartan/icon';
 import { CreateAccountDialogComponent } from './create-account-dialog.component';
 
 type AccountFormOption<T extends string> = {
@@ -26,14 +36,20 @@ type AccountFormOption<T extends string> = {
     DecimalPipe,
     RouterLink,
     PageBreadcrumbComponent,
+    HlmAccordion,
+    HlmAccordionContent,
+    HlmAccordionItem,
+    HlmAccordionTrigger,
     HlmButton,
     HlmCard,
     HlmCardContent,
     HlmCardDescription,
     HlmCardHeader,
     HlmCardTitle,
+    HlmIconImports,
     CreateAccountDialogComponent
   ],
+  providers: [provideIcons({ lucideArrowRight, lucideShare2 })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './accounts-page.component.html'
 })
@@ -46,10 +62,20 @@ export class AccountsPageComponent {
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly submitErrorMessage = signal<string | null>(null);
   protected readonly accounts = signal<AccountResponse[]>([]);
+  protected readonly openedAccountId = signal<number | null>(null);
   protected readonly breadcrumbItems: readonly PageBreadcrumbItem[] = [
     { label: 'Home', link: '/home' },
     { label: 'Accounts' }
   ];
+  protected readonly totalCurrentBalance = computed(() =>
+    this.accounts().reduce((sum, account) => sum + account.currentBalance, 0)
+  );
+  protected readonly totalAvailableBalance = computed(() =>
+    this.accounts().reduce((sum, account) => sum + account.availableBalance, 0)
+  );
+  protected readonly activeAccountCount = computed(() =>
+    this.accounts().filter((account) => account.status === 'ACTIVE').length
+  );
 
   protected readonly typeOptions: readonly AccountFormOption<AccountType>[] = [
     { value: 'CURRENT', label: 'Current account' },
@@ -86,8 +112,9 @@ export class AccountsPageComponent {
 
     this.accountApi.createAccount(payload).subscribe({
       next: (createdAccount) => {
-        this.accounts.update((accounts) => [...accounts, createdAccount]);
-        this.accounts.update((accounts) => [...accounts].sort((left, right) => left.openedAt.localeCompare(right.openedAt)));
+        const nextAccounts = [...this.accounts(), createdAccount].sort((left, right) => left.openedAt.localeCompare(right.openedAt));
+        this.accounts.set(nextAccounts);
+        this.syncOpenedAccount(nextAccounts);
         this.submitting.set(false);
         this.handleDialogOpenChange(false);
       },
@@ -102,16 +129,40 @@ export class AccountsPageComponent {
     });
   }
 
-  protected totalCurrentBalance(): number {
-    return this.accounts().reduce((sum, account) => sum + account.currentBalance, 0);
+  protected handleAccountOpenChange(accountId: number, isOpened: boolean): void {
+    this.openedAccountId.set(isOpened ? accountId : null);
   }
 
-  protected totalAvailableBalance(): number {
-    return this.accounts().reduce((sum, account) => sum + account.availableBalance, 0);
+  protected isAccountOpened(accountId: number, index: number): boolean {
+    const openedId = this.openedAccountId();
+    if (openedId === null) {
+      return index === 0;
+    }
+    return openedId === accountId;
   }
 
-  protected activeAccountCount(): number {
-    return this.accounts().filter((account) => account.status === 'ACTIVE').length;
+  protected accountTypeLabel(type: AccountType): string {
+    switch (type) {
+      case 'CURRENT':
+        return 'Current Account';
+      case 'SAVINGS':
+        return 'Savings Account';
+      case 'SAVINGS_PLAN':
+        return 'Savings Plan';
+    }
+  }
+
+  protected accountStatusClass(status: AccountStatus): string {
+    switch (status) {
+      case 'ACTIVE':
+        return '[border-color:var(--status-success-border)] [background:var(--status-success-surface)] [color:var(--status-success-foreground)]';
+      case 'BLOCKED':
+        return '[border-color:var(--status-danger-border)] [background:var(--status-danger-surface)] [color:var(--status-danger-foreground)]';
+      case 'DORMANT':
+        return 'border-border/70 [background:var(--surface-inset)] text-muted-foreground';
+      case 'CLOSED':
+        return 'border-border/70 [background:var(--surface-control-disabled)] text-muted-foreground';
+    }
   }
 
   protected trackByAccountId(_: number, account: AccountResponse): number {
@@ -124,7 +175,9 @@ export class AccountsPageComponent {
 
     this.accountApi.getAccounts().subscribe({
       next: (accounts) => {
-        this.accounts.set([...accounts].sort((left, right) => left.openedAt.localeCompare(right.openedAt)));
+        const sortedAccounts = [...accounts].sort((left, right) => left.openedAt.localeCompare(right.openedAt));
+        this.accounts.set(sortedAccounts);
+        this.syncOpenedAccount(sortedAccounts);
         this.loading.set(false);
       },
       error: (error: HttpErrorResponse) => {
@@ -136,5 +189,19 @@ export class AccountsPageComponent {
         this.errorMessage.set('Accounts could not be loaded at the moment.');
       }
     });
+  }
+
+  private syncOpenedAccount(accounts: readonly AccountResponse[]): void {
+    const currentOpenedId = this.openedAccountId();
+    if (!accounts.length) {
+      this.openedAccountId.set(null);
+      return;
+    }
+
+    if (currentOpenedId !== null && accounts.some((account) => account.id === currentOpenedId)) {
+      return;
+    }
+
+    this.openedAccountId.set(accounts[0].id);
   }
 }

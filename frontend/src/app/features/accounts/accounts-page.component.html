@@ -1,50 +1,10 @@
 <main class="min-h-screen px-4 py-8 sm:px-6 lg:px-10">
   <div class="mx-auto flex max-w-6xl flex-col gap-6">
     <app-page-breadcrumb [items]="breadcrumbItems" />
-    <section
-      class="overflow-hidden rounded-lg border border-border/70 px-6 py-7 [background:var(--surface-hero)] [box-shadow:var(--surface-shadow)] backdrop-blur-lg sm:px-8 lg:px-10"
-    >
-      <div class="grid gap-6 lg:grid-cols-[1.25fr_0.75fr] lg:items-end">
-        <div class="space-y-3">
-          <p class="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-            Account operations
-          </p>
-          <h1
-            class="text-2xl font-semibold leading-tight tracking-[-0.02em] text-foreground text-balance md:text-[1.75rem]"
-          >
-            Structured account views built for day-to-day banking operations.
-          </h1>
-          <p class="max-w-2xl text-sm leading-6 text-muted-foreground">
-            Open and review current, savings, and savings-plan accounts from one workspace with
-            clean balance and status visibility.
-          </p>
-        </div>
-        <div
-          class="flex flex-col gap-3 rounded-lg border border-border/70 p-4 [background:var(--surface-inset)] backdrop-blur-sm"
-        >
-          <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-            Workflow entry
-          </p>
-          <p class="text-xs leading-5 text-muted-foreground">
-            Open a new account with product type, currency, initial funding, and generated numbering
-            handled by the backend.
-          </p>
-          <button
-            hlmBtn
-            type="button"
-            size="sm"
-            class="mt-2 h-9 w-full rounded-lg bg-primary text-sm text-primary-foreground shadow-lg shadow-primary/15 transition hover:-translate-y-0.5"
-            (click)="openCreateSheet()"
-          >
-            Create Account
-          </button>
-        </div>
-      </div>
-    </section>
     <section class="grid gap-4 md:grid-cols-3">
       <section
         hlmCard
-        class="rounded-lg border border-border/70 [background:var(--surface-hero)]"
+        class="rounded-lg border-0 [background:color-mix(in_oklab,var(--surface-hero)_78%,transparent)]"
       >
         <div hlmCardHeader class="gap-2 p-5">
           <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
@@ -63,7 +23,7 @@
       </section>
       <section
         hlmCard
-        class="rounded-lg border border-border/70 [background:var(--surface-hero)]"
+        class="rounded-lg border-0 [background:color-mix(in_oklab,var(--surface-hero)_78%,transparent)]"
       >
         <div hlmCardHeader class="gap-2 p-5">
           <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
@@ -82,7 +42,7 @@
       </section>
       <section
         hlmCard
-        class="rounded-lg border border-border/70 [background:var(--surface-hero)]"
+        class="rounded-lg border-0 [background:color-mix(in_oklab,var(--surface-hero)_78%,transparent)]"
       >
         <div hlmCardHeader class="gap-2 p-5">
           <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
@@ -100,37 +60,51 @@
         </div>
       </section>
     </section>
-    <section hlmCard class="rounded-lg border border-border/70 [background:var(--surface-panel-strong)]">
-      <div hlmCardHeader class="gap-3 border-b border-border/70 p-6 sm:p-8">
-        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-          Account desk
-        </p>
-        <h2
-          hlmCardTitle
-          class="text-xl font-semibold leading-tight tracking-[-0.01em] text-foreground"
-        >
-          Managed account inventory
-        </h2>
-        <p hlmCardDescription class="max-w-3xl text-xs leading-5 text-muted-foreground">
-          Each row focuses on customer-facing account details, balances, and lifecycle status.
-        </p>
+    <section
+      hlmCard
+      class="overflow-hidden rounded-lg border-0 [background:var(--surface-panel-strong)] [box-shadow:var(--surface-shadow)]"
+    >
+      <div hlmCardHeader class="gap-3 p-6 pb-2 sm:p-8 sm:pb-3">
+        <div class="flex flex-wrap items-start justify-between gap-3">
+          <div class="space-y-2">
+            <h2
+              hlmCardTitle
+              class="text-xl font-semibold leading-tight tracking-[-0.01em] text-foreground"
+            >
+              Managed account inventory
+            </h2>
+            <p hlmCardDescription class="max-w-3xl text-xs leading-5 text-muted-foreground">
+              Review each account in a compact list, then expand the one you need for identifiers,
+              balance context, and next-step navigation.
+            </p>
+          </div>
+          <button
+            hlmBtn
+            type="button"
+            size="sm"
+            class="h-10 rounded-lg px-5 shadow-lg shadow-primary/10 transition-[transform,box-shadow] hover:-translate-y-0.5"
+            (click)="openCreateSheet()"
+          >
+            Create Account
+          </button>
+        </div>
       </div>
-      <div hlmCardContent class="px-6 pb-6 pt-6 sm:px-8 sm:pb-8">
+      <div hlmCardContent class="px-4 pb-4 pt-4 sm:px-6 sm:pb-6">
         @if (loading()) {
-          <div class="grid gap-4 lg:grid-cols-2">
+          <div class="grid gap-3">
             @for (item of [1, 2, 3, 4]; track item) {
               <article
-                class="min-h-72 animate-pulse rounded-lg border border-border/70 p-6 [background:var(--surface-panel)]"
+                class="min-h-28 animate-pulse rounded-lg [background:color-mix(in_oklab,var(--surface-inset)_82%,transparent)]"
               ></article>
             }
           </div>
         } @else if (errorMessage()) {
-          <p class="rounded-lg border px-4 py-3 text-sm font-medium [border-color:var(--status-danger-border)] [background:var(--status-danger-surface)] [color:var(--status-danger-foreground)]">
+          <p class="rounded-lg px-4 py-3 text-sm font-medium [background:var(--status-danger-surface)] [color:var(--status-danger-foreground)]">
             {{ errorMessage() }}
           </p>
         } @else if (!accounts().length) {
           <article
-            class="empty-accounts-state rounded-lg border border-border/80 border-dashed p-8 text-center [background:var(--surface-inset-strong)]"
+            class="empty-accounts-state rounded-lg p-8 text-center [background:color-mix(in_oklab,var(--surface-inset-strong)_88%,transparent)]"
           >
             <p
               class="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground"
@@ -151,104 +125,147 @@
             </button>
           </article>
         } @else {
-          <div class="grid gap-4 xl:grid-cols-2">
+          <hlm-accordion type="single" class="rounded-lg px-2 py-2 [background:var(--surface-panel)]">
             @for (account of accounts(); track trackByAccountId($index, account)) {
-              <article class="rounded-lg border border-border/70 p-6 [background:var(--surface-panel)]">
-                <div class="flex flex-col gap-4">
-                  <div class="flex flex-wrap items-start justify-between gap-4">
-                    <div class="space-y-1.5">
-                      <h3
-                        class="text-base font-semibold leading-tight tracking-[-0.01em] text-foreground"
-                      >
+              <hlm-accordion-item
+                class="rounded-lg px-2 transition-[background-color] hover:[background:color-mix(in_oklab,var(--surface-inset)_60%,transparent)]"
+                [isOpened]="isAccountOpened(account.id, $index)"
+                (openedChange)="handleAccountOpenChange(account.id, $event)"
+              >
+                <hlm-accordion-trigger
+                  [triggerClass]="
+                    'items-center gap-4 rounded-lg border-0 px-4 py-4 focus-visible:ring-4 focus-visible:ring-ring/25'
+                  "
+                >
+                  <div class="grid min-w-0 flex-1 gap-3 md:grid-cols-[minmax(0,1.4fr)_auto_auto] md:items-center md:gap-4">
+                    <div class="min-w-0 space-y-1">
+                      <p class="truncate text-base font-semibold tracking-[-0.02em] text-foreground">
                         {{ account.name }}
-                      </h3>
-                      <p class="text-xs leading-5 text-muted-foreground">
-                        {{ account.type.replaceAll('_', ' ') }} - {{ account.currency }}
                       </p>
                     </div>
-                    <span
-                      class="rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] [border-color:var(--status-success-border)] [background:var(--status-success-surface)] [color:var(--status-success-foreground)]"
-                    >
-                      {{ account.status }}
-                    </span>
+                    <div class="flex md:justify-center">
+                      <span
+                        class="rounded-full border px-2.5 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.2em]"
+                        [class]="accountStatusClass(account.status)"
+                      >
+                        {{ account.status }}
+                      </span>
+                    </div>
+                    <p class="min-w-0 truncate text-left text-base font-semibold text-foreground [font-variant-numeric:tabular-nums] md:text-right">
+                      {{ account.availableBalance | number: '1.2-2' }} {{ account.currency }}
+                    </p>
                   </div>
-                  <div class="grid gap-4 sm:grid-cols-2">
-                    <div class="min-w-0 rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]">
-                      <p
-                        class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
-                      >
-                        Account number
-                      </p>
-                      <p
-                        class="mt-2 overflow-hidden text-ellipsis font-mono text-sm text-foreground [font-variant-numeric:tabular-nums]"
-                      >
-                        {{ account.accountNumber }}
-                      </p>
-                    </div>
-                    <div class="min-w-0 rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]">
-                      <p
-                        class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
-                      >
-                        IBAN
-                      </p>
-                      <p
-                        class="mt-2 break-all font-mono text-sm leading-5 text-foreground [font-variant-numeric:tabular-nums]"
-                      >
-                        {{ account.iban ?? 'Pending' }}
-                      </p>
-                    </div>
+                </hlm-accordion-trigger>
+                <hlm-accordion-content>
+                  <div class="grid gap-8 px-4 pb-2 pt-3 lg:grid-cols-[minmax(0,1.45fr)_minmax(16rem,0.7fr)] lg:items-start">
+                    <section class="space-y-6 lg:pr-6">
+                      <div class="space-y-3">
+                        <p class="text-sm leading-6 text-muted-foreground">
+                          {{ accountTypeLabel(account.type) }} &middot; {{ account.currency }}
+                        </p>
+                      </div>
+
+                      <dl class="grid gap-5 sm:grid-cols-2">
+                        <div class="space-y-1">
+                          <dt class="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                            Account number
+                          </dt>
+                          <dd translate="no" class="font-mono text-sm text-foreground [font-variant-numeric:tabular-nums]">
+                            {{ account.accountNumber }}
+                          </dd>
+                        </div>
+                        <div class="space-y-1">
+                          <dt class="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                            IBAN
+                          </dt>
+                          <dd translate="no" class="break-all font-mono text-sm text-foreground [font-variant-numeric:tabular-nums]">
+                            {{ account.iban ?? 'Pending' }}
+                          </dd>
+                        </div>
+                        <div class="space-y-1">
+                          <dt class="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                            Status
+                          </dt>
+                          <dd class="text-sm font-medium text-foreground">{{ account.status }}</dd>
+                        </div>
+                        <div class="space-y-1">
+                          <dt class="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                            Opened
+                          </dt>
+                          <dd class="text-sm font-medium text-foreground">{{ account.openedAt | date: 'dd MMM yyyy' }}</dd>
+                        </div>
+                        <div class="space-y-1">
+                          <dt class="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                            Overdraft limit
+                          </dt>
+                          <dd class="text-sm font-medium text-foreground [font-variant-numeric:tabular-nums]">
+                            {{ account.overdraftLimit | number: '1.2-2' }} {{ account.currency }}
+                          </dd>
+                        </div>
+                        <div class="space-y-1">
+                          <dt class="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                            Interest rate
+                          </dt>
+                          <dd class="text-sm font-medium text-foreground [font-variant-numeric:tabular-nums]">
+                            {{ account.annualInterestRate !== null ? (account.annualInterestRate | number: '1.2-2') + '%' : 'Not Set' }}
+                          </dd>
+                        </div>
+                      </dl>
+                    </section>
+
+                    <aside class="space-y-5 lg:pt-1">
+                      <div class="flex flex-wrap items-center justify-start gap-2 lg:justify-end">
+                        <button
+                          hlmBtn
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          class="h-9 rounded-lg px-3 text-xs"
+                        >
+                          <ng-icon name="lucideShare2" size="14" class="mr-1.5" />
+                          Share
+                        </button>
+                        <a
+                          hlmBtn
+                          variant="outline"
+                          size="sm"
+                          class="group h-9 min-w-[11rem] justify-between rounded-lg px-3 text-xs"
+                          [routerLink]="['/accounts', account.accountNumber]"
+                        >
+                          View Details
+                          <ng-icon
+                            name="lucideArrowRight"
+                            size="14"
+                            class="ml-2 transition-transform group-hover:translate-x-0.5"
+                          />
+                        </a>
+                      </div>
+
+                      <dl class="space-y-5">
+                        <div class="space-y-1">
+                          <dt class="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                            Current balance
+                          </dt>
+                          <dd class="text-3xl font-semibold tracking-[-0.03em] text-foreground [font-variant-numeric:tabular-nums]">
+                            {{ account.currentBalance | number: '1.2-2' }} {{ account.currency }}
+                          </dd>
+                        </div>
+                        <div class="space-y-1">
+                          <dt class="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                            Available balance
+                          </dt>
+                          <dd class="text-xl font-semibold tracking-[-0.02em] text-foreground [font-variant-numeric:tabular-nums]">
+                            {{ account.availableBalance | number: '1.2-2' }} {{ account.currency }}
+                          </dd>
+                        </div>
+                      </dl>
+
+                    </aside>
                   </div>
-                  <div class="grid gap-4 sm:grid-cols-3">
-                    <div class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]">
-                      <p
-                        class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
-                      >
-                        Booked
-                      </p>
-                      <p
-                        class="mt-2 text-xl font-semibold leading-none text-foreground [font-variant-numeric:tabular-nums]"
-                      >
-                        {{ account.currentBalance | number: '1.2-2' }}
-                      </p>
-                    </div>
-                    <div class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]">
-                      <p
-                        class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
-                      >
-                        Available
-                      </p>
-                      <p
-                        class="mt-2 text-xl font-semibold leading-none text-foreground [font-variant-numeric:tabular-nums]"
-                      >
-                        {{ account.availableBalance | number: '1.2-2' }}
-                      </p>
-                    </div>
-                    <div class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]">
-                      <p
-                        class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
-                      >
-                        Opened
-                      </p>
-                      <p class="mt-2 text-xs font-medium text-foreground">
-                        {{ account.openedAt | date: 'dd MMM yyyy' }}
-                      </p>
-                    </div>
-                  </div>
-                  <div class="flex justify-end">
-                    <a
-                      hlmBtn
-                      variant="outline"
-                      size="sm"
-                      class="h-8 rounded-lg px-3 text-xs"
-                      [routerLink]="['/accounts', account.accountNumber]"
-                    >
-                      View details
-                    </a>
-                  </div>
-                </div>
-              </article>
+                </hlm-accordion-content>
+              </hlm-accordion-item>
             }
-          </div>
+          </hlm-accordion>
         }
       </div>
     </section>

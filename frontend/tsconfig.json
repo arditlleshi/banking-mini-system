@@ -29,7 +29,8 @@
       "@spartan/sheet": ["./src/app/shared/ui/spartan/sheet/src/index.ts"],
       "@spartan/skeleton": ["./src/app/shared/ui/spartan/skeleton/src/index.ts"],
       "@spartan/tooltip": ["./src/app/shared/ui/spartan/tooltip/src/index.ts"],
-      "@spartan/dropdown-menu": ["./src/app/shared/ui/spartan/dropdown-menu/src/index.ts"]
+      "@spartan/dropdown-menu": ["./src/app/shared/ui/spartan/dropdown-menu/src/index.ts"],
+      "@spartan/accordion": ["./src/app/shared/ui/spartan/accordion/src/index.ts"]
     }
   },
   "angularCompilerOptions": {
