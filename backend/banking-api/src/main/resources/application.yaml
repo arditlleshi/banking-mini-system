@@ -33,7 +33,7 @@ banking:
       serial-length: ${BANKING_ACCOUNT_SERIAL_LENGTH:2}
   statement:
     institution-name: ${BANKING_STATEMENT_INSTITUTION_NAME:Banking Mini System}
-    institution-address-line: ${BANKING_STATEMENT_ADDRESS_LINE:Rruga e Bankes 1}
+    institution-address-line: ${BANKING_STATEMENT_ADDRESS_LINE:Rruga Ismail Qemali}
     institution-city: ${BANKING_STATEMENT_CITY:Tirane}
     institution-country: ${BANKING_STATEMENT_COUNTRY:Albania}
     institution-bic: ${BANKING_STATEMENT_BIC:BMSIALTR}

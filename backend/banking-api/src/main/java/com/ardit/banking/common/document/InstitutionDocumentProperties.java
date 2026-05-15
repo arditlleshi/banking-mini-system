@@ -15,7 +15,7 @@ public record InstitutionDocumentProperties(
 
     public InstitutionDocumentProperties {
         institutionName = normalize(institutionName, "Banking Mini System");
-        institutionAddressLine = normalize(institutionAddressLine, "Rruga e Bankes 1");
+        institutionAddressLine = normalize(institutionAddressLine, "Rruga Ismaim Qemali");
         institutionCity = normalize(institutionCity, "Tirane");
         institutionCountry = normalize(institutionCountry, "Albania");
         institutionBic = normalize(institutionBic, "BMSIALTR");

@@ -13,6 +13,7 @@
   --font-manrope: 'Manrope Variable', 'Manrope', 'Segoe UI', sans-serif;
 
   --radius: 0.5rem;
+  --radius-surface: var(--radius);
   --background: oklch(0.978 0.004 220);
   --foreground: oklch(0.278 0.016 230);
   --card: oklch(0.995 0.003 220);
@@ -199,13 +200,15 @@
 @layer components {
   [data-slot='dropdown-menu'],
   [data-slot='dropdown-menu-sub'] {
-    @apply rounded-lg border border-border bg-popover p-1.5;
+    border-radius: var(--radius-surface);
+    @apply border border-border bg-popover p-1.5;
     box-shadow: var(--surface-shadow-strong);
   }
 
   [data-slot='dialog-content'],
   [data-slot='sheet-content'] {
-    @apply rounded-lg border border-border bg-card;
+    border-radius: var(--radius-surface);
+    @apply border border-border bg-card;
     box-shadow: var(--surface-shadow-strong);
   }
 

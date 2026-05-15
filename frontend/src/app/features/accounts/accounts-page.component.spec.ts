@@ -46,7 +46,29 @@ describe('AccountsPageComponent', () => {
     revokeObjectURLSpy.mockRestore();
   });
 
-  it('downloads payment details without showing inline success feedback', async () => {
+  it('opens the payment-details dialog and prepares a PDF preview', async () => {
+    const fixture = TestBed.createComponent(AccountsPageComponent);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const component = fixture.componentInstance as unknown as {
+      shareAccountDetails: (account: AccountResponse) => void;
+      paymentDetailsDialogOpen: () => boolean;
+      paymentDetailsDialogLoading: () => boolean;
+      paymentDetailsPreviewAccount: () => AccountResponse | null;
+      paymentDetailsPreviewUrl: () => unknown;
+    };
+
+    component.shareAccountDetails(createAccountResponse());
+
+    expect(downloadPaymentDetails).toHaveBeenCalledWith(7);
+    expect(component.paymentDetailsDialogOpen()).toBe(true);
+    expect(component.paymentDetailsDialogLoading()).toBe(false);
+    expect(component.paymentDetailsPreviewAccount()?.id).toBe(7);
+    expect(component.paymentDetailsPreviewUrl()).toBeTruthy();
+  });
+
+  it('downloads payment details from the prepared preview', async () => {
     const fixture = TestBed.createComponent(AccountsPageComponent);
     fixture.detectChanges();
     await fixture.whenStable();
@@ -58,23 +80,23 @@ describe('AccountsPageComponent', () => {
 
     const component = fixture.componentInstance as unknown as {
       shareAccountDetails: (account: AccountResponse) => void;
-      shouldShowShareFeedback: (accountId: number) => boolean;
+      downloadPreparedPaymentDetails: () => void;
     };
 
     component.shareAccountDetails(createAccountResponse());
+    component.downloadPreparedPaymentDetails();
 
     expect(downloadPaymentDetails).toHaveBeenCalledWith(7);
     expect(createObjectURLSpy).toHaveBeenCalled();
     expect(anchorClick).toHaveBeenCalled();
     expect(anchorRemove).toHaveBeenCalled();
-    expect(component.shouldShowShareFeedback(7)).toBe(false);
 
     createElementSpy.mockRestore();
     anchorClick.mockRestore();
     anchorRemove.mockRestore();
   });
 
-  it('shows a backend conflict message when payment details are unavailable', async () => {
+  it('shows a backend conflict message inside the dialog when payment details are unavailable', async () => {
     downloadPaymentDetails.mockReturnValue(
       throwError(() => ({
         status: 409,
@@ -88,12 +110,48 @@ describe('AccountsPageComponent', () => {
 
     const component = fixture.componentInstance as unknown as {
       shareAccountDetails: (account: AccountResponse) => void;
-      shareErrorMessage: () => string | null;
+      paymentDetailsDialogOpen: () => boolean;
+      paymentDetailsDialogErrorMessage: () => string | null;
     };
 
     component.shareAccountDetails(createAccountResponse());
 
-    expect(component.shareErrorMessage()).toBe('Payment details are available only for active accounts');
+    expect(component.paymentDetailsDialogOpen()).toBe(true);
+    expect(component.paymentDetailsDialogErrorMessage()).toBe('Payment details are available only for active accounts');
+  });
+
+  it('keeps the newly opened accordion item active when the previously open item closes afterward', async () => {
+    const fixture = TestBed.createComponent(AccountsPageComponent);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const component = fixture.componentInstance as unknown as {
+      handleAccountOpenChange: (accountId: number, isOpened: boolean) => void;
+      isAccountOpened: (accountId: number, index: number) => boolean;
+    };
+
+    component.handleAccountOpenChange(4, true);
+    component.handleAccountOpenChange(3, true);
+    component.handleAccountOpenChange(4, false);
+
+    expect(component.isAccountOpened(3, 0)).toBe(true);
+    expect(component.isAccountOpened(4, 0)).toBe(false);
+    expect(component.isAccountOpened(7, 0)).toBe(false);
+  });
+
+  it('allows the currently open accordion item to close without forcing the first item open', async () => {
+    const fixture = TestBed.createComponent(AccountsPageComponent);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const component = fixture.componentInstance as unknown as {
+      handleAccountOpenChange: (accountId: number, isOpened: boolean) => void;
+      isAccountOpened: (accountId: number, index: number) => boolean;
+    };
+
+    component.handleAccountOpenChange(7, false);
+
+    expect(component.isAccountOpened(7, 0)).toBe(false);
   });
 });
 

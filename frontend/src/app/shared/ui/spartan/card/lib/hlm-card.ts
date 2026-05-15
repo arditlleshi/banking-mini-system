@@ -17,7 +17,7 @@ export class HlmCard {
   constructor() {
     classes(
       () =>
-        'group/card flex flex-col rounded-lg border border-border bg-card text-card-foreground shadow-[var(--surface-shadow)]',
+        'group/card flex flex-col rounded-[var(--radius-surface)] border border-border bg-card text-card-foreground shadow-[var(--surface-shadow)]',
     );
   }
 }

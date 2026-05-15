@@ -230,7 +230,7 @@
                           (click)="shareAccountDetails(account)"
                         >
                           <ng-icon name="lucideShare2" size="14" class="mr-1.5" />
-                          {{ isSharingAccount(account.id) ? 'Preparing PDF...' : 'Share' }}
+                          {{ isSharingAccount(account.id) ? 'Preparing PDF…' : 'Share' }}
                         </button>
                         <a
                           hlmBtn
@@ -247,11 +247,6 @@
                           />
                         </a>
                       </div>
-                      @if (shouldShowShareFeedback(account.id)) {
-                        <p class="rounded-lg border border-(--status-danger-border) px-3 py-2 text-xs leading-5 [background:var(--status-danger-surface)] text-(--status-danger-foreground)">
-                          {{ shareErrorMessage() }}
-                        </p>
-                      }
 
                       <dl class="space-y-5">
                         <div class="space-y-1">
@@ -291,4 +286,17 @@
   [currencyOptions]="currencyOptions"
   (openChange)="handleDialogOpenChange($event)"
   (createAccount)="submitCreateAccount($event)"
+/>
+<app-payment-details-dialog
+  [open]="paymentDetailsDialogOpen()"
+  [loading]="paymentDetailsDialogLoading()"
+  [account]="paymentDetailsPreviewAccount()"
+  [previewUrl]="paymentDetailsPreviewUrl()"
+  [errorMessage]="paymentDetailsDialogErrorMessage()"
+  [actionMessage]="paymentDetailsActionMessage()"
+  [actionTone]="paymentDetailsActionTone()"
+  [canUseNativeShare]="canUseNativeShare()"
+  (openChange)="handlePaymentDetailsDialogOpenChange($event)"
+  (share)="sharePreparedPaymentDetails()"
+  (download)="downloadPreparedPaymentDetails()"
 />

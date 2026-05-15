@@ -20,7 +20,7 @@ class AccountStatementPdfGeneratorTests {
     private final AccountStatementPdfGenerator generator = new AccountStatementPdfGenerator(
         new InstitutionDocumentProperties(
             "Banking Mini System",
-            "Rruga e Bankes 1",
+            "Rruga Ismail Qemali",
             "Tirane",
             "Albania",
             "BMSIALTR",

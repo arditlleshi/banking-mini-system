@@ -28,7 +28,7 @@ class AccountPaymentDetailsServiceTests {
 
     private final InstitutionDocumentProperties institutionDocumentProperties = new InstitutionDocumentProperties(
         "Banking Mini System",
-        "Rruga e Bankes 1",
+        "Rruga Ismail Qemali",
         "Tirane",
         "Albania",
         "BMSIALTR",
@@ -55,7 +55,7 @@ class AccountPaymentDetailsServiceTests {
         assertThat(document.iban()).isEqualTo("AL4721211009000000123456");
         assertThat(document.bic()).isEqualTo("BMSIALTR");
         assertThat(document.institutionName()).isEqualTo("Banking Mini System");
-        assertThat(document.institutionAddressLine()).isEqualTo("Rruga e Bankes 1");
+        assertThat(document.institutionAddressLine()).isEqualTo("Rruga Ismail Qemali");
         assertThat(document.institutionCityCountry()).isEqualTo("Tirane, Albania");
         assertThat(document.currency()).isEqualTo("EUR");
         assertThat(document.generatedAt()).isNotNull();

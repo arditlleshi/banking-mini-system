@@ -1,9 +1,13 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, computed, inject, signal } from '@angular/core';
+import { DomSanitizer, type SafeResourceUrl } from '@angular/platform-browser';
+import { RouterLink } from '@angular/router';
 import { provideIcons } from '@ng-icons/core';
 import { lucideArrowRight, lucideShare2 } from '@ng-icons/lucide';
-import { RouterLink } from '@angular/router';
+import { HlmAccordion, HlmAccordionContent, HlmAccordionItem, HlmAccordionTrigger } from '@spartan/accordion';
+import { HlmIconImports } from '@spartan/icon';
+
 import {
   AccountApiService,
   type AccountCurrency,
@@ -12,7 +16,6 @@ import {
   type AccountType
 } from '../../core/services/account-api.service';
 import { PageBreadcrumbComponent, type PageBreadcrumbItem } from '../../shared/ui/page-breadcrumb';
-import { HlmAccordion, HlmAccordionContent, HlmAccordionItem, HlmAccordionTrigger } from '@spartan/accordion';
 import { HlmButton } from '../../shared/ui/spartan/button';
 import {
   HlmCard,
@@ -21,8 +24,8 @@ import {
   HlmCardHeader,
   HlmCardTitle
 } from '../../shared/ui/spartan/card';
-import { HlmIconImports } from '@spartan/icon';
 import { CreateAccountDialogComponent } from './create-account-dialog.component';
+import { PaymentDetailsDialogComponent } from './payment-details-dialog.component';
 
 type AccountFormOption<T extends string> = {
   readonly value: T;
@@ -47,25 +50,33 @@ type AccountFormOption<T extends string> = {
     HlmCardHeader,
     HlmCardTitle,
     HlmIconImports,
-    CreateAccountDialogComponent
+    CreateAccountDialogComponent,
+    PaymentDetailsDialogComponent
   ],
   providers: [provideIcons({ lucideArrowRight, lucideShare2 })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './accounts-page.component.html'
 })
-export class AccountsPageComponent {
+export class AccountsPageComponent implements OnDestroy {
   private readonly accountApi = inject(AccountApiService);
+  private readonly sanitizer = inject(DomSanitizer);
 
   protected readonly loading = signal(true);
   protected readonly submitting = signal(false);
   protected readonly sharingAccountId = signal<number | null>(null);
   protected readonly dialogOpen = signal(false);
+  protected readonly paymentDetailsDialogOpen = signal(false);
+  protected readonly paymentDetailsDialogLoading = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
-  protected readonly shareErrorMessage = signal<string | null>(null);
-  protected readonly shareFeedbackAccountId = signal<number | null>(null);
+  protected readonly paymentDetailsDialogErrorMessage = signal<string | null>(null);
+  protected readonly paymentDetailsActionMessage = signal<string | null>(null);
+  protected readonly paymentDetailsActionTone = signal<'success' | 'error' | null>(null);
   protected readonly submitErrorMessage = signal<string | null>(null);
   protected readonly accounts = signal<AccountResponse[]>([]);
   protected readonly openedAccountId = signal<number | null>(null);
+  protected readonly paymentDetailsPreviewAccount = signal<AccountResponse | null>(null);
+  protected readonly paymentDetailsPreviewBlob = signal<Blob | null>(null);
+  protected readonly paymentDetailsPreviewUrl = signal<SafeResourceUrl | null>(null);
   protected readonly breadcrumbItems: readonly PageBreadcrumbItem[] = [
     { label: 'Home', link: '/home' },
     { label: 'Accounts' }
@@ -93,8 +104,14 @@ export class AccountsPageComponent {
     { value: 'ALL', label: 'Albanian Lek (ALL)' }
   ];
 
+  private previewObjectUrl: string | null = null;
+
   constructor() {
     this.loadAccounts();
+  }
+
+  ngOnDestroy(): void {
+    this.clearPaymentDetailsPreview();
   }
 
   protected openCreateSheet(): void {
@@ -133,7 +150,14 @@ export class AccountsPageComponent {
   }
 
   protected handleAccountOpenChange(accountId: number, isOpened: boolean): void {
-    this.openedAccountId.set(isOpened ? accountId : null);
+    if (isOpened) {
+      this.openedAccountId.set(accountId);
+      return;
+    }
+
+    if (this.openedAccountId() === accountId) {
+      this.openedAccountId.set(null);
+    }
   }
 
   protected shareAccountDetails(account: AccountResponse): void {
@@ -141,18 +165,24 @@ export class AccountsPageComponent {
       return;
     }
 
+    this.clearPaymentDetailsPreview();
+    this.paymentDetailsPreviewAccount.set(account);
+    this.paymentDetailsDialogOpen.set(true);
+    this.paymentDetailsDialogLoading.set(true);
+    this.paymentDetailsDialogErrorMessage.set(null);
+    this.clearPaymentDetailsActionMessage();
     this.sharingAccountId.set(account.id);
-    this.shareErrorMessage.set(null);
 
     this.accountApi.downloadPaymentDetails(account.id).subscribe({
       next: (paymentDetailsFile) => {
-        this.saveFile(paymentDetailsFile, this.buildPaymentDetailsFileName(account.accountNumber));
-        this.shareFeedbackAccountId.set(null);
+        this.paymentDetailsPreviewBlob.set(paymentDetailsFile);
+        this.paymentDetailsPreviewUrl.set(this.buildPaymentDetailsPreviewUrl(paymentDetailsFile));
+        this.paymentDetailsDialogLoading.set(false);
         this.sharingAccountId.set(null);
       },
       error: (error: HttpErrorResponse) => {
-        this.shareFeedbackAccountId.set(account.id);
-        this.shareErrorMessage.set(this.resolveShareErrorMessage(error));
+        this.paymentDetailsDialogLoading.set(false);
+        this.paymentDetailsDialogErrorMessage.set(this.resolveShareErrorMessage(error));
         this.sharingAccountId.set(null);
       }
     });
@@ -162,17 +192,85 @@ export class AccountsPageComponent {
     return this.sharingAccountId() === accountId;
   }
 
-  protected shouldShowShareFeedback(accountId: number): boolean {
-    return this.shareFeedbackAccountId() === accountId
-      && this.shareErrorMessage() !== null;
+  protected handlePaymentDetailsDialogOpenChange(open: boolean): void {
+    this.paymentDetailsDialogOpen.set(open);
+
+    if (!open) {
+      this.paymentDetailsDialogLoading.set(false);
+      this.paymentDetailsDialogErrorMessage.set(null);
+      this.clearPaymentDetailsActionMessage();
+      this.paymentDetailsPreviewAccount.set(null);
+      this.clearPaymentDetailsPreview();
+    }
   }
 
-  protected isAccountOpened(accountId: number, index: number): boolean {
-    const openedId = this.openedAccountId();
-    if (openedId === null) {
-      return index === 0;
+  protected async sharePreparedPaymentDetails(): Promise<void> {
+    const account = this.paymentDetailsPreviewAccount();
+    const previewBlob = this.paymentDetailsPreviewBlob();
+
+    if (!account || !previewBlob) {
+      return;
     }
-    return openedId === accountId;
+
+    this.clearPaymentDetailsActionMessage();
+
+    try {
+      const shareText = this.buildPaymentDetailsShareText(account);
+      const shareFile = new File([previewBlob], this.buildPaymentDetailsFileName(account.accountNumber), {
+        type: 'application/pdf'
+      });
+
+      if (this.canSharePaymentDetailsFile(shareFile)) {
+        await navigator.share({
+          title: `Payment Details - ${account.name}`,
+          text: shareText,
+          files: [shareFile]
+        });
+        return;
+      }
+
+      if (this.canUseNativeShare()) {
+        await navigator.share({
+          title: `Payment Details - ${account.name}`,
+          text: shareText
+        });
+        return;
+      }
+
+      this.setPaymentDetailsActionMessage(
+        'Native sharing is not available here. Copy the details or download the PDF instead.',
+        'error'
+      );
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        return;
+      }
+
+      this.setPaymentDetailsActionMessage(
+        'The device share sheet could not be opened right now. Try copying the details or downloading the PDF instead.',
+        'error'
+      );
+    }
+  }
+
+  protected downloadPreparedPaymentDetails(): void {
+    const account = this.paymentDetailsPreviewAccount();
+    const previewBlob = this.paymentDetailsPreviewBlob();
+
+    if (!account || !previewBlob) {
+      return;
+    }
+
+    this.saveFile(previewBlob, this.buildPaymentDetailsFileName(account.accountNumber));
+  }
+
+  protected canUseNativeShare(): boolean {
+    return typeof navigator !== 'undefined'
+      && typeof navigator.share === 'function';
+  }
+
+  protected isAccountOpened(accountId: number, _index: number): boolean {
+    return this.openedAccountId() === accountId;
   }
 
   protected accountTypeLabel(type: AccountType): string {
@@ -254,6 +352,60 @@ export class AccountsPageComponent {
 
   private buildPaymentDetailsFileName(accountNumber: string): string {
     return `payment-details-${accountNumber}.pdf`;
+  }
+
+  private buildPaymentDetailsPreviewUrl(file: Blob): SafeResourceUrl {
+    const objectUrl = URL.createObjectURL(file);
+    this.previewObjectUrl = objectUrl;
+    return this.sanitizer.bypassSecurityTrustResourceUrl(
+      `${objectUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`
+    );
+  }
+
+  private buildPaymentDetailsShareText(account: AccountResponse): string {
+    return [
+      'Payment Details',
+      `Account Name: ${account.name}`,
+      `Account Number: ${account.accountNumber}`,
+      `IBAN: ${account.iban ? this.formatIban(account.iban) : 'Pending'}`,
+      `Currency: ${account.currency}`
+    ].join('\n');
+  }
+
+  private formatIban(iban: string): string {
+    return iban.replace(/\s+/g, '').replace(/(.{4})/g, '$1 ').trim();
+  }
+
+  private canSharePaymentDetailsFile(file: File): boolean {
+    if (!this.canUseNativeShare() || typeof navigator.canShare !== 'function') {
+      return false;
+    }
+
+    try {
+      return navigator.canShare({ files: [file] });
+    } catch {
+      return false;
+    }
+  }
+
+  private setPaymentDetailsActionMessage(message: string, tone: 'success' | 'error'): void {
+    this.paymentDetailsActionMessage.set(message);
+    this.paymentDetailsActionTone.set(tone);
+  }
+
+  private clearPaymentDetailsActionMessage(): void {
+    this.paymentDetailsActionMessage.set(null);
+    this.paymentDetailsActionTone.set(null);
+  }
+
+  private clearPaymentDetailsPreview(): void {
+    this.paymentDetailsPreviewBlob.set(null);
+    this.paymentDetailsPreviewUrl.set(null);
+
+    if (this.previewObjectUrl) {
+      URL.revokeObjectURL(this.previewObjectUrl);
+      this.previewObjectUrl = null;
+    }
   }
 
   private saveFile(file: Blob, fileName: string): void {

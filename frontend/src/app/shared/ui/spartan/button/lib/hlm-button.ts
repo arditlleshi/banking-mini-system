@@ -6,7 +6,7 @@ import type { ClassValue } from 'clsx';
 import { injectBrnButtonConfig } from './hlm-button.token';
 
 export const buttonVariants = cva(
-  'group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-lg border font-semibold tracking-[-0.01em] transition-[background-color,border-color,color,box-shadow,transform] outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_ng-icon]:pointer-events-none [&_ng-icon]:shrink-0 [box-shadow:inset_0_1px_0_var(--surface-inset-highlight)]',
+  'group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-surface)] border font-semibold tracking-[-0.01em] transition-[background-color,border-color,color,box-shadow,transform] outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_ng-icon]:pointer-events-none [&_ng-icon]:shrink-0 [box-shadow:inset_0_1px_0_var(--surface-inset-highlight)]',
   {
     variants: {
       variant: {
@@ -27,10 +27,10 @@ export const buttonVariants = cva(
         xs: 'h-8 px-3 py-1.5 text-xs',
         sm: 'h-9 px-3.5 py-2 text-sm',
         lg: 'h-11 px-5 py-2.5 text-sm',
-        icon: 'h-10 w-10 rounded-lg p-0',
-        'icon-xs': 'h-7 w-7 rounded-lg p-0',
-        'icon-sm': 'h-8 w-8 rounded-lg p-0',
-        'icon-lg': 'h-11 w-11 rounded-lg p-0',
+        icon: 'h-10 w-10 rounded-[var(--radius-surface)] p-0',
+        'icon-xs': 'h-7 w-7 rounded-[var(--radius-surface)] p-0',
+        'icon-sm': 'h-8 w-8 rounded-[var(--radius-surface)] p-0',
+        'icon-lg': 'h-11 w-11 rounded-[var(--radius-surface)] p-0',
       },
     },
     defaultVariants: {

@@ -17,7 +17,7 @@ class AccountPaymentDetailsPdfGeneratorTests {
     private final AccountPaymentDetailsPdfGenerator generator = new AccountPaymentDetailsPdfGenerator(
         new InstitutionDocumentProperties(
             "Banking Mini System",
-            "Rruga e Bankes 1",
+            "Rruga Ismail Qemali",
             "Tirane",
             "Albania",
             "BMSIALTR",
@@ -36,7 +36,7 @@ class AccountPaymentDetailsPdfGeneratorTests {
             "AL4721211009000000123456",
             "BMSIALTR",
             "Banking Mini System",
-            "Rruga e Bankes 1",
+            "Rruga Ismail Qemali",
             "Tirane, Albania",
             "EUR",
             Instant.parse("2026-05-15T08:30:00Z")
@@ -58,7 +58,7 @@ class AccountPaymentDetailsPdfGeneratorTests {
             assertThat(text).contains("Main Account");
             assertThat(text).contains("EUR");
             assertThat(text).contains("Banking Mini System");
-            assertThat(text).contains("Rruga e Bankes 1");
+            assertThat(text).contains("Rruga Ismail Qemali");
             assertThat(text).contains("Tirane, Albania");
             assertThat(text).contains("support@banking.local");
             assertThat(text).contains("+355 4 000 0000");
