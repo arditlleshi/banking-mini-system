@@ -21,6 +21,8 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.springframework.stereotype.Component;
 
+import com.ardit.banking.common.document.InstitutionDocumentProperties;
+
 @Component
 public class AccountStatementPdfGenerator {
 
@@ -43,9 +45,9 @@ public class AccountStatementPdfGenerator {
         .withZone(ZoneId.systemDefault());
     private static final float[] TRANSACTION_COLUMN_WIDTHS = new float[] {84f, 128f, 58f, 62f, 52f, 52f, 77f};
 
-    private final StatementDocumentProperties properties;
+    private final InstitutionDocumentProperties properties;
 
-    public AccountStatementPdfGenerator(StatementDocumentProperties properties) {
+    public AccountStatementPdfGenerator(InstitutionDocumentProperties properties) {
         this.properties = properties;
     }
 

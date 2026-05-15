@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,9 +15,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import com.ardit.banking.account.domain.AccountCurrency;
 import com.ardit.banking.account.domain.AccountEntity;
 import com.ardit.banking.account.domain.AccountType;
-import com.ardit.banking.account.repository.AccountRepository;
+import com.ardit.banking.account.service.OwnedAccountAccessService;
 import com.ardit.banking.security.user.domain.UserEntity;
-import com.ardit.banking.security.user.repository.UserRepository;
 import com.ardit.banking.transaction.domain.TransactionDirection;
 import com.ardit.banking.transaction.domain.TransactionEntity;
 import com.ardit.banking.transaction.domain.TransactionStatus;
@@ -32,10 +30,7 @@ import static org.mockito.Mockito.when;
 class AccountStatementServiceTests {
 
     @Mock
-    private AccountRepository accountRepository;
-
-    @Mock
-    private UserRepository userRepository;
+    private OwnedAccountAccessService ownedAccountAccessService;
 
     @Mock
     private TransactionRepository transactionRepository;
@@ -71,8 +66,7 @@ class AccountStatementServiceTests {
             Instant.parse("2026-05-03T09:00:00Z")
         );
 
-        when(userRepository.findByUsername("statement-user")).thenReturn(Optional.of(user));
-        when(accountRepository.findByIdAndOwnerId(7L, 11L)).thenReturn(Optional.of(account));
+        when(ownedAccountAccessService.getOwnedAccountById("statement-user", 7L)).thenReturn(account);
         when(transactionRepository.findStatementEntries(7L, fromDate, toDate))
             .thenReturn(List.of(latestInRange, oldestInRange));
 

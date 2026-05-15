@@ -58,8 +58,11 @@ export class AccountsPageComponent {
 
   protected readonly loading = signal(true);
   protected readonly submitting = signal(false);
+  protected readonly sharingAccountId = signal<number | null>(null);
   protected readonly dialogOpen = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
+  protected readonly shareErrorMessage = signal<string | null>(null);
+  protected readonly shareFeedbackAccountId = signal<number | null>(null);
   protected readonly submitErrorMessage = signal<string | null>(null);
   protected readonly accounts = signal<AccountResponse[]>([]);
   protected readonly openedAccountId = signal<number | null>(null);
@@ -133,6 +136,37 @@ export class AccountsPageComponent {
     this.openedAccountId.set(isOpened ? accountId : null);
   }
 
+  protected shareAccountDetails(account: AccountResponse): void {
+    if (this.sharingAccountId() !== null) {
+      return;
+    }
+
+    this.sharingAccountId.set(account.id);
+    this.shareErrorMessage.set(null);
+
+    this.accountApi.downloadPaymentDetails(account.id).subscribe({
+      next: (paymentDetailsFile) => {
+        this.saveFile(paymentDetailsFile, this.buildPaymentDetailsFileName(account.accountNumber));
+        this.shareFeedbackAccountId.set(null);
+        this.sharingAccountId.set(null);
+      },
+      error: (error: HttpErrorResponse) => {
+        this.shareFeedbackAccountId.set(account.id);
+        this.shareErrorMessage.set(this.resolveShareErrorMessage(error));
+        this.sharingAccountId.set(null);
+      }
+    });
+  }
+
+  protected isSharingAccount(accountId: number): boolean {
+    return this.sharingAccountId() === accountId;
+  }
+
+  protected shouldShowShareFeedback(accountId: number): boolean {
+    return this.shareFeedbackAccountId() === accountId
+      && this.shareErrorMessage() !== null;
+  }
+
   protected isAccountOpened(accountId: number, index: number): boolean {
     const openedId = this.openedAccountId();
     if (openedId === null) {
@@ -203,5 +237,34 @@ export class AccountsPageComponent {
     }
 
     this.openedAccountId.set(accounts[0].id);
+  }
+
+  private resolveShareErrorMessage(error: HttpErrorResponse): string {
+    if (error.status === 0) {
+      return 'Backend is not reachable. Start backend and try again.';
+    }
+    if (error.status === 404) {
+      return 'Account was not found or is not accessible for this user.';
+    }
+    if (error.status === 409) {
+      return error.error?.message ?? 'Payment details are not available for this account right now.';
+    }
+    return 'The payment details PDF could not be prepared at the moment.';
+  }
+
+  private buildPaymentDetailsFileName(accountNumber: string): string {
+    return `payment-details-${accountNumber}.pdf`;
+  }
+
+  private saveFile(file: Blob, fileName: string): void {
+    const objectUrl = URL.createObjectURL(file);
+    const downloadLink = document.createElement('a');
+    downloadLink.href = objectUrl;
+    downloadLink.download = fileName;
+    downloadLink.style.display = 'none';
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    downloadLink.remove();
+    window.setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
   }
 }

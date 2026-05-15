@@ -9,15 +9,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.ardit.banking.account.domain.AccountEntity;
-import com.ardit.banking.account.repository.AccountRepository;
-import com.ardit.banking.security.user.domain.UserEntity;
-import com.ardit.banking.security.user.repository.UserRepository;
+import com.ardit.banking.account.service.OwnedAccountAccessService;
 import com.ardit.banking.transaction.domain.TransactionDirection;
 import com.ardit.banking.transaction.domain.TransactionEntity;
 import com.ardit.banking.transaction.repository.TransactionRepository;
@@ -25,14 +21,12 @@ import com.ardit.banking.transaction.repository.TransactionRepository;
 @Service
 public class AccountStatementService {
 
-    private final AccountRepository accountRepository;
-    private final UserRepository userRepository;
+    private final OwnedAccountAccessService ownedAccountAccessService;
     private final TransactionRepository transactionRepository;
 
-    public AccountStatementService(AccountRepository accountRepository, UserRepository userRepository,
+    public AccountStatementService(OwnedAccountAccessService ownedAccountAccessService,
                                    TransactionRepository transactionRepository) {
-        this.accountRepository = accountRepository;
-        this.userRepository = userRepository;
+        this.ownedAccountAccessService = ownedAccountAccessService;
         this.transactionRepository = transactionRepository;
     }
 
@@ -40,7 +34,7 @@ public class AccountStatementService {
     public AccountStatement getStatementForUsernameAndAccount(String username, Long accountId,
                                                               LocalDate fromDate, LocalDate toDate) {
         StatementDateRange dateRange = StatementDateRange.of(fromDate, toDate);
-        AccountEntity account = getOwnedAccountById(username, accountId);
+        AccountEntity account = ownedAccountAccessService.getOwnedAccountById(username, accountId);
         return buildStatement(account, username, dateRange);
     }
 
@@ -55,7 +49,7 @@ public class AccountStatementService {
     public AccountStatement getStatementForUsernameAndAccountNumber(String username, String accountNumber,
                                                                     LocalDate fromDate, LocalDate toDate) {
         StatementDateRange dateRange = StatementDateRange.of(fromDate, toDate);
-        AccountEntity account = getOwnedAccountByNumber(username, accountNumber);
+        AccountEntity account = ownedAccountAccessService.getOwnedAccountByNumber(username, accountNumber);
         return buildStatement(account, username, dateRange);
     }
 
@@ -96,23 +90,6 @@ public class AccountStatementService {
             normalizeMoney(totalCredits.subtract(totalDebits)),
             transactions
         );
-    }
-
-    private AccountEntity getOwnedAccountById(String username, Long accountId) {
-        UserEntity owner = getOwnerByUsername(username);
-        return accountRepository.findByIdAndOwnerId(accountId, owner.getId())
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
-    }
-
-    private AccountEntity getOwnedAccountByNumber(String username, String accountNumber) {
-        UserEntity owner = getOwnerByUsername(username);
-        return accountRepository.findByAccountNumberAndOwnerId(accountNumber, owner.getId())
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
-    }
-
-    private UserEntity getOwnerByUsername(String username) {
-        return userRepository.findByUsername(username)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authenticated user not found"));
     }
 
     private static BigDecimal sumTransactions(List<TransactionEntity> transactions, TransactionDirection direction) {

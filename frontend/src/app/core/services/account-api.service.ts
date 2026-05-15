@@ -95,6 +95,12 @@ export class AccountApiService {
     });
   }
 
+  downloadPaymentDetails(accountId: number): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/accounts/${accountId}/payment-details`, {
+      responseType: 'blob'
+    });
+  }
+
   private buildStatementParams(filters: AccountStatementFilters): HttpParams {
     let params = new HttpParams();
 

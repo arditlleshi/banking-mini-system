@@ -13,10 +13,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ardit.banking.common.document.InstitutionDocumentProperties;
+
 class AccountStatementPdfGeneratorTests {
 
     private final AccountStatementPdfGenerator generator = new AccountStatementPdfGenerator(
-        new StatementDocumentProperties(
+        new InstitutionDocumentProperties(
             "Banking Mini System",
             "Rruga e Bankes 1",
             "Tirane",

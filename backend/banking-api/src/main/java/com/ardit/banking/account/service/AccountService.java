@@ -36,16 +36,19 @@ public class AccountService {
     private final TransactionService transactionService;
     private final AccountStatementService accountStatementService;
     private final AccountNumberingProperties accountNumberingProperties;
+    private final OwnedAccountAccessService ownedAccountAccessService;
     private final SecureRandom secureRandom = new SecureRandom();
 
     public AccountService(AccountRepository accountRepository, UserRepository userRepository,
                           TransactionService transactionService, AccountStatementService accountStatementService,
-                          AccountNumberingProperties accountNumberingProperties) {
+                          AccountNumberingProperties accountNumberingProperties,
+                          OwnedAccountAccessService ownedAccountAccessService) {
         this.accountRepository = accountRepository;
         this.userRepository = userRepository;
         this.transactionService = transactionService;
         this.accountStatementService = accountStatementService;
         this.accountNumberingProperties = accountNumberingProperties;
+        this.ownedAccountAccessService = ownedAccountAccessService;
     }
 
     @Transactional
@@ -90,15 +93,12 @@ public class AccountService {
 
     @Transactional(readOnly = true)
     public AccountResponse getAccountForUsername(String username, Long accountId) {
-        UserEntity owner = getOwnerByUsername(username);
-        return accountRepository.findByIdAndOwnerId(accountId, owner.getId())
-            .map(AccountService::toResponse)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
+        return toResponse(ownedAccountAccessService.getOwnedAccountById(username, accountId));
     }
 
     @Transactional(readOnly = true)
     public AccountDetailsResponse getAccountDetailsByNumberForUsername(String username, String accountNumber) {
-        AccountEntity account = getOwnedAccountByNumber(username, accountNumber);
+        AccountEntity account = ownedAccountAccessService.getOwnedAccountByNumber(username, accountNumber);
         AccountStatement statement = accountStatementService.getStatementForAccount(
             account,
             username,
@@ -121,7 +121,7 @@ public class AccountService {
 
     @Transactional
     public AccountResponse updateAccountForUsername(String username, Long accountId, UpdateAccountRequest request) {
-        AccountEntity account = getOwnedAccount(username, accountId);
+        AccountEntity account = ownedAccountAccessService.getOwnedAccountById(username, accountId);
         ensureAccountEditable(account);
         account.rename(request.name());
         return toResponse(account);
@@ -129,7 +129,7 @@ public class AccountService {
 
     @Transactional
     public void closeAccountForUsername(String username, Long accountId) {
-        AccountEntity account = getOwnedAccount(username, accountId);
+        AccountEntity account = ownedAccountAccessService.getOwnedAccountById(username, accountId);
         if (account.getStatus() == AccountStatus.CLOSED) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Account is already closed");
         }
@@ -147,18 +147,6 @@ public class AccountService {
     private UserEntity getOwnerByUsername(String username) {
         return userRepository.findByUsername(username)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authenticated user not found"));
-    }
-
-    private AccountEntity getOwnedAccount(String username, Long accountId) {
-        UserEntity owner = getOwnerByUsername(username);
-        return accountRepository.findByIdAndOwnerId(accountId, owner.getId())
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
-    }
-
-    private AccountEntity getOwnedAccountByNumber(String username, String accountNumber) {
-        UserEntity owner = getOwnerByUsername(username);
-        return accountRepository.findByAccountNumberAndOwnerId(accountNumber, owner.getId())
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
     }
 
     private static void ensureAccountEditable(AccountEntity account) {
