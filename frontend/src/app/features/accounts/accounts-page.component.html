@@ -99,7 +99,7 @@
             }
           </div>
         } @else if (errorMessage()) {
-          <p class="rounded-lg px-4 py-3 text-sm font-medium [background:var(--status-danger-surface)] [color:var(--status-danger-foreground)]">
+          <p class="rounded-lg px-4 py-3 text-sm font-medium [background:var(--status-danger-surface)] text-(--status-danger-foreground)">
             {{ errorMessage() }}
           </p>
         } @else if (!accounts().length) {
@@ -112,7 +112,7 @@
               No accounts yet
             </p>
             <h3
-              class="mt-3 font-[var(--font-manrope)] font-bold tracking-[-0.03em] text-xl leading-tight tracking-tight text-foreground text-balance sm:text-2xl"
+              class="mt-3 font-bold tracking-[-0.03em] text-xl leading-tight text-foreground text-balance sm:text-2xl"
             >
               Open the first account from this workspace
             </h3>
@@ -125,16 +125,19 @@
             </button>
           </article>
         } @else {
-          <hlm-accordion type="single" class="rounded-lg px-2 py-2 [background:var(--surface-panel)]">
+          <hlm-accordion
+            type="single"
+            class="grid gap-3"
+          >
             @for (account of accounts(); track trackByAccountId($index, account)) {
               <hlm-accordion-item
-                class="rounded-lg px-2 transition-[background-color] hover:[background:color-mix(in_oklab,var(--surface-inset)_60%,transparent)]"
+                class="last:mb-0 overflow-hidden rounded-xl border border-border/45 px-2 transition-[background-color,border-color,box-shadow] [background:color-mix(in_oklab,var(--surface-panel)_78%,var(--background)_22%)] hover:border-border/70 hover:[background:color-mix(in_oklab,var(--surface-inset)_78%,var(--background)_22%)] data-[state=open]:border-border/80 data-[state=open]:[background:color-mix(in_oklab,var(--surface-inset-strong)_88%,var(--background)_12%)] data-[state=open]:[box-shadow:var(--surface-shadow-inline)]"
                 [isOpened]="isAccountOpened(account.id, $index)"
                 (openedChange)="handleAccountOpenChange(account.id, $event)"
               >
                 <hlm-accordion-trigger
                   [triggerClass]="
-                    'items-center gap-4 rounded-lg border-0 px-4 py-4 focus-visible:ring-4 focus-visible:ring-ring/25'
+                    'items-center gap-4 rounded-xl border-0 px-4 py-4 focus-visible:ring-4 focus-visible:ring-ring/25 group-aria-expanded/accordion-trigger:[background:color-mix(in_oklab,var(--surface-control)_78%,var(--background)_22%)]'
                   "
                 >
                   <div class="grid min-w-0 flex-1 gap-3 md:grid-cols-[minmax(0,1.4fr)_auto_auto] md:items-center md:gap-4">
@@ -157,7 +160,9 @@
                   </div>
                 </hlm-accordion-trigger>
                 <hlm-accordion-content>
-                  <div class="grid gap-8 px-4 pb-2 pt-3 lg:grid-cols-[minmax(0,1.45fr)_minmax(16rem,0.7fr)] lg:items-start">
+                  <div
+                    class="grid gap-8 border-t border-border/75 px-4 pb-3 pt-5 lg:grid-cols-[minmax(0,1.45fr)_minmax(16rem,0.7fr)] lg:items-start"
+                  >
                     <section class="space-y-6 lg:pr-6">
                       <div class="space-y-3">
                         <p class="text-sm leading-6 text-muted-foreground">
@@ -229,7 +234,7 @@
                           hlmBtn
                           variant="outline"
                           size="sm"
-                          class="group h-9 min-w-[11rem] justify-between rounded-lg px-3 text-xs"
+                          class="group h-9 min-w-44 justify-between rounded-lg px-3 text-xs"
                           [routerLink]="['/accounts', account.accountNumber]"
                         >
                           View Details
