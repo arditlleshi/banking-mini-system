@@ -7,7 +7,7 @@
           Payments
         </p>
         <h1
-          class="font-[var(--font-manrope)] font-bold tracking-[-0.03em] text-2xl leading-[1.08] tracking-tight text-foreground text-balance sm:text-3xl max-w-4xl"
+          class="font-(--font-manrope) tracking-[-0.03em] text-2xl leading-[1.08] text-foreground text-balance sm:text-3xl max-w-4xl"
         >
           Choose a Payment Type, Then Review Before Booking
         </h1>
@@ -34,7 +34,7 @@
           </p>
           <h2
             id="payment-action-heading"
-            class="mt-2 font-[var(--font-manrope)] font-bold tracking-[-0.03em] text-xl leading-tight tracking-tight text-foreground text-balance sm:text-2xl"
+            class="mt-2 font-(--font-manrope) tracking-[-0.03em] text-xl leading-tight text-foreground text-balance sm:text-2xl"
           >
             Start With the Customer Intent
           </h2>
@@ -78,7 +78,7 @@
         </p>
         <h2
           hlmCardTitle
-          class="font-[var(--font-manrope)] font-bold tracking-[-0.03em] text-xl leading-tight tracking-tight text-card-foreground text-balance sm:text-2xl"
+          class="font-bold tracking-[-0.03em] text-xl leading-tight text-card-foreground text-balance sm:text-2xl"
         >
           Transfer Between Your Accounts
         </h2>
@@ -99,7 +99,7 @@
         } @else if (accountsLoadError()) {
           <p
             aria-live="polite"
-            class="rounded-lg border px-4 py-3 text-sm font-medium [border-color:var(--status-danger-border)] [background:var(--status-danger-surface)] [color:var(--status-danger-foreground)]"
+            class="rounded-lg border px-4 py-3 text-sm font-medium border-(--status-danger-border) [background:var(--status-danger-surface)] text-(--status-danger-foreground)"
           >
             {{ accountsLoadError() }}
           </p>
@@ -113,7 +113,7 @@
               Not Enough Accounts
             </p>
             <h3
-              class="mt-3 font-[var(--font-manrope)] font-bold tracking-[-0.03em] text-xl leading-tight tracking-tight text-foreground text-balance sm:text-2xl"
+              class="mt-3 font-(--font-manrope) tracking-[-0.03em] text-xl leading-tight text-foreground text-balance sm:text-2xl"
             >
               At least two accounts are required to make this payment.
             </h3>
@@ -188,6 +188,11 @@
                     {{ targetAccount()?.currency ?? '' }}
                   </p>
                 </div>
+                @if (accountSelectionErrorMessage()) {
+                  <p class="text-sm font-medium text-(--status-danger-foreground)">
+                    {{ accountSelectionErrorMessage() }}
+                  </p>
+                }
               </div>
             </div>
             <div class="grid gap-5 md:grid-cols-[0.8fr_1.2fr]">
@@ -210,6 +215,9 @@
                   formControlName="amount"
                   class="h-10 rounded-lg border border-border/80 px-4 text-sm text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20 disabled:[background:var(--surface-control-disabled)]"
                 />
+                @if (amountErrorMessage()) {
+                  <p class="text-sm font-medium text-(--status-danger-foreground)">{{ amountErrorMessage() }}</p>
+                }
               </div>
               <div class="flex flex-col gap-2">
                 <label
@@ -227,8 +235,11 @@
                   formControlName="description"
                   maxlength="280"
                   class="h-10 rounded-lg border border-border/80 px-4 text-sm text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20 disabled:[background:var(--surface-control-disabled)]"
-                  placeholder="Monthly savings transfer…"
+                  placeholder="Monthly savings transfer..."
                 />
+                @if (descriptionErrorMessage()) {
+                  <p class="text-sm font-medium text-(--status-danger-foreground)">{{ descriptionErrorMessage() }}</p>
+                }
               </div>
             </div>
             <section class="grid gap-4 md:grid-cols-3" aria-label="Payment preview">
@@ -264,7 +275,7 @@
                   </p>
                   <p class="mt-2 text-xs text-muted-foreground">{{ fxPreview()!.note }}</p>
                 } @else {
-                  <p class="mt-3 text-sm font-medium [color:var(--status-warning-foreground)]">
+                  <p class="mt-3 text-sm font-medium text-(--status-warning-foreground)">
                     Not Available
                   </p>
                 }
@@ -286,7 +297,7 @@
             @if (exchangeRateLoadWarning()) {
               <p
                 aria-live="polite"
-                class="rounded-lg border px-4 py-3 text-sm font-medium [border-color:var(--status-warning-border)] [background:var(--status-warning-surface)] [color:var(--status-warning-foreground)]"
+                class="rounded-lg border px-4 py-3 text-sm font-medium border-(--status-warning-border) [background:var(--status-warning-surface)] text-(--status-warning-foreground)"
               >
                 {{ exchangeRateLoadWarning() }}
               </p>
@@ -294,23 +305,15 @@
             @if (transferError()) {
               <p
                 aria-live="polite"
-                class="rounded-lg border px-4 py-3 text-sm font-medium [border-color:var(--status-danger-border)] [background:var(--status-danger-surface)] [color:var(--status-danger-foreground)]"
+                class="rounded-lg border px-4 py-3 text-sm font-medium border-(--status-danger-border) [background:var(--status-danger-surface)] text-(--status-danger-foreground)"
               >
                 {{ transferError() }}
-              </p>
-            }
-            @if (sameAccountSelected()) {
-              <p
-                aria-live="polite"
-                class="rounded-lg border px-4 py-3 text-sm font-medium [border-color:var(--status-warning-border)] [background:var(--status-warning-surface)] [color:var(--status-warning-foreground)]"
-              >
-                Debit and credit accounts must be different.
               </p>
             }
             @if (insufficientFunds()) {
               <p
                 aria-live="polite"
-                class="rounded-lg border px-4 py-3 text-sm font-medium [border-color:var(--status-warning-border)] [background:var(--status-warning-surface)] [color:var(--status-warning-foreground)]"
+                class="rounded-lg border px-4 py-3 text-sm font-medium border-(--status-warning-border) [background:var(--status-warning-surface)] text-(--status-warning-foreground)"
               >
                 Payment amount cannot be greater than the available balance of the debit account.
               </p>
@@ -318,7 +321,7 @@
             @if (successTransfer()) {
               <article
                 aria-live="polite"
-                class="rounded-lg border p-4 text-sm [border-color:var(--status-success-border)] [background:var(--status-success-surface)] [color:var(--status-success-foreground)]"
+                class="rounded-lg border p-4 text-sm border-(--status-success-border) [background:var(--status-success-surface)] text-(--status-success-foreground)"
               >
                 <p class="font-semibold">Payment Booked Successfully</p>
                 <p class="mt-2">Reference: {{ successTransfer()!.transferReference }}</p>
@@ -338,7 +341,7 @@
                 hlmBtn
                 type="submit"
                 class="h-10 rounded-lg px-5 text-sm"
-                [disabled]="submitting() || insufficientFunds() || sameAccountSelected()"
+                [disabled]="submitting() || form.invalid || insufficientFunds()"
               >
                 {{ submitting() ? 'Submitting…' : 'Book Payment' }}
               </button>

@@ -1,7 +1,7 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { provideIcons } from '@ng-icons/core';
 import { lucideBuilding2, lucideCreditCard, lucideHistory, lucideLandmark, lucideSmartphone, lucideZap } from '@ng-icons/lucide';
@@ -68,6 +68,8 @@ type PaymentAction = {
   templateUrl: './payments-page.component.html'
 })
 export class PaymentsPageComponent {
+  private static readonly descriptionPattern = /^[A-Za-z0-9][A-Za-z0-9 .,'()\/\-]*$/;
+
   private readonly fb = new FormBuilder();
   private readonly accountApi = inject(AccountApiService);
   private readonly exchangeRateApi = inject(ExchangeRateApiService);
@@ -131,9 +133,9 @@ export class PaymentsPageComponent {
   protected readonly form = this.fb.nonNullable.group({
     sourceAccountId: [0, [Validators.required, Validators.min(1)]],
     targetAccountId: [0, [Validators.required, Validators.min(1)]],
-    amount: [0, [Validators.required, Validators.min(0.01)]],
-    description: ['', [Validators.required, Validators.maxLength(280)]]
-  });
+    amount: [0, [Validators.required, Validators.min(0.01), Validators.max(1_000_000)]],
+    description: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(280), Validators.pattern(PaymentsPageComponent.descriptionPattern)]]
+  }, { validators: [PaymentsPageComponent.differentAccountsValidator] });
 
   private readonly sourceAccountIdValue = toSignal(
     this.form.controls.sourceAccountId.valueChanges.pipe(startWith(this.form.controls.sourceAccountId.value)),
@@ -207,6 +209,38 @@ export class PaymentsPageComponent {
     this.loadData();
   }
 
+  protected controlHasError(controlName: 'sourceAccountId' | 'targetAccountId' | 'amount' | 'description'): boolean {
+    const control = this.form.controls[controlName];
+    return control.invalid && (control.touched || control.dirty);
+  }
+
+  protected amountErrorMessage(): string | null {
+    const control = this.form.controls.amount;
+    if (!this.controlHasError('amount')) return null;
+    if (control.hasError('required')) return 'Amount is required.';
+    if (control.hasError('min')) return 'Amount must be at least 0.01.';
+    if (control.hasError('max')) return 'Amount cannot be greater than 1,000,000.';
+    return 'Enter a valid payment amount.';
+  }
+
+  protected descriptionErrorMessage(): string | null {
+    const control = this.form.controls.description;
+    if (!this.controlHasError('description')) return null;
+    if (control.hasError('required')) return 'Description is required.';
+    if (control.hasError('minlength')) return 'Description must be at least 5 characters.';
+    if (control.hasError('maxlength')) return 'Description cannot exceed 280 characters.';
+    if (control.hasError('pattern')) return 'Description must start with a letter or number and use valid characters only.';
+    return 'Enter a valid description.';
+  }
+
+  protected accountSelectionErrorMessage(): string | null {
+    if (!this.form.hasError('sameAccount')) return null;
+    const sourceTouched = this.form.controls.sourceAccountId.touched || this.form.controls.sourceAccountId.dirty;
+    const targetTouched = this.form.controls.targetAccountId.touched || this.form.controls.targetAccountId.dirty;
+    if (!sourceTouched && !targetTouched) return null;
+    return 'Debit and credit accounts must be different.';
+  }
+
   protected submitTransfer(): void {
     if (this.form.invalid || this.submitting()) {
       this.form.markAllAsTouched();
@@ -219,7 +253,7 @@ export class PaymentsPageComponent {
       this.transferError.set('Choose both debit and credit accounts before submitting.');
       return;
     }
-    if (source.id === target.id) {
+    if (this.form.hasError('sameAccount') || source.id === target.id) {
       this.transferError.set('Source and target accounts must be different.');
       return;
     }
@@ -256,6 +290,15 @@ export class PaymentsPageComponent {
           this.transferError.set(error.error?.message ?? 'Transfer failed. Please review your inputs and try again.');
         }
       });
+  }
+
+  private static differentAccountsValidator(control: AbstractControl): ValidationErrors | null {
+    const sourceAccountId = control.get('sourceAccountId')?.value;
+    const targetAccountId = control.get('targetAccountId')?.value;
+    if (!sourceAccountId || !targetAccountId) {
+      return null;
+    }
+    return sourceAccountId === targetAccountId ? { sameAccount: true } : null;
   }
 
   protected accountLabel(account: AccountResponse): string {
