@@ -136,7 +136,7 @@ class AccountPaymentDetailsControllerIntegrationTests {
         entityManager.flush();
 
         mockMvc.perform(get("/api/accounts/{accountId}/payment-details", account.getId()))
-            .andExpect(status().isForbidden());
+            .andExpect(status().isUnauthorized());
     }
 
     private UserEntity persistUser(String username, String fullName) {

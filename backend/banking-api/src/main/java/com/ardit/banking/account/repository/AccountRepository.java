@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.ardit.banking.account.domain.AccountEntity;
+import com.ardit.banking.account.domain.AccountCurrency;
 
 public interface AccountRepository extends JpaRepository<AccountEntity, Long> {
 
@@ -31,4 +32,31 @@ public interface AccountRepository extends JpaRepository<AccountEntity, Long> {
         @Param("ownerId") Long ownerId,
         @Param("accountClassCode") String accountClassCode
     );
+
+    @Query("""
+        select account.currency as currency, count(account.id) as accountCount
+        from AccountEntity account
+        where account.owner.id = :ownerId
+        group by account.currency
+        """)
+    List<AccountCurrencyCountProjection> findAccountCountByCurrencyForOwnerId(@Param("ownerId") Long ownerId);
+
+    interface AccountCurrencyCountProjection {
+        AccountCurrency getCurrency();
+
+        long getAccountCount();
+    }
+
+    @Query("""
+        select account.currency as currency, account.currentBalance as currentBalance
+        from AccountEntity account
+        where account.owner.id = :ownerId
+        """)
+    List<DashboardAccountBalanceProjection> findDashboardBalancesByOwnerId(@Param("ownerId") Long ownerId);
+
+    interface DashboardAccountBalanceProjection {
+        AccountCurrency getCurrency();
+
+        java.math.BigDecimal getCurrentBalance();
+    }
 }

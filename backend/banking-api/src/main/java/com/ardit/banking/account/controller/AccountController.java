@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ardit.banking.account.dto.AccountResponse;
+import com.ardit.banking.account.dto.AccountCurrencyDistributionResponse;
 import com.ardit.banking.account.dto.AccountDetailsResponse;
 import com.ardit.banking.account.dto.CreateAccountRequest;
 import com.ardit.banking.account.dto.UpdateAccountRequest;
@@ -45,6 +46,11 @@ public class AccountController {
     @GetMapping
     public List<AccountResponse> getMyAccounts(@AuthenticationPrincipal UserDetails user) {
         return accountService.getAccountsForUsername(user.getUsername());
+    }
+
+    @GetMapping("/currency-distribution")
+    public List<AccountCurrencyDistributionResponse> getMyAccountCurrencyDistribution(@AuthenticationPrincipal UserDetails user) {
+        return accountService.getAccountCurrencyDistributionForUsername(user.getUsername());
     }
 
     @GetMapping("/{accountId}")

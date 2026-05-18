@@ -1,186 +1,146 @@
 <main class="quiet-dashboard min-h-screen px-4 py-8 sm:px-6 lg:px-10">
   <div class="mx-auto flex max-w-6xl flex-col gap-8">
     <app-page-breadcrumb [items]="breadcrumbItems" />
-    <header
-      class="rounded-lg border border-border/70 px-6 py-8 [background:var(--surface-hero)] [box-shadow:var(--surface-shadow)] backdrop-blur-lg sm:px-8 lg:px-10"
-    >
-      <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-        <div class="max-w-3xl space-y-4">
-          <p class="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-            Operations overview
-          </p>
-          <h1
-            class="font-bold tracking-[-0.03em] text-2xl leading-[1.08] text-foreground text-balance sm:text-3xl"
-          >
-            Core banking activity in one controlled operating view.
-          </h1>
-          <p class="max-w-2xl text-base leading-7 text-muted-foreground">
-            Monitor connectivity, session status, and the main operating areas from a cleaner
-            banking workspace built for day-to-day use.
-          </p>
-        </div>
-        <div class="rounded-lg border border-border/70 px-5 py-4 [background:var(--surface-inset)] backdrop-blur-sm">
-          <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-            Workspace
-          </p>
-          <p class="mt-2 max-w-xs text-sm leading-6 text-muted-foreground">
-            Move between accounts, customers, payments, and settings from the shared navigation
-            rail.
-          </p>
-        </div>
-      </div>
-    </header>
     <section class="grid gap-4 md:grid-cols-3">
       <section hlmCard class="rounded-lg border border-border/70 [background:var(--surface-hero)]">
         <div hlmCardHeader class="gap-3 p-6">
           <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-            Connection
+            Net worth
           </p>
           <h2
             hlmCardTitle
             class="font-bold text-2xl leading-none tracking-tight text-card-foreground sm:text-3xl"
           >
-            {{ status() }}
+            {{ summaryValue('netWorth') }}
           </h2>
           <p hlmCardDescription class="text-sm leading-6 text-muted-foreground">
-            Frontend connectivity to the backend service from the Angular workspace.
+            Current account balances converted to {{ summaryBaseCurrency() }} as of
+            {{ summaryPeriodEndLabel() }}.
           </p>
         </div>
       </section>
       <section hlmCard class="rounded-lg border border-border/70 [background:var(--surface-hero)]">
         <div hlmCardHeader class="gap-3 p-6">
           <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-            Session state
+            Income this month
           </p>
           <h2
             hlmCardTitle
             class="font-(--font-manrope) tracking-[-0.03em] text-2xl leading-none text-card-foreground sm:text-3xl"
           >
-            {{ sessionState() }}
+            {{ summaryValue('incomeThisMonth') }}
           </h2>
           <p hlmCardDescription class="text-sm leading-6 text-muted-foreground">
-            Authentication state and route protection for the current user session.
+            Booked credits for the current month, excluding internal transfers between your own
+            accounts.
           </p>
         </div>
       </section>
       <section hlmCard class="rounded-lg border border-border/70 [background:var(--surface-hero)]">
         <div hlmCardHeader class="gap-3 p-6">
           <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-            Visible modules
+            Expenses this month
           </p>
           <h2
             hlmCardTitle
             class="font-(--font-manrope) tracking-[-0.03em] text-2xl leading-none text-card-foreground sm:text-3xl"
           >
-            {{ itemCount() }}
+            {{ summaryValue('expensesThisMonth') }}
           </h2>
           <p hlmCardDescription class="text-sm leading-6 text-muted-foreground">
-            Available modules currently returned by the backend test endpoint.
+            Booked debits for the current month, excluding internal transfers between your own
+            accounts.
           </p>
         </div>
       </section>
     </section>
-    <section class="grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
+    @if (summaryError(); as errorMessage) {
+      <section class="rounded-lg border border-[var(--status-danger-border)] px-6 py-4 [background:var(--status-danger-surface)]">
+        <p class="text-sm leading-6 [color:var(--status-danger-foreground)]">
+          {{ errorMessage }}
+        </p>
+      </section>
+    }
+    <section class="grid gap-6 lg:grid-cols-[0.88fr_1.12fr]">
       <section hlmCard class="rounded-lg border border-border/70 [background:var(--surface-panel-strong)]">
         <div hlmCardHeader class="gap-3 p-6 sm:p-8">
           <p class="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-            Module preview
+            Portfolio exposure
           </p>
           <h2
             hlmCardTitle
             class="font-(--font-manrope) tracking-[-0.03em] text-xl leading-tight text-card-foreground text-balance sm:text-2xl"
           >
-            Connected banking modules
+            Accounts by currency
           </h2>
           <p hlmCardDescription class="max-w-2xl text-sm leading-6 text-muted-foreground">
-            These entries are still sample data, but the layout is ready to expand into production
-            account, customer, and payment workflows.
+            Live distribution across EUR, USD, GBP, and ALL account books.
           </p>
         </div>
         <div hlmCardContent class="px-6 pb-6 sm:px-8 sm:pb-8">
-          <div class="grid gap-4">
-            @for (item of items(); track item.id) {
-              <article
-                class="quiet-list-row rounded-lg border border-border/70 p-5 transition-[transform,box-shadow] hover:-translate-y-0.5 [background:var(--surface-inset)] hover:[box-shadow:var(--surface-shadow)]"
-              >
-                <div class="flex items-start justify-between gap-4">
-                  <div class="space-y-2">
-                    <p
-                      class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
-                    >
-                      Module {{ item.id }}
-                    </p>
-                    <h3
-                      class="font-(--font-manrope) tracking-[-0.03em] text-xl leading-tight text-foreground text-balance sm:text-2xl"
-                    >
-                      {{ item.name }}
-                    </h3>
-                    <p class="text-sm leading-6 text-muted-foreground">
-                      Reserved for operational workflows with clear balances, controlled actions,
-                      and easier state visibility.
-                    </p>
-                  </div>
-                  <span
-                    class="rounded-full border border-border/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground"
-                  >
-                    {{ accessMode() }}
-                  </span>
-                </div>
-              </article>
-            }
-          </div>
+          @if (currencyDistributionLoading()) {
+            <p class="text-sm leading-6 text-muted-foreground">
+              Loading currency distribution...
+            </p>
+          } @else if (currencyDistributionError(); as errorMessage) {
+            <p class="text-sm leading-6 [color:var(--status-danger-foreground)]">
+              {{ errorMessage }}
+            </p>
+          } @else if (!hasCurrencyData()) {
+            <p class="text-sm leading-6 text-muted-foreground">
+              No accounts found yet. Create an account to populate this chart.
+            </p>
+          } @else {
+            <div class="h-72 w-full">
+              <canvas
+                baseChart
+                [data]="currencyChartData()"
+                [options]="currencyChartOptions"
+                [type]="'doughnut'"
+              ></canvas>
+            </div>
+          }
         </div>
       </section>
       <section hlmCard class="rounded-lg border border-border/70 [background:var(--surface-panel-strong)]">
-        <div hlmCardHeader class="gap-3 p-6">
+        <div hlmCardHeader class="gap-3 p-6 sm:p-8">
           <p class="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-            Design notes
+            External cash flow
           </p>
           <h2
             hlmCardTitle
             class="font-(--font-manrope) tracking-[-0.03em] text-xl leading-tight text-card-foreground text-balance sm:text-2xl"
           >
-            Banking theme system
+            Monthly income vs. expenses
           </h2>
-          <p hlmCardDescription class="text-sm leading-6 text-muted-foreground">
-            The interface now favors cleaner contrast, disciplined corners, and reusable banking
-            surfaces over decorative styling.
+          <p hlmCardDescription class="max-w-2xl text-sm leading-6 text-muted-foreground">
+            Last six months of booked inflows and outflows in {{ summaryBaseCurrency() }}, with
+            internal transfers stripped out.
           </p>
         </div>
-        <div hlmCardContent class="flex flex-col gap-4 px-6 pb-6">
-          <div class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]">
-            <p
-              class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
-            >
-              Typography
+        <div hlmCardContent class="px-6 pb-6 sm:px-8 sm:pb-8">
+          @if (monthlyCashFlowLoading()) {
+            <p class="text-sm leading-6 text-muted-foreground">
+              Loading monthly cash flow…
             </p>
-            <p class="mt-2 text-sm leading-6 text-muted-foreground">
-              A single corporate sans-serif keeps the interface clear and consistent.
+          } @else if (monthlyCashFlowError(); as errorMessage) {
+            <p class="text-sm leading-6 [color:var(--status-danger-foreground)]">
+              {{ errorMessage }}
             </p>
-          </div>
-          <hlm-separator decorative></hlm-separator>
-          <div class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]">
-            <p
-              class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
-            >
-              Palette
+          } @else if (!hasMonthlyCashFlowData()) {
+            <p class="text-sm leading-6 text-muted-foreground">
+              No booked external cash flow is available for the selected period yet.
             </p>
-            <p class="mt-2 text-sm leading-6 text-muted-foreground">
-              Slate and graphite surfaces are paired with a restrained teal action color.
-            </p>
-          </div>
-          <hlm-separator decorative></hlm-separator>
-          <div class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]">
-            <p
-              class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
-            >
-              Mode support
-            </p>
-            <p class="mt-2 text-sm leading-6 text-muted-foreground">
-              Light and dark mode now keep the same tone, with softer dark surfaces and clearer
-              states.
-            </p>
-          </div>
+          } @else {
+            <div class="h-80 w-full min-w-0">
+              <canvas
+                baseChart
+                [data]="monthlyCashFlowChartData()"
+                [options]="monthlyCashFlowChartOptions"
+                [type]="'bar'"
+              ></canvas>
+            </div>
+          }
         </div>
       </section>
     </section>

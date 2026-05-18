@@ -1,6 +1,8 @@
 package com.ardit.banking.exchange.repository;
 
 import java.time.Instant;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,6 +14,12 @@ public interface ExchangeRateRepository extends JpaRepository<ExchangeRateEntity
 
     Optional<ExchangeRateEntity> findFirstByBaseCurrencyAndQuoteCurrencyAndValidFromLessThanEqualOrderByValidFromDescIdDesc(
         AccountCurrency baseCurrency,
+        AccountCurrency quoteCurrency,
+        Instant effectiveAt
+    );
+
+    List<ExchangeRateEntity> findByBaseCurrencyInAndQuoteCurrencyAndValidFromLessThanEqualOrderByBaseCurrencyAscValidFromAscIdAsc(
+        Collection<AccountCurrency> baseCurrencies,
         AccountCurrency quoteCurrency,
         Instant effectiveAt
     );

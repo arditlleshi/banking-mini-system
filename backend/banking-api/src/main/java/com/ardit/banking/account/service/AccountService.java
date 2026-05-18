@@ -3,7 +3,10 @@ package com.ardit.banking.account.service;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -12,8 +15,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.ardit.banking.account.config.AccountNumberingProperties;
 import com.ardit.banking.account.domain.AccountEntity;
+import com.ardit.banking.account.domain.AccountCurrency;
 import com.ardit.banking.account.domain.AccountStatus;
 import com.ardit.banking.account.domain.AccountType;
+import com.ardit.banking.account.dto.AccountCurrencyDistributionResponse;
 import com.ardit.banking.account.dto.AccountDetailsResponse;
 import com.ardit.banking.account.dto.AccountResponse;
 import com.ardit.banking.account.dto.CreateAccountRequest;
@@ -88,6 +93,26 @@ public class AccountService {
         UserEntity owner = getOwnerByUsername(username);
         return accountRepository.findAllByOwnerIdOrderByOpenedAtAsc(owner.getId()).stream()
             .map(AccountService::toResponse)
+            .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<AccountCurrencyDistributionResponse> getAccountCurrencyDistributionForUsername(String username) {
+        UserEntity owner = getOwnerByUsername(username);
+        Map<AccountCurrency, Long> accountCountsByCurrency = accountRepository
+            .findAccountCountByCurrencyForOwnerId(owner.getId())
+            .stream()
+            .collect(Collectors.toMap(
+                AccountRepository.AccountCurrencyCountProjection::getCurrency,
+                AccountRepository.AccountCurrencyCountProjection::getAccountCount,
+                Long::sum
+            ));
+
+        return Arrays.stream(AccountCurrency.values())
+            .map(currency -> {
+                long accountCount = accountCountsByCurrency.getOrDefault(currency, 0L);
+                return new AccountCurrencyDistributionResponse(currency.name(), accountCount);
+            })
             .toList();
     }
 

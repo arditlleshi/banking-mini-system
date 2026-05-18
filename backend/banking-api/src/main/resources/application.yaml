@@ -39,6 +39,9 @@ banking:
     institution-bic: ${BANKING_STATEMENT_BIC:BMSIALTR}
     support-email: ${BANKING_STATEMENT_SUPPORT_EMAIL:support@banking.local}
     support-phone: ${BANKING_STATEMENT_SUPPORT_PHONE:+355 4 000 0000}
+  dashboard:
+    reporting-zone: ${BANKING_DASHBOARD_REPORTING_ZONE:Europe/Tirane}
+    default-base-currency: ${BANKING_DASHBOARD_BASE_CURRENCY:ALL}
 
 springdoc:
   api-docs:

@@ -1,5 +1,7 @@
 package com.ardit.banking.transaction.repository;
 
+import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -8,7 +10,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.ardit.banking.account.domain.AccountCurrency;
+import com.ardit.banking.transaction.domain.TransactionDirection;
 import com.ardit.banking.transaction.domain.TransactionEntity;
+import com.ardit.banking.transaction.domain.TransactionStatus;
+import com.ardit.banking.transaction.domain.TransactionType;
 
 public interface TransactionRepository extends JpaRepository<TransactionEntity, Long> {
 
@@ -29,4 +35,37 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
     Optional<TransactionEntity> findTopByAccountIdOrderByValueDateAscBookingTimestampAscIdAsc(Long accountId);
 
     Optional<TransactionEntity> findByIdAndAccountId(Long id, Long accountId);
+
+    @Query("""
+        select transaction.type as type,
+               transaction.direction as direction,
+               transaction.currency as currency,
+               transaction.amount as amount,
+               transaction.bookingTimestamp as bookingTimestamp
+        from TransactionEntity transaction
+        join transaction.account account
+        where account.owner.id = :ownerId
+          and transaction.status = :status
+          and transaction.bookingTimestamp >= :fromInclusive
+          and transaction.bookingTimestamp < :toExclusive
+        order by transaction.bookingTimestamp asc, transaction.id asc
+        """)
+    List<DashboardCashFlowProjection> findDashboardCashFlowEntries(
+        @Param("ownerId") Long ownerId,
+        @Param("status") TransactionStatus status,
+        @Param("fromInclusive") Instant fromInclusive,
+        @Param("toExclusive") Instant toExclusive
+    );
+
+    interface DashboardCashFlowProjection {
+        TransactionType getType();
+
+        TransactionDirection getDirection();
+
+        AccountCurrency getCurrency();
+
+        BigDecimal getAmount();
+
+        Instant getBookingTimestamp();
+    }
 }

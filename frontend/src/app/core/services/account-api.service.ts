@@ -65,6 +65,11 @@ export type AccountStatementFilters = {
   readonly toDate?: string | null;
 };
 
+export type AccountCurrencyDistributionResponse = {
+  currency: AccountCurrency;
+  accountCount: number;
+};
+
 @Injectable({ providedIn: 'root' })
 export class AccountApiService {
   private readonly http = inject(HttpClient);
@@ -72,6 +77,10 @@ export class AccountApiService {
 
   getAccounts(): Observable<AccountResponse[]> {
     return this.http.get<AccountResponse[]>(`${this.baseUrl}/accounts`);
+  }
+
+  getAccountCurrencyDistribution(): Observable<AccountCurrencyDistributionResponse[]> {
+    return this.http.get<AccountCurrencyDistributionResponse[]>(`${this.baseUrl}/accounts/currency-distribution`);
   }
 
   createAccount(payload: CreateAccountRequest): Observable<AccountResponse> {
