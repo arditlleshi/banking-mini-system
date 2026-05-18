@@ -134,22 +134,10 @@
   </hlm-sidebar>
   <main id="main-content" hlmSidebarInset class="min-w-0" tabindex="-1">
     <header
-      class="sticky top-0 z-30 flex h-15 items-center border-b px-4 [background:color-mix(in_oklab,var(--background)_93%,var(--card)_7%)] backdrop-blur-[14px] sm:px-6 lg:px-10"
+      class="sticky top-0 z-30 border-b border-border/70 px-4 py-3 [background:color-mix(in_oklab,var(--background)_88%,var(--card)_12%)] [box-shadow:var(--surface-shadow)] backdrop-blur-[18px] sm:px-6 lg:px-10"
     >
-      <div class="flex h-full w-full items-center mx-auto max-w-6xl">
-        <div class="flex min-h-9 w-full min-w-0 items-center gap-2.5">
-          <p
-            class="min-w-0 text-[1rem] font-semibold leading-tight tracking-tight text-foreground text-pretty sm:text-[1.06rem]"
-            translate="no"
-          >
-            {{ activeItem().label }}
-          </p>
-          <p
-            class="hidden min-w-0 truncate text-[0.79rem] leading-tight text-muted-foreground lg:block"
-          >
-            Operational workspace for account servicing, approvals, & customer activity.
-          </p>
-        </div>
+      <div class="mx-auto flex min-h-10 w-full max-w-6xl items-center">
+        <app-page-breadcrumb [items]="breadcrumbItems()" aria-label="Current page path" />
       </div>
     </header>
     <div class="min-w-0 p-3.5 max-lg:p-3"><router-outlet /></div>

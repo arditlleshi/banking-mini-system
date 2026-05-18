@@ -11,7 +11,6 @@ import {
   type AccountStatementFilters,
   type AccountTransactionResponse
 } from '../../../core/services/account-api.service';
-import { PageBreadcrumbComponent, type PageBreadcrumbItem } from '../../../shared/ui/page-breadcrumb';
 import { HlmButton } from '../../../shared/ui/spartan/button';
 import { HlmCard, HlmCardContent, HlmCardDescription, HlmCardHeader, HlmCardTitle } from '../../../shared/ui/spartan/card';
 import { AccountStatementDialogComponent } from './account-statement-dialog.component';
@@ -31,7 +30,6 @@ type StatementFiltersForm = FormGroup<{
 @Component({
   selector: 'app-account-details-page',
   imports: [
-    PageBreadcrumbComponent,
     HlmButton,
     HlmCard,
     HlmCardContent,
@@ -68,11 +66,6 @@ export class AccountDetailsPageComponent {
   protected readonly details = signal<AccountDetailsResponse | null>(null);
   protected readonly statementTransactions = signal<AccountTransactionResponse[]>([]);
   protected readonly statementDialogOpen = signal(false);
-  protected readonly breadcrumbItems = computed<readonly PageBreadcrumbItem[]>(() => [
-    { label: 'Home', link: '/home' },
-    { label: 'Accounts', link: '/accounts' },
-    { label: this.details()?.account.name ?? this.route.snapshot.paramMap.get('accountNumber') ?? 'Account details' }
-  ]);
   protected readonly statementFiltersForm: StatementFiltersForm = this.fb.group({
     fromDate: this.fb.control<Date | null>(null),
     toDate: this.fb.control<Date | null>(null)

@@ -4,13 +4,12 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { provideIcons } from '@ng-icons/core';
-import { lucideBuilding2, lucideCreditCard, lucideHistory, lucideLandmark, lucideSmartphone, lucideZap } from '@ng-icons/lucide';
+import { lucideBuilding2, lucideCreditCard, lucideLandmark, lucideSmartphone, lucideZap } from '@ng-icons/lucide';
 import { startWith } from 'rxjs';
 
 import { AccountApiService, type AccountCurrency, type AccountResponse } from '../../core/services/account-api.service';
 import { ExchangeRateApiService, type ExchangeRateResponse } from '../../core/services/exchange-rate-api.service';
 import { TransferApiService, type TransferResponse } from '../../core/services/transfer-api.service';
-import { PageBreadcrumbComponent, type PageBreadcrumbItem } from '../../shared/ui/page-breadcrumb';
 import { HlmButton } from '../../shared/ui/spartan/button';
 import { HlmCard, HlmCardContent, HlmCardDescription, HlmCardHeader, HlmCardTitle } from '../../shared/ui/spartan/card';
 import { HlmIconImports } from '@spartan/icon';
@@ -37,7 +36,6 @@ type PaymentAction = {
     DatePipe,
     DecimalPipe,
     ReactiveFormsModule,
-    PageBreadcrumbComponent,
     HlmButton,
     HlmCard,
     HlmCardContent,
@@ -58,7 +56,6 @@ type PaymentAction = {
     provideIcons({
       lucideBuilding2,
       lucideCreditCard,
-      lucideHistory,
       lucideLandmark,
       lucideSmartphone,
       lucideZap
@@ -85,10 +82,6 @@ export class PaymentsPageComponent {
   protected readonly successTransfer = signal<TransferResponse | null>(null);
   protected readonly accounts = signal<AccountResponse[]>([]);
   protected readonly exchangeRates = signal<ExchangeRateResponse[]>([]);
-  protected readonly breadcrumbItems: readonly PageBreadcrumbItem[] = [
-    { label: 'Home', link: '/home' },
-    { label: 'Payments' }
-  ];
   protected readonly compactControlClass =
     'h-10 rounded-lg border border-border/80 px-4 text-sm text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20 disabled:[background:var(--surface-control-disabled)]';
   protected readonly activePaymentAction = signal<PaymentAction['id']>('own-accounts');
@@ -211,7 +204,7 @@ export class PaymentsPageComponent {
 
   protected controlHasError(controlName: 'sourceAccountId' | 'targetAccountId' | 'amount' | 'description'): boolean {
     const control = this.form.controls[controlName];
-    return control.invalid && (control.touched || control.dirty);
+    return control.invalid && control.touched;
   }
 
   protected amountErrorMessage(): string | null {
@@ -235,8 +228,8 @@ export class PaymentsPageComponent {
 
   protected accountSelectionErrorMessage(): string | null {
     if (!this.form.hasError('sameAccount')) return null;
-    const sourceTouched = this.form.controls.sourceAccountId.touched || this.form.controls.sourceAccountId.dirty;
-    const targetTouched = this.form.controls.targetAccountId.touched || this.form.controls.targetAccountId.dirty;
+    const sourceTouched = this.form.controls.sourceAccountId.touched;
+    const targetTouched = this.form.controls.targetAccountId.touched;
     if (!sourceTouched && !targetTouched) return null;
     return 'Debit and credit accounts must be different.';
   }
@@ -277,8 +270,7 @@ export class PaymentsPageComponent {
         next: (response) => {
           this.successTransfer.set(response);
           this.submitting.set(false);
-          this.form.controls.amount.setValue(0);
-          this.form.controls.description.setValue('');
+          this.resetTransferDraft();
           this.loadAccountsOnly();
         },
         error: (error: HttpErrorResponse) => {
@@ -290,6 +282,15 @@ export class PaymentsPageComponent {
           this.transferError.set(error.error?.message ?? 'Transfer failed. Please review your inputs and try again.');
         }
       });
+  }
+
+  private resetTransferDraft(): void {
+    this.form.reset({
+      sourceAccountId: this.form.controls.sourceAccountId.value,
+      targetAccountId: this.form.controls.targetAccountId.value,
+      amount: 0,
+      description: ''
+    });
   }
 
   private static differentAccountsValidator(control: AbstractControl): ValidationErrors | null {

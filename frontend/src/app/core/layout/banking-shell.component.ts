@@ -1,16 +1,14 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { provideIcons } from '@ng-icons/core';
 import {
-  lucideBadgeEuro,
   lucideBuilding2,
   lucideChevronUp,
-  lucideChevronRight,
   lucideCreditCard,
   lucideLayoutDashboard,
   lucideLogOut,
   lucideSettings2,
   lucideUsers,
-  lucideWalletCards
+  lucideWalletCards,
 } from '@ng-icons/lucide';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
@@ -18,17 +16,16 @@ import { filter } from 'rxjs';
 
 import { AuthSessionService } from '../auth/auth-session.service';
 import { ThemeService } from '../theme/theme.service';
+import { PageBreadcrumbComponent, type PageBreadcrumbItem } from '../../shared/ui/page-breadcrumb';
 import { HlmButton } from '@spartan/button';
 import {
   HlmDropdownMenu,
   HlmDropdownMenuItem,
   HlmDropdownMenuLabel,
   HlmDropdownMenuSeparator,
-  HlmDropdownMenuTrigger
+  HlmDropdownMenuTrigger,
 } from '@spartan/dropdown-menu';
-import {
-  HlmIconImports
-} from '@spartan/icon';
+import { HlmIconImports } from '@spartan/icon';
 import { HlmLabel } from '@spartan/label';
 import {
   HlmSidebar,
@@ -44,7 +41,7 @@ import {
   HlmSidebarMenuItem,
   HlmSidebarTrigger,
   HlmSidebarWrapper,
-  provideHlmSidebarConfig
+  provideHlmSidebarConfig,
 } from '@spartan/sidebar';
 import { HlmSwitch } from '@spartan/switch';
 
@@ -60,6 +57,7 @@ type NavigationItem = {
   imports: [
     RouterLink,
     RouterOutlet,
+    PageBreadcrumbComponent,
     HlmButton,
     HlmDropdownMenu,
     HlmDropdownMenuItem,
@@ -81,31 +79,29 @@ type NavigationItem = {
     HlmSidebarMenuItem,
     HlmSidebarTrigger,
     HlmSidebarWrapper,
-    HlmSwitch
+    HlmSwitch,
   ],
   providers: [
     provideIcons({
-      lucideBadgeEuro,
       lucideBuilding2,
       lucideChevronUp,
-      lucideChevronRight,
       lucideCreditCard,
       lucideLayoutDashboard,
       lucideLogOut,
       lucideSettings2,
       lucideUsers,
-      lucideWalletCards
+      lucideWalletCards,
     }),
     provideHlmSidebarConfig({
       sidebarWidth: '16rem',
       sidebarWidthMobile: '20rem',
       sidebarWidthIcon: '3.875rem',
       mobileBreakpoint: '1024px',
-      closeMobileSidebarOnMenuButtonClick: true
-    })
+      closeMobileSidebarOnMenuButtonClick: true,
+    }),
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './banking-shell.component.html'
+  templateUrl: './banking-shell.component.html',
 })
 export class BankingShellComponent {
   private readonly authSession = inject(AuthSessionService);
@@ -117,32 +113,39 @@ export class BankingShellComponent {
       path: '/home',
       label: 'Overview',
       icon: 'lucideLayoutDashboard',
-      exact: true
+      exact: true,
     },
     {
       path: '/accounts',
       label: 'Accounts',
-      icon: 'lucideWalletCards'
+      icon: 'lucideWalletCards',
     },
     {
       path: '/customers',
       label: 'Customers',
-      icon: 'lucideUsers'
+      icon: 'lucideUsers',
     },
     {
       path: '/payments',
       label: 'Payments',
-      icon: 'lucideCreditCard'
+      icon: 'lucideCreditCard',
     },
     {
       path: '/settings',
       label: 'Settings',
-      icon: 'lucideSettings2'
-    }
+      icon: 'lucideSettings2',
+    },
   ]);
   protected readonly activePath = signal(this.router.url);
-  protected readonly activeItem = computed(
-    () => this.navigation().find((item) => this.matchesRoute(item.path, item.exact ?? false)) ?? this.navigation()[0]
+  protected readonly primarySegments = computed(() =>
+    this.resolvePrimarySegments(this.activePath()),
+  );
+  protected readonly currentPrimaryPath = computed(() => {
+    const path = this.primarySegments().join('/');
+    return path ? `/${path}` : '/home';
+  });
+  protected readonly breadcrumbItems = computed<readonly PageBreadcrumbItem[]>(() =>
+    this.resolveBreadcrumbItems(this.primarySegments()),
   );
   protected readonly userInitials = computed(() => 'AL');
 
@@ -150,7 +153,7 @@ export class BankingShellComponent {
     this.router.events
       .pipe(
         filter((event): event is NavigationEnd => event instanceof NavigationEnd),
-        takeUntilDestroyed()
+        takeUntilDestroyed(),
       )
       .subscribe((event) => {
         this.activePath.set(event.urlAfterRedirects);
@@ -160,15 +163,57 @@ export class BankingShellComponent {
   protected logout(): void {
     this.authSession.logoutAndClear().subscribe({
       next: () => this.router.navigateByUrl('/login'),
-      error: () => this.router.navigateByUrl('/login')
+      error: () => this.router.navigateByUrl('/login'),
     });
   }
 
   protected matchesRoute(path: string, exact: boolean): boolean {
-    return exact ? this.activePath() === path : this.activePath().startsWith(path);
+    const currentPath = this.currentPrimaryPath();
+    return exact
+      ? currentPath === path
+      : currentPath === path || currentPath.startsWith(`${path}/`);
   }
 
   protected toggleTheme(isDark: boolean): void {
     this.theme.setMode(isDark ? 'dark' : 'light');
+  }
+
+  private resolvePrimarySegments(url: string): readonly string[] {
+    return (
+      this.router.parseUrl(url).root.children['primary']?.segments.map((segment) => segment.path) ??
+      []
+    );
+  }
+
+  private resolveBreadcrumbItems(segments: readonly string[]): readonly PageBreadcrumbItem[] {
+    const section = segments[0] ?? 'home';
+
+    switch (section) {
+      case 'accounts': {
+        const accountNumber = segments[1];
+        if (accountNumber) {
+          return [
+            { label: 'Home', link: '/home' },
+            { label: 'Accounts', link: '/accounts' },
+            { label: `Account ${this.formatBreadcrumbSegment(accountNumber)}` },
+          ];
+        }
+
+        return [{ label: 'Home', link: '/home' }, { label: 'Accounts' }];
+      }
+      case 'customers':
+        return [{ label: 'Home', link: '/home' }, { label: 'Customers' }];
+      case 'payments':
+        return [{ label: 'Home', link: '/home' }, { label: 'Payments' }];
+      case 'settings':
+        return [{ label: 'Home', link: '/home' }, { label: 'Settings' }];
+      case 'home':
+      default:
+        return [{ label: 'Home' }];
+    }
+  }
+
+  private formatBreadcrumbSegment(segment: string): string {
+    return decodeURIComponent(segment).replace(/[-_]+/g, ' ');
   }
 }

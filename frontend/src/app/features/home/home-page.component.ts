@@ -8,12 +8,11 @@ import {
   type DashboardMonthlyCashFlowResponse,
   type DashboardSummaryResponse
 } from '../../core/services/dashboard-api.service';
-import { PageBreadcrumbComponent, type PageBreadcrumbItem } from '../../shared/ui/page-breadcrumb';
 import { HlmCard, HlmCardContent, HlmCardDescription, HlmCardHeader, HlmCardTitle } from '../../shared/ui/spartan/card';
 
 @Component({
   selector: 'app-home-page',
-  imports: [BaseChartDirective, PageBreadcrumbComponent, HlmCard, HlmCardContent, HlmCardDescription, HlmCardHeader, HlmCardTitle],
+  imports: [BaseChartDirective, HlmCard, HlmCardContent, HlmCardDescription, HlmCardHeader, HlmCardTitle],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.css'
@@ -166,8 +165,6 @@ export class HomePageComponent {
       }
     }
   };
-  protected readonly breadcrumbItems: readonly PageBreadcrumbItem[] = [{ label: 'Home' }];
-
   constructor() {
     this.loadDashboardSummary();
     this.loadDashboardMonthlyCashFlow();
@@ -255,4 +252,3 @@ export class HomePageComponent {
     return this.currencyDistribution().find((item) => item.currency === currency)?.accountCount ?? 0;
   }
 }
-

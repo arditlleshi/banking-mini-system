@@ -1,19 +1,32 @@
-<nav hlmBreadcrumb [aria-label]="ariaLabel()" class="inline-flex max-w-full self-start">
-  <ol hlmBreadcrumbList class="flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground">
+<nav hlmBreadcrumb [aria-label]="ariaLabel()" class="inline-flex max-w-full min-w-0 self-start">
+  <ol
+    hlmBreadcrumbList
+    class="flex max-w-full min-w-0 flex-nowrap items-center gap-1 overflow-hidden rounded-full border border-border/60 px-2 py-1 text-[0.76rem] leading-none text-muted-foreground [background:color-mix(in_oklab,var(--card)_76%,transparent)] [box-shadow:inset_0_1px_0_var(--surface-inset-highlight)]"
+  >
     @for (item of items(); track $index; let last = $last) {
-      <li hlmBreadcrumbItem>
+      <li hlmBreadcrumbItem class="min-w-0 shrink-0">
         @if (last) {
-          <span hlmBreadcrumbPage class="text-foreground">{{ item.label }}</span>
+          <span
+            hlmBreadcrumbPage
+            class="block max-w-[13rem] truncate rounded-full px-1.5 py-1 font-bold text-foreground sm:max-w-[18rem]"
+            >{{ item.label }}</span
+          >
         } @else if (item.link) {
-          <a hlmBreadcrumbLink [link]="item.link" class="transition-colors hover:text-foreground">
+          <a
+            hlmBreadcrumbLink
+            [link]="item.link"
+            class="block max-w-[9rem] truncate rounded-full px-1.5 py-1 font-semibold transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/25 sm:max-w-[12rem]"
+          >
             {{ item.label }}
           </a>
         } @else {
-          <span>{{ item.label }}</span>
+          <span class="block max-w-[9rem] truncate rounded-full px-1.5 py-1 sm:max-w-[12rem]">{{
+            item.label
+          }}</span>
         }
       </li>
       @if (!last) {
-        <li hlmBreadcrumbSeparator></li>
+        <li hlmBreadcrumbSeparator class="shrink-0 text-muted-foreground/60"></li>
       }
     }
   </ol>

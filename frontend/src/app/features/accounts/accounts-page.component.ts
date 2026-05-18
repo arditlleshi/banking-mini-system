@@ -15,7 +15,6 @@ import {
   type AccountStatus,
   type AccountType
 } from '../../core/services/account-api.service';
-import { PageBreadcrumbComponent, type PageBreadcrumbItem } from '../../shared/ui/page-breadcrumb';
 import { HlmButton } from '../../shared/ui/spartan/button';
 import {
   HlmCard,
@@ -38,7 +37,6 @@ type AccountFormOption<T extends string> = {
     DatePipe,
     DecimalPipe,
     RouterLink,
-    PageBreadcrumbComponent,
     HlmAccordion,
     HlmAccordionContent,
     HlmAccordionItem,
@@ -77,10 +75,6 @@ export class AccountsPageComponent implements OnDestroy {
   protected readonly paymentDetailsPreviewAccount = signal<AccountResponse | null>(null);
   protected readonly paymentDetailsPreviewBlob = signal<Blob | null>(null);
   protected readonly paymentDetailsPreviewUrl = signal<SafeResourceUrl | null>(null);
-  protected readonly breadcrumbItems: readonly PageBreadcrumbItem[] = [
-    { label: 'Home', link: '/home' },
-    { label: 'Accounts' }
-  ];
   protected readonly totalCurrentBalance = computed(() =>
     this.accounts().reduce((sum, account) => sum + account.currentBalance, 0)
   );

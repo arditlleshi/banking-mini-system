@@ -1,7 +1,5 @@
 <main class="min-h-screen px-4 py-8 sm:px-6 lg:px-10">
   <div class="mx-auto flex max-w-6xl flex-col gap-6">
-    <app-page-breadcrumb [items]="breadcrumbItems()" />
-
     @if (loading()) {
       <div class="grid gap-4 lg:grid-cols-3">
         @for (item of [1, 2, 3, 4, 5, 6]; track item) {

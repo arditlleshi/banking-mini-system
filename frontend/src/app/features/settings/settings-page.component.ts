@@ -15,10 +15,6 @@ export class SettingsPageComponent {
     eyebrow: 'Platform governance',
     headline: 'Operational preferences, access control, and system policies in one workspace.',
     summary: 'Reserve this area for permissions, environment controls, audit settings, and product configuration.',
-    highlights: ['Role policies', 'Session governance', 'Operational defaults'],
-    breadcrumb: [
-      { label: 'Home', link: '/home' },
-      { label: 'Settings' }
-    ]
+    highlights: ['Role policies', 'Session governance', 'Operational defaults']
   };
 }
