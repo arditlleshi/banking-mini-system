@@ -30,7 +30,7 @@ public class DatabaseUserDetailsService implements UserDetailsService {
             .username(user.getUsername())
             .password(user.getPasswordHash())
             .disabled(!Boolean.TRUE.equals(user.getActive()))
-            .authorities(List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole())))
+            .authorities(List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name())))
             .build();
     }
 }

@@ -15,6 +15,7 @@ import com.ardit.banking.account.domain.AccountCurrency;
 import com.ardit.banking.account.domain.AccountEntity;
 import com.ardit.banking.account.domain.AccountType;
 import com.ardit.banking.security.user.domain.UserEntity;
+import com.ardit.banking.security.user.domain.UserRole;
 import com.ardit.banking.transaction.domain.TransactionDirection;
 import com.ardit.banking.transaction.domain.TransactionEntity;
 import com.ardit.banking.transaction.domain.TransactionStatus;
@@ -68,7 +69,7 @@ class TransactionRepositoryTests {
         ReflectionTestUtils.setField(user, "fullName", "Ordering User");
         ReflectionTestUtils.setField(user, "passwordHash", "$2a$10$ordering-test-hash");
         ReflectionTestUtils.setField(user, "active", Boolean.TRUE);
-        ReflectionTestUtils.setField(user, "role", "USER");
+        ReflectionTestUtils.setField(user, "role", UserRole.USER);
         entityManager.persist(user);
         return user;
     }

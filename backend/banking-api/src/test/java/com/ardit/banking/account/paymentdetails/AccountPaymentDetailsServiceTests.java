@@ -19,6 +19,7 @@ import com.ardit.banking.account.domain.AccountType;
 import com.ardit.banking.account.service.OwnedAccountAccessService;
 import com.ardit.banking.common.document.InstitutionDocumentProperties;
 import com.ardit.banking.security.user.domain.UserEntity;
+import com.ardit.banking.security.user.domain.UserRole;
 
 @ExtendWith(MockitoExtension.class)
 class AccountPaymentDetailsServiceTests {
@@ -117,7 +118,7 @@ class AccountPaymentDetailsServiceTests {
         ReflectionTestUtils.setField(owner, "fullName", fullName);
         ReflectionTestUtils.setField(owner, "passwordHash", "$2a$10$payment-test-hash");
         ReflectionTestUtils.setField(owner, "active", Boolean.TRUE);
-        ReflectionTestUtils.setField(owner, "role", "USER");
+        ReflectionTestUtils.setField(owner, "role", UserRole.USER);
 
         AccountEntity account = AccountEntity.open(
             "123456CUR01",

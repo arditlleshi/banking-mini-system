@@ -23,6 +23,7 @@ import com.ardit.banking.account.domain.AccountEntity;
 import com.ardit.banking.account.domain.AccountType;
 import com.ardit.banking.account.dto.AccountCurrencyDistributionResponse;
 import com.ardit.banking.security.user.domain.UserEntity;
+import com.ardit.banking.security.user.domain.UserRole;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -95,7 +96,7 @@ class AccountCurrencyDistributionControllerIntegrationTests {
         ReflectionTestUtils.setField(user, "fullName", fullName);
         ReflectionTestUtils.setField(user, "passwordHash", "$2a$10$currency-distribution-test-hash");
         ReflectionTestUtils.setField(user, "active", Boolean.TRUE);
-        ReflectionTestUtils.setField(user, "role", "USER");
+        ReflectionTestUtils.setField(user, "role", UserRole.USER);
         entityManager.persist(user);
         return user;
     }

@@ -23,6 +23,7 @@ import com.ardit.banking.account.domain.AccountCurrency;
 import com.ardit.banking.account.domain.AccountEntity;
 import com.ardit.banking.account.domain.AccountType;
 import com.ardit.banking.security.user.domain.UserEntity;
+import com.ardit.banking.security.user.domain.UserRole;
 
 import jakarta.persistence.EntityManager;
 
@@ -146,7 +147,7 @@ class AccountPaymentDetailsControllerIntegrationTests {
         ReflectionTestUtils.setField(user, "fullName", fullName);
         ReflectionTestUtils.setField(user, "passwordHash", "$2a$10$payment-test-hash");
         ReflectionTestUtils.setField(user, "active", Boolean.TRUE);
-        ReflectionTestUtils.setField(user, "role", "USER");
+        ReflectionTestUtils.setField(user, "role", UserRole.USER);
         entityManager.persist(user);
         return user;
     }
