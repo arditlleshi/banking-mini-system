@@ -18,8 +18,7 @@ import com.ardit.banking.security.user.domain.UserEntity;
 import com.ardit.banking.security.user.domain.UserRole;
 import com.ardit.banking.security.user.dto.UserResponse;
 import com.ardit.banking.security.user.repository.UserRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import tools.jackson.databind.ObjectMapper;
 @SpringBootTest(properties = {
     "spring.datasource.url=jdbc:h2:mem:user-admin-api;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE",
     "spring.datasource.driver-class-name=org.h2.Driver",

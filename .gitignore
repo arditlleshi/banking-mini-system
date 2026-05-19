@@ -19,6 +19,5 @@ frontend/.angular/
 frontend/coverage/
 
 # Backend (Spring Boot / Maven)
-backend/banking-api/target/
-backend/banking-api/.mvn/wrapper/maven-wrapper.jar
-
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar

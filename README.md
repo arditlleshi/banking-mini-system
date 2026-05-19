@@ -3,7 +3,7 @@
 This repository contains two separate applications:
 
 - `frontend`: Angular client app
-- `backend/banking-api`: Spring Boot API
+- `backend`: Spring Boot API
 
 ## Project Structure
 
@@ -11,7 +11,6 @@ This repository contains two separate applications:
 banking-mini-system/
   frontend/
   backend/
-    banking-api/
 ```
 
 ## Prerequisites
@@ -23,17 +22,17 @@ banking-mini-system/
 
 ## Run Backend
 
-From the `backend/banking-api` folder:
+From the `backend` folder:
 
 ```powershell
-cd backend/banking-api
+cd backend
 .\mvnw.cmd spring-boot:run
 ```
 
 Or run it directly from the repository root:
 
 ```powershell
-.\backend\banking-api\mvnw.cmd -f .\backend\banking-api\pom.xml spring-boot:run
+.\backend\mvnw.cmd -f .\backend\pom.xml spring-boot:run
 ```
 
 If you see `JAVA_HOME environment variable is not defined correctly`, set it to your installed JDK 21 path:
@@ -46,7 +45,7 @@ Then close and reopen the terminal before starting the backend again.
 
 ## Run Backend (PostgreSQL)
 
-From `backend/banking-api`:
+From `backend`:
 
 ```powershell
 Copy-Item .env.example .env
@@ -62,10 +61,10 @@ docker compose --env-file .env -f docker-compose.postgres.yaml down
 
 ## Run Database Only (Docker Compose)
 
-From `backend/banking-api`:
+From `backend`:
 
 ```powershell
-cd backend/banking-api
+cd backend
 Copy-Item .env.example .env
 docker compose --env-file .env -f docker-compose.postgres.yaml up -d
 ```
@@ -99,4 +98,3 @@ The frontend runs at `http://localhost:4200` by default.
 - Keep app-specific settings and scripts inside each app folder.
 - Use this root README for shared setup and workflow instructions.
 - Root `.gitignore` covers cross-project and generated files at the repository level.
-

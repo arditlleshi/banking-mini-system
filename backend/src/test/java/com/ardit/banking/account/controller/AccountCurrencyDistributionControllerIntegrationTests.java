@@ -24,10 +24,9 @@ import com.ardit.banking.account.domain.AccountType;
 import com.ardit.banking.account.dto.AccountCurrencyDistributionResponse;
 import com.ardit.banking.security.user.domain.UserEntity;
 import com.ardit.banking.security.user.domain.UserRole;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import jakarta.persistence.EntityManager;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest(properties = {
     "spring.datasource.url=jdbc:h2:mem:account-currency-distribution-api;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE",
