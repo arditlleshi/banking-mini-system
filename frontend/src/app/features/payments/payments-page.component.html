@@ -363,23 +363,6 @@
                   Payment amount cannot be greater than the available balance of the debit account.
                 </p>
               }
-              @if (successPayment()) {
-                <article
-                  aria-live="polite"
-                  class="rounded-lg border p-4 text-sm border-(--status-success-border) [background:var(--status-success-surface)] text-(--status-success-foreground)"
-                >
-                  <p class="font-semibold">Payment Booked Successfully</p>
-                  <p class="mt-2">Reference: {{ successPayment()!.paymentReference }}</p>
-                  <p class="mt-1">
-                    {{ successPayment()!.amount | number: '1.2-2' }}
-                    {{ successPayment()!.currency }} sent to {{ successPayment()!.counterpartyName }}
-                  </p>
-                  <p class="mt-1">
-                    Booked at {{ successPayment()!.bookedAt | date: 'dd MMM yyyy, HH:mm' }}
-                  </p>
-                </article>
-              }
-
               <div class="flex justify-end">
                 <button
                   hlmBtn
@@ -387,7 +370,7 @@
                   class="h-10 rounded-lg px-5 text-sm"
                   [disabled]="submitting() || paymentForm.invalid || paymentInsufficientFunds() || !beneficiary()"
                 >
-                  {{ submitting() ? 'Submitting…' : 'Book Payment' }}
+                  {{ submitting() ? 'Submitting…' : 'Review Payment' }}
                 </button>
               </div>
             </form>
@@ -584,26 +567,8 @@
                   aria-live="polite"
                   class="rounded-lg border px-4 py-3 text-sm font-medium border-(--status-warning-border) [background:var(--status-warning-surface)] text-(--status-warning-foreground)"
                 >
-                  Payment amount cannot be greater than the available balance of the debit account.
+                  Transfer amount cannot be greater than the available balance of the debit account.
                 </p>
-              }
-              @if (successTransfer()) {
-                <article
-                  aria-live="polite"
-                  class="rounded-lg border p-4 text-sm border-(--status-success-border) [background:var(--status-success-surface)] text-(--status-success-foreground)"
-                >
-                  <p class="font-semibold">Payment Booked Successfully</p>
-                  <p class="mt-2">Reference: {{ successTransfer()!.transferReference }}</p>
-                  <p class="mt-1">
-                    {{ successTransfer()!.sourceAmount | number: '1.2-2' }}
-                    {{ successTransfer()!.sourceCurrency }} to
-                    {{ successTransfer()!.targetAmount | number: '1.2-2' }}
-                    {{ successTransfer()!.targetCurrency }}
-                  </p>
-                  <p class="mt-1">
-                    Booked at {{ successTransfer()!.bookedAt | date: 'dd MMM yyyy, HH:mm' }}
-                  </p>
-                </article>
               }
 
               <div class="flex justify-end">
@@ -613,7 +578,7 @@
                   class="h-10 rounded-lg px-5 text-sm"
                   [disabled]="submitting() || ownTransferForm.invalid || insufficientFunds()"
                 >
-                  {{ submitting() ? 'Submitting…' : 'Book Payment' }}
+                  {{ submitting() ? 'Submitting…' : 'Review Transfer' }}
                 </button>
               </div>
             </form>
@@ -623,3 +588,10 @@
     </section>
   </div>
 </main>
+<app-payment-confirmation-dialog
+  [open]="confirmationOpen()"
+  [confirmation]="pendingConfirmation()"
+  [submitting]="submitting()"
+  (openChange)="handleConfirmationOpenChange($event)"
+  (confirm)="confirmPendingConfirmation()"
+></app-payment-confirmation-dialog>

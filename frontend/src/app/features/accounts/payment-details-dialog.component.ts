@@ -9,7 +9,6 @@ import { CopyFeedbackComponent } from '../../shared/ui/copy-feedback';
 import { HlmButton } from '../../shared/ui/spartan/button';
 import {
   HlmDialog,
-  HlmDialogClose,
   HlmDialogContent,
   HlmDialogDescription,
   HlmDialogFooter,
@@ -25,7 +24,6 @@ import {
     HlmButton,
     HlmIconImports,
     HlmDialog,
-    HlmDialogClose,
     HlmDialogContent,
     HlmDialogDescription,
     HlmDialogFooter,
@@ -39,7 +37,6 @@ import {
     <hlm-dialog [state]="open() ? 'open' : 'closed'" (stateChanged)="handleDialogStateChanged($event)">
       <hlm-dialog-content
         *hlmDialogPortal="let ctx"
-        [showCloseButton]="false"
         class="flex max-h-[min(92vh,56rem)] w-[calc(100vw-1rem)] max-w-6xl flex-col overflow-hidden border-border/70 p-0 backdrop-blur-xl [background:color-mix(in_oklab,var(--surface-panel-strong)_94%,var(--background)_6%)]"
       >
         <div class="flex items-start justify-between gap-4 border-b border-border/70 px-4 py-4 sm:px-5">
@@ -51,17 +48,6 @@ import {
               Preview the document before sharing or downloading it.
             </p>
           </div>
-
-          <button
-            hlmBtn
-            type="button"
-            variant="ghost"
-            class="mt-0.5 size-9 shrink-0 border border-border/60 bg-background/60 p-0 hover:bg-background/80"
-            hlmDialogClose
-          >
-            <span aria-hidden="true" class="text-lg leading-none text-foreground">x</span>
-            <span class="sr-only">Close</span>
-          </button>
         </div>
 
         <section class="flex min-h-0 flex-1 [background:color-mix(in_oklab,var(--surface-inset-strong)_82%,var(--background)_18%)]">

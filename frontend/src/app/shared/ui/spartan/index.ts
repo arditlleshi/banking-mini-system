@@ -1,5 +1,6 @@
 export * from './utils';
 export * from './accordion/src';
+export * from './alert';
 export * from './button';
 export * from './card';
 export * from './dropdown-menu/src';
@@ -11,5 +12,6 @@ export * from './separator';
 export * from './sheet/src';
 export * from './sidebar/src';
 export * from './skeleton/src';
+export * from './sonner';
 export * from './switch';
 export * from './tooltip/src';

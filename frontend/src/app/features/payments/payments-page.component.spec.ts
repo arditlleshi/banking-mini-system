@@ -27,7 +27,19 @@ describe('PaymentsPageComponent', () => {
 
     getAccounts.mockReturnValue(of([createAccount(1, 'Source Account', '111111CUR01'), createAccount(2, 'Savings', '222222CUR01')]));
     getExchangeRates.mockReturnValue(of([]));
-    createTransfer.mockReturnValue(of({}));
+    createTransfer.mockReturnValue(
+      of({
+        transferReference: 'transfer-ref-1',
+        sourceAccountId: 1,
+        targetAccountId: 2,
+        sourceCurrency: 'EUR',
+        targetCurrency: 'EUR',
+        sourceAmount: 150,
+        targetAmount: 150,
+        description: 'Monthly savings transfer',
+        bookedAt: '2026-05-19T09:05:00Z'
+      })
+    );
     lookupBeneficiary.mockReturnValue(
       of({
         accountId: 3,
@@ -94,7 +106,7 @@ describe('PaymentsPageComponent', () => {
     expect(component.activePaymentAction()).toBe('bank-account');
   });
 
-  it('verifies a beneficiary and submits the payment', () => {
+  it('opens a confirmation dialog before booking a beneficiary payment', () => {
     const fixture = TestBed.createComponent(PaymentsPageComponent);
     fixture.detectChanges();
 
@@ -109,6 +121,9 @@ describe('PaymentsPageComponent', () => {
       };
       lookupBeneficiary: () => void;
       submitPayment: () => void;
+      confirmPendingConfirmation: () => void;
+      confirmationOpen: () => boolean;
+      pendingConfirmation: () => { title: string } | null;
       beneficiary: () => { beneficiaryName: string } | null;
       successPayment: () => { paymentReference: string } | null;
     };
@@ -125,6 +140,12 @@ describe('PaymentsPageComponent', () => {
 
     expect(lookupBeneficiary).toHaveBeenCalledWith('333333CUR01');
     expect(component.beneficiary()?.beneficiaryName).toBe('Beneficiary User');
+    expect(component.confirmationOpen()).toBe(true);
+    expect(component.pendingConfirmation()?.title).toBe('Confirm Payment');
+    expect(createPayment).not.toHaveBeenCalled();
+
+    component.confirmPendingConfirmation();
+
     expect(createPayment).toHaveBeenCalledWith({
       sourceAccountId: 1,
       amount: 75,
@@ -133,6 +154,50 @@ describe('PaymentsPageComponent', () => {
       counterpartyAccount: '333333CUR01'
     });
     expect(component.successPayment()?.paymentReference).toBe('payment-ref-1');
+  });
+
+  it('opens a confirmation dialog before booking an own-account transfer', () => {
+    const fixture = TestBed.createComponent(PaymentsPageComponent);
+    fixture.detectChanges();
+
+    const component = fixture.componentInstance as unknown as {
+      ownTransferForm: {
+        patchValue: (value: {
+          sourceAccountId: number;
+          targetAccountId: number;
+          amount: number;
+          description: string;
+        }) => void;
+      };
+      submitTransfer: () => void;
+      confirmPendingConfirmation: () => void;
+      confirmationOpen: () => boolean;
+      pendingConfirmation: () => { title: string } | null;
+      successTransfer: () => { transferReference: string } | null;
+    };
+
+    component.ownTransferForm.patchValue({
+      sourceAccountId: 1,
+      targetAccountId: 2,
+      amount: 150,
+      description: 'Monthly savings transfer'
+    });
+
+    component.submitTransfer();
+
+    expect(component.confirmationOpen()).toBe(true);
+    expect(component.pendingConfirmation()?.title).toBe('Confirm Transfer');
+    expect(createTransfer).not.toHaveBeenCalled();
+
+    component.confirmPendingConfirmation();
+
+    expect(createTransfer).toHaveBeenCalledWith({
+      sourceAccountId: 1,
+      targetAccountId: 2,
+      amount: 150,
+      description: 'Monthly savings transfer'
+    });
+    expect(component.successTransfer()?.transferReference).toBe('transfer-ref-1');
   });
 });
 

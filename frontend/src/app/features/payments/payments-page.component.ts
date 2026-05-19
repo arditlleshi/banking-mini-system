@@ -1,4 +1,4 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toSignal, takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -7,6 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { provideIcons } from '@ng-icons/core';
 import { lucideBuilding2, lucideCreditCard, lucideLandmark, lucideSmartphone, lucideZap } from '@ng-icons/lucide';
 import { HlmIconImports } from '@spartan/icon';
+import { toast } from '@spartan-ng/brain/sonner';
 import { startWith } from 'rxjs';
 
 import { AccountApiService, type AccountCurrency, type AccountResponse } from '../../core/services/account-api.service';
@@ -22,6 +23,10 @@ import { HlmCard, HlmCardContent, HlmCardDescription, HlmCardHeader, HlmCardTitl
 import { HlmInput } from '../../shared/ui/spartan/input';
 import { HlmLabel } from '../../shared/ui/spartan/label';
 import { HlmSelect, HlmSelectContent, HlmSelectItem, HlmSelectPortal, HlmSelectTrigger, HlmSelectValue } from '../../shared/ui/spartan/select';
+import {
+  PaymentConfirmationDialogComponent,
+  type PaymentConfirmation
+} from './payment-confirmation-dialog.component';
 
 type AccountOption = {
   readonly value: number;
@@ -44,10 +49,26 @@ type FxPreview = {
   readonly note: string;
 };
 
+type PendingTransferConfirmation = PaymentConfirmation & {
+  readonly kind: 'own-transfer';
+  readonly sourceAccountId: number;
+  readonly targetAccountId: number;
+  readonly bookingDescription: string;
+};
+
+type PendingBankPaymentConfirmation = PaymentConfirmation & {
+  readonly kind: 'bank-payment';
+  readonly sourceAccountId: number;
+  readonly counterpartyName: string;
+  readonly counterpartyAccount: string;
+  readonly bookingDescription: string;
+};
+
+type PendingConfirmation = PendingTransferConfirmation | PendingBankPaymentConfirmation;
+
 @Component({
   selector: 'app-payments-page',
   imports: [
-    DatePipe,
     DecimalPipe,
     ReactiveFormsModule,
     HlmButton,
@@ -59,6 +80,7 @@ type FxPreview = {
     HlmIconImports,
     HlmInput,
     HlmLabel,
+    PaymentConfirmationDialogComponent,
     HlmSelect,
     HlmSelectContent,
     HlmSelectItem,
@@ -100,11 +122,11 @@ export class PaymentsPageComponent {
   protected readonly paymentError = signal<string | null>(null);
   protected readonly beneficiaryLookupError = signal<string | null>(null);
   protected readonly exchangeRateLoadWarning = signal<string | null>(null);
-  protected readonly successTransfer = signal<TransferResponse | null>(null);
-  protected readonly successPayment = signal<PaymentResponse | null>(null);
   protected readonly accounts = signal<AccountResponse[]>([]);
   protected readonly exchangeRates = signal<ExchangeRateResponse[]>([]);
   protected readonly beneficiary = signal<PaymentBeneficiaryResponse | null>(null);
+  protected readonly confirmationOpen = signal(false);
+  protected readonly pendingConfirmation = signal<PendingConfirmation | null>(null);
   private readonly resolvedBeneficiaryAccountNumber = signal<string | null>(null);
   protected readonly compactControlClass =
     'h-10 rounded-lg border border-border/80 px-4 text-sm text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20 disabled:[background:var(--surface-control-disabled)]';
@@ -323,52 +345,15 @@ export class PaymentsPageComponent {
   }
 
   protected submitTransfer(): void {
-    if (this.ownTransferForm.invalid || this.submitting()) {
-      this.ownTransferForm.markAllAsTouched();
+    const confirmation = this.prepareTransferConfirmation();
+    if (!confirmation) {
       return;
     }
 
-    const source = this.sourceAccount();
-    const target = this.targetAccount();
-    if (!source || !target) {
-      this.transferError.set('Choose both debit and credit accounts before submitting.');
-      return;
-    }
-    if (this.ownTransferForm.hasError('sameAccount') || source.id === target.id) {
-      this.transferError.set('Source and target accounts must be different.');
-      return;
-    }
-    const raw = this.ownTransferForm.getRawValue();
-    if (Number(raw.amount) > source.availableBalance) {
-      this.transferError.set('Transfer amount cannot be greater than the available balance of the debit account.');
-      return;
-    }
-
-    this.submitting.set(true);
     this.transferError.set(null);
     this.paymentError.set(null);
-    this.successTransfer.set(null);
-    this.successPayment.set(null);
-
-    this.transferApi
-      .createTransfer({
-        sourceAccountId: raw.sourceAccountId,
-        targetAccountId: raw.targetAccountId,
-        amount: Number(raw.amount),
-        description: raw.description.trim()
-      })
-      .subscribe({
-        next: (response) => {
-          this.successTransfer.set(response);
-          this.submitting.set(false);
-          this.resetOwnTransferDraft();
-          this.loadAccountsOnly();
-        },
-        error: (error: HttpErrorResponse) => {
-          this.submitting.set(false);
-          this.transferError.set(this.extractApiError(error, 'Transfer failed. Please review your inputs and try again.'));
-        }
-      });
+    this.pendingConfirmation.set(confirmation);
+    this.confirmationOpen.set(true);
   }
 
   protected lookupBeneficiary(): void {
@@ -390,7 +375,6 @@ export class PaymentsPageComponent {
     this.beneficiaryLookupLoading.set(true);
     this.beneficiaryLookupError.set(null);
     this.paymentError.set(null);
-    this.successPayment.set(null);
 
     this.paymentApi.lookupBeneficiary(normalizedAccountNumber).subscribe({
       next: (beneficiary) => {
@@ -419,54 +403,41 @@ export class PaymentsPageComponent {
   }
 
   protected submitPayment(): void {
-    if (this.paymentForm.invalid || this.submitting()) {
-      this.paymentForm.markAllAsTouched();
+    const confirmation = this.preparePaymentConfirmation();
+    if (!confirmation) {
       return;
     }
 
-    const source = this.paymentSourceAccount();
-    const beneficiary = this.beneficiary();
-    if (!source) {
-      this.paymentError.set('Choose a debit account before submitting.');
-      return;
-    }
-    if (!beneficiary) {
-      this.paymentError.set('Verify the beneficiary account before submitting the payment.');
-      return;
-    }
-
-    const raw = this.paymentForm.getRawValue();
-    if (Number(raw.amount) > source.availableBalance) {
-      this.paymentError.set('Payment amount cannot be greater than the available balance of the debit account.');
-      return;
-    }
-
-    this.submitting.set(true);
     this.paymentError.set(null);
     this.transferError.set(null);
-    this.successTransfer.set(null);
-    this.successPayment.set(null);
+    this.pendingConfirmation.set(confirmation);
+    this.confirmationOpen.set(true);
+  }
 
-    this.paymentApi
-      .createPayment({
-        sourceAccountId: raw.sourceAccountId,
-        amount: Number(raw.amount),
-        description: raw.description.trim(),
-        counterpartyName: beneficiary.beneficiaryName,
-        counterpartyAccount: beneficiary.accountNumber
-      })
-      .subscribe({
-        next: (response) => {
-          this.successPayment.set(response);
-          this.submitting.set(false);
-          this.resetPaymentDraft();
-          this.loadAccountsOnly();
-        },
-        error: (error: HttpErrorResponse) => {
-          this.submitting.set(false);
-          this.paymentError.set(this.extractApiError(error, 'Payment failed. Please review your inputs and try again.'));
-        }
-      });
+  protected handleConfirmationOpenChange(open: boolean): void {
+    if (!open && this.submitting()) {
+      this.confirmationOpen.set(true);
+      return;
+    }
+
+    this.confirmationOpen.set(open);
+    if (!open && !this.submitting()) {
+      this.pendingConfirmation.set(null);
+    }
+  }
+
+  protected confirmPendingConfirmation(): void {
+    const confirmation = this.pendingConfirmation();
+    if (!confirmation || this.submitting()) {
+      return;
+    }
+
+    if (confirmation.kind === 'own-transfer') {
+      this.executeTransfer(confirmation);
+      return;
+    }
+
+    this.executePayment(confirmation);
   }
 
   protected readonly accountValueToLabel = (value: number | null): string => {
@@ -522,6 +493,13 @@ export class PaymentsPageComponent {
     return `${account.name} - ${account.currency} - ${account.accountNumber}`;
   }
 
+  protected accountConfirmationData(account: AccountResponse): { name: string; number: string } {
+    return {
+      name: account.name,
+      number: account.accountNumber
+    };
+  }
+
   private initializePaymentAction(): void {
     const requestedMode = this.route.snapshot.queryParamMap.get('mode');
     if (!requestedMode) {
@@ -546,7 +524,6 @@ export class PaymentsPageComponent {
         this.beneficiary.set(null);
         this.resolvedBeneficiaryAccountNumber.set(null);
         this.beneficiaryLookupError.set(null);
-        this.successPayment.set(null);
       });
   }
 
@@ -583,8 +560,6 @@ export class PaymentsPageComponent {
     this.ratesLoading.set(true);
     this.accountsLoadError.set(null);
     this.exchangeRateLoadWarning.set(null);
-    this.successTransfer.set(null);
-    this.successPayment.set(null);
 
     this.loadAccountsOnly();
     this.exchangeRateApi.getExchangeRates().subscribe({
@@ -714,6 +689,161 @@ export class PaymentsPageComponent {
     return value?.trim() ?? '';
   }
 
+  private prepareTransferConfirmation(): PendingTransferConfirmation | null {
+    if (this.ownTransferForm.invalid || this.submitting()) {
+      this.ownTransferForm.markAllAsTouched();
+      return null;
+    }
+
+    const source = this.sourceAccount();
+    const target = this.targetAccount();
+    if (!source || !target) {
+      this.transferError.set('Choose both debit and credit accounts before reviewing the transfer.');
+      return null;
+    }
+    if (this.ownTransferForm.hasError('sameAccount') || source.id === target.id) {
+      this.transferError.set('Source and target accounts must be different.');
+      return null;
+    }
+
+    const raw = this.ownTransferForm.getRawValue();
+    const amount = Number(raw.amount);
+    if (amount > source.availableBalance) {
+      this.transferError.set('Transfer amount cannot be greater than the available balance of the debit account.');
+      return null;
+    }
+
+    const fxPreview = this.ownFxPreview();
+    const debitAccount = this.accountConfirmationData(source);
+    const creditAccount = this.accountConfirmationData(target);
+    return {
+      kind: 'own-transfer',
+      title: 'Confirm Transfer',
+      description: 'Review the booking details before continuing.',
+      confirmLabel: 'Confirm Transfer',
+      amount,
+      debitCurrency: source.currency,
+      creditCurrency: target.currency,
+      exchangeRate: fxPreview?.rate ?? null,
+      estimatedCreditAmount: fxPreview?.targetAmount ?? null,
+      debitAccountName: debitAccount.name,
+      debitAccountNumber: debitAccount.number,
+      creditAccountName: creditAccount.name,
+      creditAccountNumber: creditAccount.number,
+      sourceAccountId: raw.sourceAccountId,
+      targetAccountId: raw.targetAccountId,
+      bookingDescription: raw.description.trim()
+    };
+  }
+
+  private preparePaymentConfirmation(): PendingBankPaymentConfirmation | null {
+    if (this.paymentForm.invalid || this.submitting()) {
+      this.paymentForm.markAllAsTouched();
+      return null;
+    }
+
+    const source = this.paymentSourceAccount();
+    const beneficiary = this.beneficiary();
+    if (!source) {
+      this.paymentError.set('Choose a debit account before reviewing the payment.');
+      return null;
+    }
+    if (!beneficiary) {
+      this.paymentError.set('Verify the beneficiary account before reviewing the payment.');
+      return null;
+    }
+
+    const raw = this.paymentForm.getRawValue();
+    const amount = Number(raw.amount);
+    if (amount > source.availableBalance) {
+      this.paymentError.set('Payment amount cannot be greater than the available balance of the debit account.');
+      return null;
+    }
+
+    const fxPreview = this.beneficiaryFxPreview();
+    const debitAccount = this.accountConfirmationData(source);
+    return {
+      kind: 'bank-payment',
+      title: 'Confirm Payment',
+      description: 'Review the booking details before continuing.',
+      confirmLabel: 'Confirm Payment',
+      amount,
+      debitCurrency: source.currency,
+      creditCurrency: beneficiary.currency,
+      exchangeRate: fxPreview?.rate ?? null,
+      estimatedCreditAmount: fxPreview?.targetAmount ?? null,
+      debitAccountName: debitAccount.name,
+      debitAccountNumber: debitAccount.number,
+      creditAccountName: beneficiary.beneficiaryName,
+      creditAccountNumber: beneficiary.accountNumber,
+      sourceAccountId: raw.sourceAccountId,
+      counterpartyName: beneficiary.beneficiaryName,
+      counterpartyAccount: beneficiary.accountNumber,
+      bookingDescription: raw.description.trim()
+    };
+  }
+
+  private executeTransfer(confirmation: PendingTransferConfirmation): void {
+    this.submitting.set(true);
+    this.transferError.set(null);
+    this.paymentError.set(null);
+
+    this.transferApi
+      .createTransfer({
+        sourceAccountId: confirmation.sourceAccountId,
+        targetAccountId: confirmation.targetAccountId,
+        amount: confirmation.amount,
+        description: confirmation.bookingDescription
+      })
+      .subscribe({
+        next: (response) => {
+          this.showTransferSuccessToast(response);
+          this.submitting.set(false);
+          this.confirmationOpen.set(false);
+          this.pendingConfirmation.set(null);
+          this.resetOwnTransferDraft();
+          this.loadAccountsOnly();
+        },
+        error: (error: HttpErrorResponse) => {
+          this.submitting.set(false);
+          this.confirmationOpen.set(false);
+          this.pendingConfirmation.set(null);
+          this.transferError.set(this.extractApiError(error, 'Transfer failed. Please review your inputs and try again.'));
+        }
+      });
+  }
+
+  private executePayment(confirmation: PendingBankPaymentConfirmation): void {
+    this.submitting.set(true);
+    this.paymentError.set(null);
+    this.transferError.set(null);
+
+    this.paymentApi
+      .createPayment({
+        sourceAccountId: confirmation.sourceAccountId,
+        amount: confirmation.amount,
+        description: confirmation.bookingDescription,
+        counterpartyName: confirmation.counterpartyName,
+        counterpartyAccount: confirmation.counterpartyAccount
+      })
+      .subscribe({
+        next: (response) => {
+          this.showPaymentSuccessToast(response);
+          this.submitting.set(false);
+          this.confirmationOpen.set(false);
+          this.pendingConfirmation.set(null);
+          this.resetPaymentDraft();
+          this.loadAccountsOnly();
+        },
+        error: (error: HttpErrorResponse) => {
+          this.submitting.set(false);
+          this.confirmationOpen.set(false);
+          this.pendingConfirmation.set(null);
+          this.paymentError.set(this.extractApiError(error, 'Payment failed. Please review your inputs and try again.'));
+        }
+      });
+  }
+
   private extractApiError(error: HttpErrorResponse, fallbackMessage: string): string {
     if (error.status === 0) {
       return 'Backend is not reachable. Start backend and try again.';
@@ -737,6 +867,16 @@ export class PaymentsPageComponent {
     }
 
     return fallbackMessage;
+  }
+
+  private showPaymentSuccessToast(response: PaymentResponse): void {
+    void response;
+    toast.success('Event has been created');
+  }
+
+  private showTransferSuccessToast(response: TransferResponse): void {
+    void response;
+    toast.success('Event has been created');
   }
 
   private static differentAccountsValidator(control: AbstractControl): ValidationErrors | null {
