@@ -14,6 +14,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 
+import { AuthApiService } from '../auth/auth-api.service';
 import { AuthSessionService } from '../auth/auth-session.service';
 import { ThemeService } from '../theme/theme.service';
 import { PageBreadcrumbComponent, type PageBreadcrumbItem } from '../../shared/ui/page-breadcrumb';
@@ -104,6 +105,7 @@ type NavigationItem = {
   templateUrl: './banking-shell.component.html',
 })
 export class BankingShellComponent {
+  private readonly authApi = inject(AuthApiService);
   private readonly authSession = inject(AuthSessionService);
   private readonly router = inject(Router);
   protected readonly theme = inject(ThemeService);
@@ -147,9 +149,39 @@ export class BankingShellComponent {
   protected readonly breadcrumbItems = computed<readonly PageBreadcrumbItem[]>(() =>
     this.resolveBreadcrumbItems(this.primarySegments()),
   );
-  protected readonly userInitials = computed(() => 'AL');
+  protected readonly currentUser = signal<{
+    fullName: string;
+    username: string;
+    email: string;
+    role: string;
+  } | null>(null);
+  protected readonly userDisplayName = computed(() => {
+    const user = this.currentUser();
+    if (!user) {
+      return 'User';
+    }
+
+    return user.fullName.trim() || user.username.trim() || user.email.trim() || 'User';
+  });
+  protected readonly userMeta = computed(() => {
+    const user = this.currentUser();
+    if (!user) {
+      return '';
+    }
+
+    return user.username.trim() || user.email.trim() || user.role.trim();
+  });
+  protected readonly userInitials = computed(() => this.buildUserInitials(this.userDisplayName()));
 
   constructor() {
+    this.authApi
+      .getCurrentUser()
+      .pipe(takeUntilDestroyed())
+      .subscribe({
+        next: (user) => this.currentUser.set(user),
+        error: () => this.currentUser.set(null),
+      });
+
     this.router.events
       .pipe(
         filter((event): event is NavigationEnd => event instanceof NavigationEnd),
@@ -215,5 +247,21 @@ export class BankingShellComponent {
 
   private formatBreadcrumbSegment(segment: string): string {
     return decodeURIComponent(segment).replace(/[-_]+/g, ' ');
+  }
+
+  private buildUserInitials(value: string): string {
+    const parts = value
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
+
+    if (parts.length === 0) {
+      return 'U';
+    }
+
+    return parts
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase() ?? '')
+      .join('');
   }
 }

@@ -2,6 +2,7 @@ package com.ardit.banking.security.user.service;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,6 +51,13 @@ public class UserService {
                 exception
             );
         }
+    }
+
+    @Transactional(readOnly = true)
+    public UserResponse getUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+            .map(UserService::toResponse)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     private static UserResponse toResponse(UserEntity user) {

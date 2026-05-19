@@ -30,6 +30,8 @@ export type RegisteredUser = {
   createdAt: string;
 };
 
+export type AuthenticatedUser = RegisteredUser;
+
 @Injectable({ providedIn: 'root' })
 export class AuthApiService {
   private readonly http = inject(HttpClient);
@@ -64,5 +66,11 @@ export class AuthApiService {
       {},
       { context: this.skipAuthContext, withCredentials: true }
     );
+  }
+
+  getCurrentUser(): Observable<AuthenticatedUser> {
+    return this.http.get<AuthenticatedUser>(`${this.baseUrl}/users/me`, {
+      withCredentials: true
+    });
   }
 }
