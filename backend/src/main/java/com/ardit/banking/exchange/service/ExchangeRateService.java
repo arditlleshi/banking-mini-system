@@ -57,6 +57,23 @@ public class ExchangeRateService {
             );
         }
 
+        ExchangeRateEntity directPair = exchangeRateRepository
+            .findFirstByBaseCurrencyAndQuoteCurrencyAndValidFromLessThanEqualOrderByValidFromDescIdDesc(
+                sourceCurrency,
+                targetCurrency,
+                effectiveAt
+            )
+            .orElse(null);
+        if (directPair != null) {
+            return new FxQuote(
+                sourceCurrency,
+                targetCurrency,
+                directPair.getBuyRate(),
+                "DIRECT_PAIR",
+                directPair.getBuyRate()
+            );
+        }
+
         if (sourceCurrency == AccountCurrency.ALL) {
             ExchangeRateEntity targetRate = getLekPair(targetCurrency, effectiveAt);
             return new FxQuote(
