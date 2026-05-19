@@ -13,14 +13,15 @@
         </p>
       </div>
     </section>
+
     <section aria-labelledby="payment-action-heading" class="grid gap-4">
       <div class="flex flex-wrap items-end justify-between gap-3">
-          <h2
-            id="payment-action-heading"
-            class="mt-2 font-(--font-manrope) tracking-[-0.03em] text-xl leading-tight text-foreground text-balance sm:text-2xl"
-          >
-            Start With the Customer Intent
-          </h2>
+        <h2
+          id="payment-action-heading"
+          class="mt-2 font-(--font-manrope) tracking-[-0.03em] text-xl leading-tight text-foreground text-balance sm:text-2xl"
+        >
+          Start With the Customer Intent
+        </h2>
       </div>
       <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-5" role="list">
         @for (action of paymentActions; track action.id) {
@@ -53,22 +54,33 @@
         }
       </div>
     </section>
+
     <section hlmCard class="rounded-lg border border-border/70 [background:var(--surface-panel-strong)]">
       <div hlmCardHeader class="gap-3 border-b border-border/70 p-6 sm:p-8">
         <p class="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-          Own Accounts
+          {{ activePaymentAction() === 'bank-account' ? 'Another Account' : 'Own Accounts' }}
         </p>
         <h2
           hlmCardTitle
           class="font-bold tracking-[-0.03em] text-xl leading-tight text-card-foreground text-balance sm:text-2xl"
         >
-          Transfer Between Your Accounts
+          @if (activePaymentAction() === 'bank-account') {
+            Send Money to Another Customer Account
+          } @else {
+            Transfer Between Your Accounts
+          }
         </h2>
         <p hlmCardDescription class="max-w-3xl text-sm leading-6 text-muted-foreground">
-          Debit one account, credit another, and preview currency conversion before booking the
-          payment.
+          @if (activePaymentAction() === 'bank-account') {
+            Verify the beneficiary account number first, review the destination details, and then
+            book the payment.
+          } @else {
+            Debit one account, credit another, and preview currency conversion before booking the
+            payment.
+          }
         </p>
       </div>
+
       <div hlmCardContent class="px-6 pb-6 pt-6 sm:px-8 sm:pb-8">
         @if (loading()) {
           <div class="grid gap-4 lg:grid-cols-2" aria-live="polite">
@@ -85,7 +97,7 @@
           >
             {{ accountsLoadError() }}
           </p>
-        } @else if (accounts().length < 2) {
+        } @else if (activePaymentAction() === 'own-accounts' && accounts().length < 2) {
           <article
             class="rounded-lg border border-border/80 border-dashed p-8 text-center [background:var(--surface-inset-strong)]"
           >
@@ -101,234 +113,514 @@
             </h3>
           </article>
         } @else {
-          <form [formGroup]="form" (ngSubmit)="submitTransfer()" class="grid gap-6">
-            <div class="grid gap-5 md:grid-cols-2">
-              <div class="flex flex-col gap-2">
-                <label
-                  hlmLabel
-                  for="source-account"
-                  class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase"
-                  >Debit Account</label
-                >
-                <div
-                  hlmSelect
-                  [value]="form.controls.sourceAccountId.value"
-                  [itemToString]="accountValueToLabel"
-                  (valueChange)="handleSourceAccountChange($any($event))"
-                >
-                  <hlm-select-trigger buttonId="source-account" [class]="compactControlClass">
-                    <span hlmSelectValue placeholder="Choose debit account"></span>
-                  </hlm-select-trigger>
-                  <hlm-select-content *hlmSelectPortal>
-                    @for (option of accountOptions(); track option.value) {
-                      <hlm-select-item [value]="option.value"> {{ option.label }} </hlm-select-item>
-                    }
-                  </hlm-select-content>
-                </div>
-                <div class="rounded-lg border border-border/60 px-3 py-2 [background:var(--surface-inset)]">
-                  <p
-                    class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+          @if (activePaymentAction() === 'bank-account') {
+            <form [formGroup]="paymentForm" (ngSubmit)="submitPayment()" class="grid gap-6">
+              <div class="grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
+                <div class="flex flex-col gap-2">
+                  <label
+                    hlmLabel
+                    for="payment-source-account"
+                    class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase"
+                    >Debit Account</label
                   >
-                    Available Balance
-                  </p>
-                  <p class="mt-1 text-sm font-semibold text-foreground">
-                    {{ sourceAccount()?.availableBalance | number: '1.2-2' }}
-                    {{ sourceAccount()?.currency ?? '' }}
-                  </p>
+                  <div
+                    hlmSelect
+                    [value]="paymentForm.controls.sourceAccountId.value"
+                    [itemToString]="accountValueToLabel"
+                    (valueChange)="handlePaymentSourceAccountChange($any($event))"
+                  >
+                    <hlm-select-trigger buttonId="payment-source-account" [class]="compactControlClass">
+                      <span hlmSelectValue placeholder="Choose debit account"></span>
+                    </hlm-select-trigger>
+                    <hlm-select-content *hlmSelectPortal>
+                      @for (option of accountOptions(); track option.value) {
+                        <hlm-select-item [value]="option.value"> {{ option.label }} </hlm-select-item>
+                      }
+                    </hlm-select-content>
+                  </div>
+                  <div class="rounded-lg border border-border/60 px-3 py-2 [background:var(--surface-inset)]">
+                    <p
+                      class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                    >
+                      Available Balance
+                    </p>
+                    <p class="mt-1 text-sm font-semibold text-foreground">
+                      {{ paymentSourceAccount()?.availableBalance | number: '1.2-2' }}
+                      {{ paymentSourceAccount()?.currency ?? '' }}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="grid gap-3">
+                  <div class="flex flex-col gap-2">
+                    <label
+                      hlmLabel
+                      for="beneficiary-account-number"
+                      class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase"
+                      >Beneficiary Account Number</label
+                    >
+                    <div class="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
+                      <input
+                        id="beneficiary-account-number"
+                        hlmInput
+                        type="text"
+                        name="beneficiaryAccountNumber"
+                        autocomplete="off"
+                        spellcheck="false"
+                        formControlName="beneficiaryAccountNumber"
+                        class="h-10 rounded-lg border border-border/80 px-4 text-sm text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20 disabled:[background:var(--surface-control-disabled)]"
+                        placeholder="Enter the destination account number…"
+                        (blur)="handleBeneficiaryAccountBlur()"
+                      />
+                      <button
+                        hlmBtn
+                        type="button"
+                        class="h-10 rounded-lg px-5 text-sm"
+                        [disabled]="beneficiaryLookupLoading()"
+                        (click)="lookupBeneficiary()"
+                      >
+                        {{ beneficiaryLookupLoading() ? 'Checking…' : 'Check Account' }}
+                      </button>
+                    </div>
+                    @if (beneficiaryAccountNumberErrorMessage()) {
+                      <p class="text-sm font-medium text-(--status-danger-foreground)">
+                        {{ beneficiaryAccountNumberErrorMessage() }}
+                      </p>
+                    }
+                  </div>
+
+                  @if (beneficiary()) {
+                    <article
+                      aria-live="polite"
+                      class="grid gap-4 rounded-xl border border-border/70 p-4 [background:var(--surface-inset)] sm:grid-cols-3"
+                    >
+                      <div class="min-w-0">
+                        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                          Beneficiary
+                        </p>
+                        <p class="mt-2 font-semibold text-foreground text-pretty">
+                          {{ beneficiary()!.beneficiaryName }}
+                        </p>
+                        <p class="mt-1 text-sm text-muted-foreground text-pretty">
+                          {{ beneficiary()!.accountName }}
+                        </p>
+                      </div>
+                      <div class="min-w-0">
+                        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                          Destination
+                        </p>
+                        <p class="mt-2 font-semibold text-foreground break-words">
+                          {{ beneficiary()!.accountNumber }}
+                        </p>
+                        <p class="mt-1 text-sm text-muted-foreground break-words">
+                          {{ beneficiary()!.iban || 'IBAN unavailable' }}
+                        </p>
+                      </div>
+                      <div class="min-w-0">
+                        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                          Credit Currency
+                        </p>
+                        <p class="mt-2 text-lg font-semibold text-foreground">
+                          {{ beneficiary()!.currency }}
+                        </p>
+                      </div>
+                    </article>
+                  } @else {
+                    <article
+                      class="rounded-xl border border-dashed border-border/80 p-4 [background:var(--surface-inset-strong)]"
+                    >
+                      <p class="text-sm leading-6 text-muted-foreground">
+                        Verify the beneficiary account number to reveal the destination details
+                        before entering the amount and payment description.
+                      </p>
+                    </article>
+                  }
                 </div>
               </div>
-              <div class="flex flex-col gap-2">
-                <label
-                  hlmLabel
-                  for="target-account"
-                  class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase"
-                  >Credit Account</label
-                >
-                <div
-                  hlmSelect
-                  [value]="form.controls.targetAccountId.value"
-                  [itemToString]="accountValueToLabel"
-                  (valueChange)="handleTargetAccountChange($any($event))"
-                >
-                  <hlm-select-trigger buttonId="target-account" [class]="compactControlClass">
-                    <span hlmSelectValue placeholder="Choose credit account"></span>
-                  </hlm-select-trigger>
-                  <hlm-select-content *hlmSelectPortal>
-                    @for (option of targetAccountOptions(); track option.value) {
-                      <hlm-select-item [value]="option.value"> {{ option.label }} </hlm-select-item>
-                    }
-                  </hlm-select-content>
-                </div>
-                <div class="rounded-lg border border-border/60 px-3 py-2 [background:var(--surface-inset)]">
-                  <p
-                    class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+
+              <div class="grid gap-5 md:grid-cols-[0.8fr_1.2fr]">
+                <div class="flex flex-col gap-2">
+                  <label
+                    hlmLabel
+                    for="payment-amount"
+                    class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase"
+                    >Amount</label
                   >
-                    Available Balance
+                  <input
+                    id="payment-amount"
+                    hlmInput
+                    type="number"
+                    name="paymentAmount"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    min="0.01"
+                    step="0.01"
+                    formControlName="amount"
+                    class="h-10 rounded-lg border border-border/80 px-4 text-sm text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20 disabled:[background:var(--surface-control-disabled)]"
+                  />
+                  @if (paymentAmountErrorMessage()) {
+                    <p class="text-sm font-medium text-(--status-danger-foreground)">
+                      {{ paymentAmountErrorMessage() }}
+                    </p>
+                  }
+                </div>
+                <div class="flex flex-col gap-2">
+                  <label
+                    hlmLabel
+                    for="payment-description"
+                    class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase"
+                    >Description</label
+                  >
+                  <input
+                    id="payment-description"
+                    hlmInput
+                    type="text"
+                    name="paymentDescription"
+                    autocomplete="off"
+                    formControlName="description"
+                    maxlength="280"
+                    class="h-10 rounded-lg border border-border/80 px-4 text-sm text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20 disabled:[background:var(--surface-control-disabled)]"
+                    placeholder="Rent contribution for May…"
+                  />
+                  @if (paymentDescriptionErrorMessage()) {
+                    <p class="text-sm font-medium text-(--status-danger-foreground)">
+                      {{ paymentDescriptionErrorMessage() }}
+                    </p>
+                  }
+                </div>
+              </div>
+
+              <section class="grid gap-4 md:grid-cols-3" aria-label="Payment preview">
+                <article class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]">
+                  <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    Debit Currency
                   </p>
-                  <p class="mt-1 text-sm font-semibold text-foreground">
-                    {{ targetAccount()?.availableBalance | number: '1.2-2' }}
+                  <p class="mt-3 text-lg font-semibold text-foreground">
+                    {{ paymentSourceAccount()?.currency ?? '-' }}
+                  </p>
+                </article>
+                <article class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]">
+                  <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    Credit Currency
+                  </p>
+                  <p class="mt-3 text-lg font-semibold text-foreground">
+                    {{ beneficiary()?.currency ?? '-' }}
+                  </p>
+                </article>
+                <article class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]">
+                  <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    Exchange Rate
+                  </p>
+                  @if (beneficiaryFxPreview()) {
+                    <p class="mt-3 text-lg font-semibold text-foreground">
+                      {{ beneficiaryFxPreview()!.rate | number: '1.4-8' }}
+                    </p>
+                    <p class="mt-2 text-xs text-muted-foreground">{{ beneficiaryFxPreview()!.note }}</p>
+                  } @else {
+                    <p class="mt-3 text-sm font-medium text-(--status-warning-foreground)">Not Available</p>
+                  }
+                </article>
+              </section>
+
+              @if (beneficiaryFxPreview()) {
+                <article class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]">
+                  <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    Estimated Credit Amount
+                  </p>
+                  <p class="mt-2 text-base font-semibold text-foreground">
+                    {{ beneficiaryFxPreview()!.targetAmount | number: '1.2-2' }}
+                    {{ beneficiary()?.currency ?? '' }}
+                  </p>
+                </article>
+              }
+
+              @if (exchangeRateLoadWarning()) {
+                <p
+                  aria-live="polite"
+                  class="rounded-lg border px-4 py-3 text-sm font-medium border-(--status-warning-border) [background:var(--status-warning-surface)] text-(--status-warning-foreground)"
+                >
+                  {{ exchangeRateLoadWarning() }}
+                </p>
+              }
+              @if (beneficiaryLookupError()) {
+                <p
+                  aria-live="polite"
+                  class="rounded-lg border px-4 py-3 text-sm font-medium border-(--status-danger-border) [background:var(--status-danger-surface)] text-(--status-danger-foreground)"
+                >
+                  {{ beneficiaryLookupError() }}
+                </p>
+              }
+              @if (paymentError()) {
+                <p
+                  aria-live="polite"
+                  class="rounded-lg border px-4 py-3 text-sm font-medium border-(--status-danger-border) [background:var(--status-danger-surface)] text-(--status-danger-foreground)"
+                >
+                  {{ paymentError() }}
+                </p>
+              }
+              @if (paymentInsufficientFunds()) {
+                <p
+                  aria-live="polite"
+                  class="rounded-lg border px-4 py-3 text-sm font-medium border-(--status-warning-border) [background:var(--status-warning-surface)] text-(--status-warning-foreground)"
+                >
+                  Payment amount cannot be greater than the available balance of the debit account.
+                </p>
+              }
+              @if (successPayment()) {
+                <article
+                  aria-live="polite"
+                  class="rounded-lg border p-4 text-sm border-(--status-success-border) [background:var(--status-success-surface)] text-(--status-success-foreground)"
+                >
+                  <p class="font-semibold">Payment Booked Successfully</p>
+                  <p class="mt-2">Reference: {{ successPayment()!.paymentReference }}</p>
+                  <p class="mt-1">
+                    {{ successPayment()!.amount | number: '1.2-2' }}
+                    {{ successPayment()!.currency }} sent to {{ successPayment()!.counterpartyName }}
+                  </p>
+                  <p class="mt-1">
+                    Booked at {{ successPayment()!.bookedAt | date: 'dd MMM yyyy, HH:mm' }}
+                  </p>
+                </article>
+              }
+
+              <div class="flex justify-end">
+                <button
+                  hlmBtn
+                  type="submit"
+                  class="h-10 rounded-lg px-5 text-sm"
+                  [disabled]="submitting() || paymentForm.invalid || paymentInsufficientFunds() || !beneficiary()"
+                >
+                  {{ submitting() ? 'Submitting…' : 'Book Payment' }}
+                </button>
+              </div>
+            </form>
+          } @else {
+            <form [formGroup]="ownTransferForm" (ngSubmit)="submitTransfer()" class="grid gap-6">
+              <div class="grid gap-5 md:grid-cols-2">
+                <div class="flex flex-col gap-2">
+                  <label
+                    hlmLabel
+                    for="source-account"
+                    class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase"
+                    >Debit Account</label
+                  >
+                  <div
+                    hlmSelect
+                    [value]="ownTransferForm.controls.sourceAccountId.value"
+                    [itemToString]="accountValueToLabel"
+                    (valueChange)="handleSourceAccountChange($any($event))"
+                  >
+                    <hlm-select-trigger buttonId="source-account" [class]="compactControlClass">
+                      <span hlmSelectValue placeholder="Choose debit account"></span>
+                    </hlm-select-trigger>
+                    <hlm-select-content *hlmSelectPortal>
+                      @for (option of accountOptions(); track option.value) {
+                        <hlm-select-item [value]="option.value"> {{ option.label }} </hlm-select-item>
+                      }
+                    </hlm-select-content>
+                  </div>
+                  <div class="rounded-lg border border-border/60 px-3 py-2 [background:var(--surface-inset)]">
+                    <p
+                      class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                    >
+                      Available Balance
+                    </p>
+                    <p class="mt-1 text-sm font-semibold text-foreground">
+                      {{ sourceAccount()?.availableBalance | number: '1.2-2' }}
+                      {{ sourceAccount()?.currency ?? '' }}
+                    </p>
+                  </div>
+                </div>
+                <div class="flex flex-col gap-2">
+                  <label
+                    hlmLabel
+                    for="target-account"
+                    class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase"
+                    >Credit Account</label
+                  >
+                  <div
+                    hlmSelect
+                    [value]="ownTransferForm.controls.targetAccountId.value"
+                    [itemToString]="accountValueToLabel"
+                    (valueChange)="handleTargetAccountChange($any($event))"
+                  >
+                    <hlm-select-trigger buttonId="target-account" [class]="compactControlClass">
+                      <span hlmSelectValue placeholder="Choose credit account"></span>
+                    </hlm-select-trigger>
+                    <hlm-select-content *hlmSelectPortal>
+                      @for (option of targetAccountOptions(); track option.value) {
+                        <hlm-select-item [value]="option.value"> {{ option.label }} </hlm-select-item>
+                      }
+                    </hlm-select-content>
+                  </div>
+                  <div class="rounded-lg border border-border/60 px-3 py-2 [background:var(--surface-inset)]">
+                    <p
+                      class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                    >
+                      Available Balance
+                    </p>
+                    <p class="mt-1 text-sm font-semibold text-foreground">
+                      {{ targetAccount()?.availableBalance | number: '1.2-2' }}
+                      {{ targetAccount()?.currency ?? '' }}
+                    </p>
+                  </div>
+                  @if (accountSelectionErrorMessage()) {
+                    <p class="text-sm font-medium text-(--status-danger-foreground)">
+                      {{ accountSelectionErrorMessage() }}
+                    </p>
+                  }
+                </div>
+              </div>
+
+              <div class="grid gap-5 md:grid-cols-[0.8fr_1.2fr]">
+                <div class="flex flex-col gap-2">
+                  <label
+                    hlmLabel
+                    for="transfer-amount"
+                    class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase"
+                    >Amount</label
+                  >
+                  <input
+                    id="transfer-amount"
+                    hlmInput
+                    type="number"
+                    name="transferAmount"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    min="0.01"
+                    step="0.01"
+                    formControlName="amount"
+                    class="h-10 rounded-lg border border-border/80 px-4 text-sm text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20 disabled:[background:var(--surface-control-disabled)]"
+                  />
+                  @if (ownAmountErrorMessage()) {
+                    <p class="text-sm font-medium text-(--status-danger-foreground)">{{ ownAmountErrorMessage() }}</p>
+                  }
+                </div>
+                <div class="flex flex-col gap-2">
+                  <label
+                    hlmLabel
+                    for="transfer-description"
+                    class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase"
+                    >Description</label
+                  >
+                  <input
+                    id="transfer-description"
+                    hlmInput
+                    type="text"
+                    name="transferDescription"
+                    autocomplete="off"
+                    formControlName="description"
+                    maxlength="280"
+                    class="h-10 rounded-lg border border-border/80 px-4 text-sm text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20 disabled:[background:var(--surface-control-disabled)]"
+                    placeholder="Monthly savings transfer…"
+                  />
+                  @if (ownDescriptionErrorMessage()) {
+                    <p class="text-sm font-medium text-(--status-danger-foreground)">{{ ownDescriptionErrorMessage() }}</p>
+                  }
+                </div>
+              </div>
+
+              <section class="grid gap-4 md:grid-cols-3" aria-label="Payment preview">
+                <article class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]">
+                  <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    Debit Currency
+                  </p>
+                  <p class="mt-3 text-lg font-semibold text-foreground">
+                    {{ sourceAccount()?.currency ?? '-' }}
+                  </p>
+                </article>
+                <article class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]">
+                  <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    Credit Currency
+                  </p>
+                  <p class="mt-3 text-lg font-semibold text-foreground">
+                    {{ targetAccount()?.currency ?? '-' }}
+                  </p>
+                </article>
+                <article class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]">
+                  <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    Exchange Rate
+                  </p>
+                  @if (ownFxPreview()) {
+                    <p class="mt-3 text-lg font-semibold text-foreground">
+                      {{ ownFxPreview()!.rate | number: '1.4-8' }}
+                    </p>
+                    <p class="mt-2 text-xs text-muted-foreground">{{ ownFxPreview()!.note }}</p>
+                  } @else {
+                    <p class="mt-3 text-sm font-medium text-(--status-warning-foreground)">
+                      Not Available
+                    </p>
+                  }
+                </article>
+              </section>
+
+              @if (ownFxPreview()) {
+                <article class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]">
+                  <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    Estimated Credit Amount
+                  </p>
+                  <p class="mt-2 text-base font-semibold text-foreground">
+                    {{ ownFxPreview()!.targetAmount | number: '1.2-2' }}
                     {{ targetAccount()?.currency ?? '' }}
                   </p>
-                </div>
-                @if (accountSelectionErrorMessage()) {
-                  <p class="text-sm font-medium text-(--status-danger-foreground)">
-                    {{ accountSelectionErrorMessage() }}
+                </article>
+              }
+
+              @if (exchangeRateLoadWarning()) {
+                <p
+                  aria-live="polite"
+                  class="rounded-lg border px-4 py-3 text-sm font-medium border-(--status-warning-border) [background:var(--status-warning-surface)] text-(--status-warning-foreground)"
+                >
+                  {{ exchangeRateLoadWarning() }}
+                </p>
+              }
+              @if (transferError()) {
+                <p
+                  aria-live="polite"
+                  class="rounded-lg border px-4 py-3 text-sm font-medium border-(--status-danger-border) [background:var(--status-danger-surface)] text-(--status-danger-foreground)"
+                >
+                  {{ transferError() }}
+                </p>
+              }
+              @if (insufficientFunds()) {
+                <p
+                  aria-live="polite"
+                  class="rounded-lg border px-4 py-3 text-sm font-medium border-(--status-warning-border) [background:var(--status-warning-surface)] text-(--status-warning-foreground)"
+                >
+                  Payment amount cannot be greater than the available balance of the debit account.
+                </p>
+              }
+              @if (successTransfer()) {
+                <article
+                  aria-live="polite"
+                  class="rounded-lg border p-4 text-sm border-(--status-success-border) [background:var(--status-success-surface)] text-(--status-success-foreground)"
+                >
+                  <p class="font-semibold">Payment Booked Successfully</p>
+                  <p class="mt-2">Reference: {{ successTransfer()!.transferReference }}</p>
+                  <p class="mt-1">
+                    {{ successTransfer()!.sourceAmount | number: '1.2-2' }}
+                    {{ successTransfer()!.sourceCurrency }} to
+                    {{ successTransfer()!.targetAmount | number: '1.2-2' }}
+                    {{ successTransfer()!.targetCurrency }}
                   </p>
-                }
-              </div>
-            </div>
-            <div class="grid gap-5 md:grid-cols-[0.8fr_1.2fr]">
-              <div class="flex flex-col gap-2">
-                <label
-                  hlmLabel
-                  for="transfer-amount"
-                  class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase"
-                  >Amount</label
-                >
-                <input
-                  id="transfer-amount"
-                  hlmInput
-                  type="number"
-                  name="transferAmount"
-                  inputmode="decimal"
-                  autocomplete="off"
-                  min="0.01"
-                  step="0.01"
-                  formControlName="amount"
-                  class="h-10 rounded-lg border border-border/80 px-4 text-sm text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20 disabled:[background:var(--surface-control-disabled)]"
-                />
-                @if (amountErrorMessage()) {
-                  <p class="text-sm font-medium text-(--status-danger-foreground)">{{ amountErrorMessage() }}</p>
-                }
-              </div>
-              <div class="flex flex-col gap-2">
-                <label
-                  hlmLabel
-                  for="transfer-description"
-                  class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase"
-                  >Description</label
-                >
-                <input
-                  id="transfer-description"
-                  hlmInput
-                  type="text"
-                  name="transferDescription"
-                  autocomplete="off"
-                  formControlName="description"
-                  maxlength="280"
-                  class="h-10 rounded-lg border border-border/80 px-4 text-sm text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20 disabled:[background:var(--surface-control-disabled)]"
-                  placeholder="Monthly savings transfer..."
-                />
-                @if (descriptionErrorMessage()) {
-                  <p class="text-sm font-medium text-(--status-danger-foreground)">{{ descriptionErrorMessage() }}</p>
-                }
-              </div>
-            </div>
-            <section class="grid gap-4 md:grid-cols-3" aria-label="Payment preview">
-              <article class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]">
-                <p
-                  class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
-                >
-                  Debit Currency
-                </p>
-                <p class="mt-3 text-lg font-semibold text-foreground">
-                  {{ sourceAccount()?.currency ?? '-' }}
-                </p>
-              </article>
-              <article class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]">
-                <p
-                  class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
-                >
-                  Credit Currency
-                </p>
-                <p class="mt-3 text-lg font-semibold text-foreground">
-                  {{ targetAccount()?.currency ?? '-' }}
-                </p>
-              </article>
-              <article class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]">
-                <p
-                  class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
-                >
-                  Exchange Rate
-                </p>
-                @if (fxPreview()) {
-                  <p class="mt-3 text-lg font-semibold text-foreground">
-                    {{ fxPreview()!.rate | number: '1.4-8' }}
+                  <p class="mt-1">
+                    Booked at {{ successTransfer()!.bookedAt | date: 'dd MMM yyyy, HH:mm' }}
                   </p>
-                  <p class="mt-2 text-xs text-muted-foreground">{{ fxPreview()!.note }}</p>
-                } @else {
-                  <p class="mt-3 text-sm font-medium text-(--status-warning-foreground)">
-                    Not Available
-                  </p>
-                }
-              </article>
-            </section>
-            @if (fxPreview()) {
-              <article class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]">
-                <p
-                  class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                </article>
+              }
+
+              <div class="flex justify-end">
+                <button
+                  hlmBtn
+                  type="submit"
+                  class="h-10 rounded-lg px-5 text-sm"
+                  [disabled]="submitting() || ownTransferForm.invalid || insufficientFunds()"
                 >
-                  Estimated Credit Amount
-                </p>
-                <p class="mt-2 text-base font-semibold text-foreground">
-                  {{ fxPreview()!.targetAmount | number: '1.2-2' }}
-                  {{ targetAccount()?.currency ?? '' }}
-                </p>
-              </article>
-            }
-            @if (exchangeRateLoadWarning()) {
-              <p
-                aria-live="polite"
-                class="rounded-lg border px-4 py-3 text-sm font-medium border-(--status-warning-border) [background:var(--status-warning-surface)] text-(--status-warning-foreground)"
-              >
-                {{ exchangeRateLoadWarning() }}
-              </p>
-            }
-            @if (transferError()) {
-              <p
-                aria-live="polite"
-                class="rounded-lg border px-4 py-3 text-sm font-medium border-(--status-danger-border) [background:var(--status-danger-surface)] text-(--status-danger-foreground)"
-              >
-                {{ transferError() }}
-              </p>
-            }
-            @if (insufficientFunds()) {
-              <p
-                aria-live="polite"
-                class="rounded-lg border px-4 py-3 text-sm font-medium border-(--status-warning-border) [background:var(--status-warning-surface)] text-(--status-warning-foreground)"
-              >
-                Payment amount cannot be greater than the available balance of the debit account.
-              </p>
-            }
-            @if (successTransfer()) {
-              <article
-                aria-live="polite"
-                class="rounded-lg border p-4 text-sm border-(--status-success-border) [background:var(--status-success-surface)] text-(--status-success-foreground)"
-              >
-                <p class="font-semibold">Payment Booked Successfully</p>
-                <p class="mt-2">Reference: {{ successTransfer()!.transferReference }}</p>
-                <p class="mt-1">
-                  {{ successTransfer()!.sourceAmount | number: '1.2-2' }}
-                  {{ successTransfer()!.sourceCurrency }} to
-                  {{ successTransfer()!.targetAmount | number: '1.2-2' }}
-                  {{ successTransfer()!.targetCurrency }}
-                </p>
-                <p class="mt-1">
-                  Booked at {{ successTransfer()!.bookedAt | date: 'dd MMM yyyy, HH:mm' }}
-                </p>
-              </article>
-            }
-            <div class="flex justify-end">
-              <button
-                hlmBtn
-                type="submit"
-                class="h-10 rounded-lg px-5 text-sm"
-                [disabled]="submitting() || form.invalid || insufficientFunds()"
-              >
-                {{ submitting() ? 'Submitting…' : 'Book Payment' }}
-              </button>
-            </div>
-          </form>
+                  {{ submitting() ? 'Submitting…' : 'Book Payment' }}
+                </button>
+              </div>
+            </form>
+          }
         }
       </div>
     </section>

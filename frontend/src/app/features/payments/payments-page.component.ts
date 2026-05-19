@@ -1,18 +1,24 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { toSignal, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router } from '@angular/router';
 import { provideIcons } from '@ng-icons/core';
 import { lucideBuilding2, lucideCreditCard, lucideLandmark, lucideSmartphone, lucideZap } from '@ng-icons/lucide';
+import { HlmIconImports } from '@spartan/icon';
 import { startWith } from 'rxjs';
 
 import { AccountApiService, type AccountCurrency, type AccountResponse } from '../../core/services/account-api.service';
 import { ExchangeRateApiService, type ExchangeRateResponse } from '../../core/services/exchange-rate-api.service';
+import {
+  PaymentApiService,
+  type PaymentBeneficiaryResponse,
+  type PaymentResponse
+} from '../../core/services/payment-api.service';
 import { TransferApiService, type TransferResponse } from '../../core/services/transfer-api.service';
 import { HlmButton } from '../../shared/ui/spartan/button';
 import { HlmCard, HlmCardContent, HlmCardDescription, HlmCardHeader, HlmCardTitle } from '../../shared/ui/spartan/card';
-import { HlmIconImports } from '@spartan/icon';
 import { HlmInput } from '../../shared/ui/spartan/input';
 import { HlmLabel } from '../../shared/ui/spartan/label';
 import { HlmSelect, HlmSelectContent, HlmSelectItem, HlmSelectPortal, HlmSelectTrigger, HlmSelectValue } from '../../shared/ui/spartan/select';
@@ -22,12 +28,20 @@ type AccountOption = {
   readonly label: string;
 };
 
+type PaymentActionId = 'own-accounts' | 'bank-account' | 'utilities' | 'mobile-top-up' | 'credit-card';
+
 type PaymentAction = {
-  readonly id: 'own-accounts' | 'bank-account' | 'utilities' | 'mobile-top-up' | 'credit-card';
+  readonly id: PaymentActionId;
   readonly label: string;
   readonly description: string;
   readonly icon: string;
   readonly available: boolean;
+};
+
+type FxPreview = {
+  readonly rate: number;
+  readonly targetAmount: number;
+  readonly note: string;
 };
 
 @Component({
@@ -66,25 +80,35 @@ type PaymentAction = {
 })
 export class PaymentsPageComponent {
   private static readonly descriptionPattern = /^[A-Za-z0-9][A-Za-z0-9 .,'()\/\-]*$/;
+  private static readonly accountNumberPattern = /^[A-Za-z0-9]+$/;
 
-  private readonly fb = new FormBuilder();
+  private readonly fb = inject(FormBuilder);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly accountApi = inject(AccountApiService);
   private readonly exchangeRateApi = inject(ExchangeRateApiService);
   private readonly transferApi = inject(TransferApiService);
+  private readonly paymentApi = inject(PaymentApiService);
 
   private readonly accountsLoading = signal(true);
   private readonly ratesLoading = signal(true);
   protected readonly loading = computed(() => this.accountsLoading() || this.ratesLoading());
   protected readonly submitting = signal(false);
+  protected readonly beneficiaryLookupLoading = signal(false);
   protected readonly accountsLoadError = signal<string | null>(null);
   protected readonly transferError = signal<string | null>(null);
+  protected readonly paymentError = signal<string | null>(null);
+  protected readonly beneficiaryLookupError = signal<string | null>(null);
   protected readonly exchangeRateLoadWarning = signal<string | null>(null);
   protected readonly successTransfer = signal<TransferResponse | null>(null);
+  protected readonly successPayment = signal<PaymentResponse | null>(null);
   protected readonly accounts = signal<AccountResponse[]>([]);
   protected readonly exchangeRates = signal<ExchangeRateResponse[]>([]);
+  protected readonly beneficiary = signal<PaymentBeneficiaryResponse | null>(null);
+  private readonly resolvedBeneficiaryAccountNumber = signal<string | null>(null);
   protected readonly compactControlClass =
     'h-10 rounded-lg border border-border/80 px-4 text-sm text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20 disabled:[background:var(--surface-control-disabled)]';
-  protected readonly activePaymentAction = signal<PaymentAction['id']>('own-accounts');
+  protected readonly activePaymentAction = signal<PaymentActionId>('own-accounts');
   protected readonly paymentActions: readonly PaymentAction[] = [
     {
       id: 'own-accounts',
@@ -96,9 +120,9 @@ export class PaymentsPageComponent {
     {
       id: 'bank-account',
       label: 'Another Account',
-      description: 'Send money to a saved or new bank beneficiary.',
+      description: 'Send money to another customer account after verification.',
       icon: 'lucideBuilding2',
-      available: false
+      available: true
     },
     {
       id: 'utilities',
@@ -123,71 +147,93 @@ export class PaymentsPageComponent {
     }
   ];
 
-  protected readonly form = this.fb.nonNullable.group({
-    sourceAccountId: [0, [Validators.required, Validators.min(1)]],
-    targetAccountId: [0, [Validators.required, Validators.min(1)]],
-    amount: [0, [Validators.required, Validators.min(0.01), Validators.max(1_000_000)]],
-    description: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(280), Validators.pattern(PaymentsPageComponent.descriptionPattern)]]
-  }, { validators: [PaymentsPageComponent.differentAccountsValidator] });
+  protected readonly ownTransferForm = this.fb.nonNullable.group(
+    {
+      sourceAccountId: [0, [Validators.required, Validators.min(1)]],
+      targetAccountId: [0, [Validators.required, Validators.min(1)]],
+      amount: [0, [Validators.required, Validators.min(0.01), Validators.max(1_000_000)]],
+      description: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(5),
+          Validators.maxLength(280),
+          Validators.pattern(PaymentsPageComponent.descriptionPattern)
+        ]
+      ]
+    },
+    { validators: [PaymentsPageComponent.differentAccountsValidator] }
+  );
 
-  private readonly sourceAccountIdValue = toSignal(
-    this.form.controls.sourceAccountId.valueChanges.pipe(startWith(this.form.controls.sourceAccountId.value)),
-    { initialValue: this.form.controls.sourceAccountId.value }
-  );
-  private readonly targetAccountIdValue = toSignal(
-    this.form.controls.targetAccountId.valueChanges.pipe(startWith(this.form.controls.targetAccountId.value)),
-    { initialValue: this.form.controls.targetAccountId.value }
-  );
-  private readonly amountValue = toSignal(this.form.controls.amount.valueChanges.pipe(startWith(this.form.controls.amount.value)), {
-    initialValue: this.form.controls.amount.value
+  protected readonly paymentForm = this.fb.nonNullable.group({
+    sourceAccountId: [0, [Validators.required, Validators.min(1)]],
+    beneficiaryAccountNumber: [
+      '',
+      [Validators.required, Validators.maxLength(34), Validators.pattern(PaymentsPageComponent.accountNumberPattern)]
+    ],
+    amount: [0, [Validators.required, Validators.min(0.01), Validators.max(1_000_000)]],
+    description: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(5),
+        Validators.maxLength(280),
+        Validators.pattern(PaymentsPageComponent.descriptionPattern)
+      ]
+    ]
   });
+
+  private readonly ownSourceAccountIdValue = toSignal(
+    this.ownTransferForm.controls.sourceAccountId.valueChanges.pipe(startWith(this.ownTransferForm.controls.sourceAccountId.value)),
+    { initialValue: this.ownTransferForm.controls.sourceAccountId.value }
+  );
+  private readonly ownTargetAccountIdValue = toSignal(
+    this.ownTransferForm.controls.targetAccountId.valueChanges.pipe(startWith(this.ownTransferForm.controls.targetAccountId.value)),
+    { initialValue: this.ownTransferForm.controls.targetAccountId.value }
+  );
+  private readonly ownAmountValue = toSignal(
+    this.ownTransferForm.controls.amount.valueChanges.pipe(startWith(this.ownTransferForm.controls.amount.value)),
+    { initialValue: this.ownTransferForm.controls.amount.value }
+  );
+  private readonly paymentSourceAccountIdValue = toSignal(
+    this.paymentForm.controls.sourceAccountId.valueChanges.pipe(startWith(this.paymentForm.controls.sourceAccountId.value)),
+    { initialValue: this.paymentForm.controls.sourceAccountId.value }
+  );
+  private readonly paymentAmountValue = toSignal(
+    this.paymentForm.controls.amount.valueChanges.pipe(startWith(this.paymentForm.controls.amount.value)),
+    { initialValue: this.paymentForm.controls.amount.value }
+  );
 
   protected readonly sourceAccount = computed(() =>
-    this.accounts().find((account) => account.id === this.sourceAccountIdValue()) ?? null
+    this.accounts().find((account) => account.id === this.ownSourceAccountIdValue()) ?? null
   );
-
   protected readonly targetAccount = computed(() =>
-    this.accounts().find((account) => account.id === this.targetAccountIdValue()) ?? null
+    this.accounts().find((account) => account.id === this.ownTargetAccountIdValue()) ?? null
   );
-
-  protected readonly fxPreview = computed(() => {
-    const source = this.sourceAccount();
-    const target = this.targetAccount();
-    if (!source || !target) {
-      return null;
-    }
-
-    if (source.currency === target.currency) {
-      return {
-        rate: 1,
-        targetAmount: this.amountValue() || 0,
-        note: 'Same currency transfer'
-      };
-    }
-
-    const rate = this.resolveExchangeRate(source.currency, target.currency);
-    if (rate == null) {
-      return null;
-    }
-
-    const amount = this.amountValue() || 0;
-    return {
-      rate,
-      targetAmount: Number((amount * rate).toFixed(2)),
-      note: 'Estimated target amount'
-    };
+  protected readonly paymentSourceAccount = computed(() =>
+    this.accounts().find((account) => account.id === this.paymentSourceAccountIdValue()) ?? null
+  );
+  protected readonly ownFxPreview = computed(() =>
+    this.buildFxPreview(this.sourceAccount()?.currency ?? null, this.targetAccount()?.currency ?? null, this.ownAmountValue() || 0)
+  );
+  protected readonly beneficiaryFxPreview = computed(() => {
+    const beneficiaryCurrency = this.beneficiary()?.currency ?? null;
+    return this.buildFxPreview(
+      this.paymentSourceAccount()?.currency ?? null,
+      beneficiaryCurrency as AccountCurrency | null,
+      this.paymentAmountValue() || 0
+    );
   });
-
   protected readonly accountOptions = computed<readonly AccountOption[]>(() =>
     this.accounts().map((account) => ({ value: account.id, label: this.accountLabel(account) }))
   );
   protected readonly targetAccountOptions = computed<readonly AccountOption[]>(() => {
-    const sourceAccountId = this.sourceAccountIdValue();
+    const sourceAccountId = this.ownSourceAccountIdValue();
     return this.accountOptions().filter((option) => option.value !== sourceAccountId);
   });
   protected readonly sameAccountSelected = computed(() => {
-    const source = this.sourceAccountIdValue();
-    const target = this.targetAccountIdValue();
+    const source = this.ownSourceAccountIdValue();
+    const target = this.ownTargetAccountIdValue();
     return source > 0 && target > 0 && source === target;
   });
   protected readonly insufficientFunds = computed(() => {
@@ -195,30 +241,53 @@ export class PaymentsPageComponent {
     if (!source) {
       return false;
     }
-    return (this.amountValue() || 0) > source.availableBalance;
+    return (this.ownAmountValue() || 0) > source.availableBalance;
+  });
+  protected readonly paymentInsufficientFunds = computed(() => {
+    const source = this.paymentSourceAccount();
+    if (!source) {
+      return false;
+    }
+    return (this.paymentAmountValue() || 0) > source.availableBalance;
   });
 
   constructor() {
+    this.initializePaymentAction();
+    this.monitorBeneficiaryAccountNumber();
     this.loadData();
   }
 
-  protected controlHasError(controlName: 'sourceAccountId' | 'targetAccountId' | 'amount' | 'description'): boolean {
-    const control = this.form.controls[controlName];
+  protected ownControlHasError(controlName: 'sourceAccountId' | 'targetAccountId' | 'amount' | 'description'): boolean {
+    const control = this.ownTransferForm.controls[controlName];
     return control.invalid && control.touched;
   }
 
-  protected amountErrorMessage(): string | null {
-    const control = this.form.controls.amount;
-    if (!this.controlHasError('amount')) return null;
+  protected paymentControlHasError(controlName: 'sourceAccountId' | 'beneficiaryAccountNumber' | 'amount' | 'description'): boolean {
+    const control = this.paymentForm.controls[controlName];
+    return control.invalid && control.touched;
+  }
+
+  protected ownAmountErrorMessage(): string | null {
+    const control = this.ownTransferForm.controls.amount;
+    if (!this.ownControlHasError('amount')) return null;
     if (control.hasError('required')) return 'Amount is required.';
     if (control.hasError('min')) return 'Amount must be at least 0.01.';
     if (control.hasError('max')) return 'Amount cannot be greater than 1,000,000.';
     return 'Enter a valid payment amount.';
   }
 
-  protected descriptionErrorMessage(): string | null {
-    const control = this.form.controls.description;
-    if (!this.controlHasError('description')) return null;
+  protected paymentAmountErrorMessage(): string | null {
+    const control = this.paymentForm.controls.amount;
+    if (!this.paymentControlHasError('amount')) return null;
+    if (control.hasError('required')) return 'Amount is required.';
+    if (control.hasError('min')) return 'Amount must be at least 0.01.';
+    if (control.hasError('max')) return 'Amount cannot be greater than 1,000,000.';
+    return 'Enter a valid payment amount.';
+  }
+
+  protected ownDescriptionErrorMessage(): string | null {
+    const control = this.ownTransferForm.controls.description;
+    if (!this.ownControlHasError('description')) return null;
     if (control.hasError('required')) return 'Description is required.';
     if (control.hasError('minlength')) return 'Description must be at least 5 characters.';
     if (control.hasError('maxlength')) return 'Description cannot exceed 280 characters.';
@@ -226,17 +295,36 @@ export class PaymentsPageComponent {
     return 'Enter a valid description.';
   }
 
+  protected paymentDescriptionErrorMessage(): string | null {
+    const control = this.paymentForm.controls.description;
+    if (!this.paymentControlHasError('description')) return null;
+    if (control.hasError('required')) return 'Description is required.';
+    if (control.hasError('minlength')) return 'Description must be at least 5 characters.';
+    if (control.hasError('maxlength')) return 'Description cannot exceed 280 characters.';
+    if (control.hasError('pattern')) return 'Description must start with a letter or number and use valid characters only.';
+    return 'Enter a valid description.';
+  }
+
+  protected beneficiaryAccountNumberErrorMessage(): string | null {
+    const control = this.paymentForm.controls.beneficiaryAccountNumber;
+    if (!this.paymentControlHasError('beneficiaryAccountNumber')) return null;
+    if (control.hasError('required')) return 'Beneficiary account number is required.';
+    if (control.hasError('maxlength')) return 'Beneficiary account number cannot exceed 34 characters.';
+    if (control.hasError('pattern')) return 'Use letters and numbers only in the beneficiary account number.';
+    return 'Enter a valid beneficiary account number.';
+  }
+
   protected accountSelectionErrorMessage(): string | null {
-    if (!this.form.hasError('sameAccount')) return null;
-    const sourceTouched = this.form.controls.sourceAccountId.touched;
-    const targetTouched = this.form.controls.targetAccountId.touched;
+    if (!this.ownTransferForm.hasError('sameAccount')) return null;
+    const sourceTouched = this.ownTransferForm.controls.sourceAccountId.touched;
+    const targetTouched = this.ownTransferForm.controls.targetAccountId.touched;
     if (!sourceTouched && !targetTouched) return null;
     return 'Debit and credit accounts must be different.';
   }
 
   protected submitTransfer(): void {
-    if (this.form.invalid || this.submitting()) {
-      this.form.markAllAsTouched();
+    if (this.ownTransferForm.invalid || this.submitting()) {
+      this.ownTransferForm.markAllAsTouched();
       return;
     }
 
@@ -246,11 +334,11 @@ export class PaymentsPageComponent {
       this.transferError.set('Choose both debit and credit accounts before submitting.');
       return;
     }
-    if (this.form.hasError('sameAccount') || source.id === target.id) {
+    if (this.ownTransferForm.hasError('sameAccount') || source.id === target.id) {
       this.transferError.set('Source and target accounts must be different.');
       return;
     }
-    const raw = this.form.getRawValue();
+    const raw = this.ownTransferForm.getRawValue();
     if (Number(raw.amount) > source.availableBalance) {
       this.transferError.set('Transfer amount cannot be greater than the available balance of the debit account.');
       return;
@@ -258,7 +346,10 @@ export class PaymentsPageComponent {
 
     this.submitting.set(true);
     this.transferError.set(null);
+    this.paymentError.set(null);
     this.successTransfer.set(null);
+    this.successPayment.set(null);
+
     this.transferApi
       .createTransfer({
         sourceAccountId: raw.sourceAccountId,
@@ -270,40 +361,112 @@ export class PaymentsPageComponent {
         next: (response) => {
           this.successTransfer.set(response);
           this.submitting.set(false);
-          this.resetTransferDraft();
+          this.resetOwnTransferDraft();
           this.loadAccountsOnly();
         },
         error: (error: HttpErrorResponse) => {
           this.submitting.set(false);
-          if (error.status === 0) {
-            this.transferError.set('Backend is not reachable. Start backend and try again.');
-            return;
-          }
-          this.transferError.set(error.error?.message ?? 'Transfer failed. Please review your inputs and try again.');
+          this.transferError.set(this.extractApiError(error, 'Transfer failed. Please review your inputs and try again.'));
         }
       });
   }
 
-  private resetTransferDraft(): void {
-    this.form.reset({
-      sourceAccountId: this.form.controls.sourceAccountId.value,
-      targetAccountId: this.form.controls.targetAccountId.value,
-      amount: 0,
-      description: ''
+  protected lookupBeneficiary(): void {
+    const control = this.paymentForm.controls.beneficiaryAccountNumber;
+    if (control.invalid || this.beneficiaryLookupLoading()) {
+      control.markAsTouched();
+      return;
+    }
+
+    const normalizedAccountNumber = this.normalizeAccountNumber(control.getRawValue());
+    if (!normalizedAccountNumber) {
+      control.markAsTouched();
+      return;
+    }
+    if (this.resolvedBeneficiaryAccountNumber() === normalizedAccountNumber && this.beneficiary()) {
+      return;
+    }
+
+    this.beneficiaryLookupLoading.set(true);
+    this.beneficiaryLookupError.set(null);
+    this.paymentError.set(null);
+    this.successPayment.set(null);
+
+    this.paymentApi.lookupBeneficiary(normalizedAccountNumber).subscribe({
+      next: (beneficiary) => {
+        this.beneficiary.set(beneficiary);
+        this.resolvedBeneficiaryAccountNumber.set(beneficiary.accountNumber);
+        control.setValue(beneficiary.accountNumber, { emitEvent: false });
+        this.beneficiaryLookupLoading.set(false);
+      },
+      error: (error: HttpErrorResponse) => {
+        this.beneficiary.set(null);
+        this.resolvedBeneficiaryAccountNumber.set(null);
+        this.beneficiaryLookupLoading.set(false);
+        this.beneficiaryLookupError.set(
+          this.extractApiError(error, 'Beneficiary account could not be verified right now.')
+        );
+      }
     });
   }
 
-  private static differentAccountsValidator(control: AbstractControl): ValidationErrors | null {
-    const sourceAccountId = control.get('sourceAccountId')?.value;
-    const targetAccountId = control.get('targetAccountId')?.value;
-    if (!sourceAccountId || !targetAccountId) {
-      return null;
+  protected handleBeneficiaryAccountBlur(): void {
+    const normalized = this.normalizeAccountNumber(this.paymentForm.controls.beneficiaryAccountNumber.getRawValue());
+    if (!normalized || normalized === this.resolvedBeneficiaryAccountNumber()) {
+      return;
     }
-    return sourceAccountId === targetAccountId ? { sameAccount: true } : null;
+    this.lookupBeneficiary();
   }
 
-  protected accountLabel(account: AccountResponse): string {
-    return `${account.name} - ${account.currency} - ${account.accountNumber}`;
+  protected submitPayment(): void {
+    if (this.paymentForm.invalid || this.submitting()) {
+      this.paymentForm.markAllAsTouched();
+      return;
+    }
+
+    const source = this.paymentSourceAccount();
+    const beneficiary = this.beneficiary();
+    if (!source) {
+      this.paymentError.set('Choose a debit account before submitting.');
+      return;
+    }
+    if (!beneficiary) {
+      this.paymentError.set('Verify the beneficiary account before submitting the payment.');
+      return;
+    }
+
+    const raw = this.paymentForm.getRawValue();
+    if (Number(raw.amount) > source.availableBalance) {
+      this.paymentError.set('Payment amount cannot be greater than the available balance of the debit account.');
+      return;
+    }
+
+    this.submitting.set(true);
+    this.paymentError.set(null);
+    this.transferError.set(null);
+    this.successTransfer.set(null);
+    this.successPayment.set(null);
+
+    this.paymentApi
+      .createPayment({
+        sourceAccountId: raw.sourceAccountId,
+        amount: Number(raw.amount),
+        description: raw.description.trim(),
+        counterpartyName: beneficiary.beneficiaryName,
+        counterpartyAccount: beneficiary.accountNumber
+      })
+      .subscribe({
+        next: (response) => {
+          this.successPayment.set(response);
+          this.submitting.set(false);
+          this.resetPaymentDraft();
+          this.loadAccountsOnly();
+        },
+        error: (error: HttpErrorResponse) => {
+          this.submitting.set(false);
+          this.paymentError.set(this.extractApiError(error, 'Payment failed. Please review your inputs and try again.'));
+        }
+      });
   }
 
   protected readonly accountValueToLabel = (value: number | null): string => {
@@ -313,21 +476,21 @@ export class PaymentsPageComponent {
   };
 
   protected handleSourceAccountChange(nextSourceAccountId: number): void {
-    this.form.controls.sourceAccountId.setValue(nextSourceAccountId);
-    if (this.form.controls.targetAccountId.value === nextSourceAccountId) {
+    this.ownTransferForm.controls.sourceAccountId.setValue(nextSourceAccountId);
+    if (this.ownTransferForm.controls.targetAccountId.value === nextSourceAccountId) {
       const nextTarget = this.accounts().find((account) => account.id !== nextSourceAccountId);
       if (nextTarget) {
-        this.form.controls.targetAccountId.setValue(nextTarget.id);
+        this.ownTransferForm.controls.targetAccountId.setValue(nextTarget.id);
       }
     }
   }
 
   protected handleTargetAccountChange(nextTargetAccountId: number): void {
-    this.form.controls.targetAccountId.setValue(nextTargetAccountId);
+    this.ownTransferForm.controls.targetAccountId.setValue(nextTargetAccountId);
   }
 
-  protected trackByAccountId(_: number, account: AccountResponse): number {
-    return account.id;
+  protected handlePaymentSourceAccountChange(nextSourceAccountId: number): void {
+    this.paymentForm.controls.sourceAccountId.setValue(nextSourceAccountId);
   }
 
   protected selectPaymentAction(action: PaymentAction): void {
@@ -336,6 +499,11 @@ export class PaymentsPageComponent {
     }
 
     this.activePaymentAction.set(action.id);
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { mode: action.id },
+      queryParamsHandling: 'merge'
+    });
   }
 
   protected paymentActionClass(action: PaymentAction): string {
@@ -350,12 +518,73 @@ export class PaymentsPageComponent {
     return `${base} border-border/70 text-foreground [background:var(--surface-panel)] hover:border-primary/30 hover:[background:var(--surface-selected-hover)]`;
   }
 
+  protected accountLabel(account: AccountResponse): string {
+    return `${account.name} - ${account.currency} - ${account.accountNumber}`;
+  }
+
+  private initializePaymentAction(): void {
+    const requestedMode = this.route.snapshot.queryParamMap.get('mode');
+    if (!requestedMode) {
+      return;
+    }
+
+    const matchedAction = this.paymentActions.find((action) => action.id === requestedMode && action.available);
+    if (matchedAction) {
+      this.activePaymentAction.set(matchedAction.id);
+    }
+  }
+
+  private monitorBeneficiaryAccountNumber(): void {
+    this.paymentForm.controls.beneficiaryAccountNumber.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe((value) => {
+        const normalized = this.normalizeAccountNumber(value);
+        if (normalized === this.resolvedBeneficiaryAccountNumber()) {
+          return;
+        }
+
+        this.beneficiary.set(null);
+        this.resolvedBeneficiaryAccountNumber.set(null);
+        this.beneficiaryLookupError.set(null);
+        this.successPayment.set(null);
+      });
+  }
+
+  private buildFxPreview(
+    sourceCurrency: AccountCurrency | null,
+    targetCurrency: AccountCurrency | null,
+    amount: number
+  ): FxPreview | null {
+    if (!sourceCurrency || !targetCurrency) {
+      return null;
+    }
+    if (sourceCurrency === targetCurrency) {
+      return {
+        rate: 1,
+        targetAmount: amount,
+        note: 'Same currency transfer'
+      };
+    }
+
+    const rate = this.resolveExchangeRate(sourceCurrency, targetCurrency);
+    if (rate == null) {
+      return null;
+    }
+
+    return {
+      rate,
+      targetAmount: Number((amount * rate).toFixed(2)),
+      note: 'Estimated credit amount'
+    };
+  }
+
   private loadData(): void {
     this.accountsLoading.set(true);
     this.ratesLoading.set(true);
     this.accountsLoadError.set(null);
     this.exchangeRateLoadWarning.set(null);
     this.successTransfer.set(null);
+    this.successPayment.set(null);
 
     this.loadAccountsOnly();
     this.exchangeRateApi.getExchangeRates().subscribe({
@@ -390,32 +619,58 @@ export class PaymentsPageComponent {
           return;
         }
 
-        const sourceSelected = sorted.some((account) => account.id === this.form.controls.sourceAccountId.value);
-        const targetSelected = sorted.some((account) => account.id === this.form.controls.targetAccountId.value);
-
-        if (!sourceSelected) {
-          this.form.controls.sourceAccountId.setValue(sorted[0].id);
-        }
-        if (!targetSelected) {
-          const fallback = sorted.length > 1 ? sorted[1].id : sorted[0].id;
-          this.form.controls.targetAccountId.setValue(fallback);
-        }
-        if (this.form.controls.sourceAccountId.value === this.form.controls.targetAccountId.value && sorted.length > 1) {
-          const currentSource = this.form.controls.sourceAccountId.value;
-          const fallbackTarget = sorted.find((account) => account.id !== currentSource);
-          if (fallbackTarget) {
-            this.form.controls.targetAccountId.setValue(fallbackTarget.id);
-          }
-        }
+        this.ensureOwnTransferDefaults(sorted);
+        this.ensurePaymentDefaults(sorted);
       },
       error: (error: HttpErrorResponse) => {
         this.accountsLoading.set(false);
-        if (error.status === 0) {
-          this.accountsLoadError.set('Backend is not reachable. Start backend and refresh the page.');
-          return;
-        }
-        this.accountsLoadError.set('Accounts could not be loaded at the moment.');
+        this.accountsLoadError.set(this.extractApiError(error, 'Accounts could not be loaded at the moment.'));
       }
+    });
+  }
+
+  private ensureOwnTransferDefaults(accounts: AccountResponse[]): void {
+    const sourceSelected = accounts.some((account) => account.id === this.ownTransferForm.controls.sourceAccountId.value);
+    const targetSelected = accounts.some((account) => account.id === this.ownTransferForm.controls.targetAccountId.value);
+
+    if (!sourceSelected) {
+      this.ownTransferForm.controls.sourceAccountId.setValue(accounts[0].id);
+    }
+    if (!targetSelected) {
+      const fallback = accounts.length > 1 ? accounts[1].id : accounts[0].id;
+      this.ownTransferForm.controls.targetAccountId.setValue(fallback);
+    }
+    if (this.ownTransferForm.controls.sourceAccountId.value === this.ownTransferForm.controls.targetAccountId.value && accounts.length > 1) {
+      const currentSource = this.ownTransferForm.controls.sourceAccountId.value;
+      const fallbackTarget = accounts.find((account) => account.id !== currentSource);
+      if (fallbackTarget) {
+        this.ownTransferForm.controls.targetAccountId.setValue(fallbackTarget.id);
+      }
+    }
+  }
+
+  private ensurePaymentDefaults(accounts: AccountResponse[]): void {
+    const sourceSelected = accounts.some((account) => account.id === this.paymentForm.controls.sourceAccountId.value);
+    if (!sourceSelected) {
+      this.paymentForm.controls.sourceAccountId.setValue(accounts[0].id);
+    }
+  }
+
+  private resetOwnTransferDraft(): void {
+    this.ownTransferForm.reset({
+      sourceAccountId: this.ownTransferForm.controls.sourceAccountId.value,
+      targetAccountId: this.ownTransferForm.controls.targetAccountId.value,
+      amount: 0,
+      description: ''
+    });
+  }
+
+  private resetPaymentDraft(): void {
+    this.paymentForm.reset({
+      sourceAccountId: this.paymentForm.controls.sourceAccountId.value,
+      beneficiaryAccountNumber: this.paymentForm.controls.beneficiaryAccountNumber.value,
+      amount: 0,
+      description: ''
     });
   }
 
@@ -453,5 +708,43 @@ export class PaymentsPageComponent {
       .filter((rate) => rate.baseCurrency === baseCurrency && rate.quoteCurrency === quoteCurrency)
       .sort((left, right) => right.validFrom.localeCompare(left.validFrom));
     return candidates[0] ?? null;
+  }
+
+  private normalizeAccountNumber(value: string | null | undefined): string {
+    return value?.trim() ?? '';
+  }
+
+  private extractApiError(error: HttpErrorResponse, fallbackMessage: string): string {
+    if (error.status === 0) {
+      return 'Backend is not reachable. Start backend and try again.';
+    }
+
+    const payload = error.error;
+    if (payload && typeof payload === 'object') {
+      if (typeof payload.message === 'string' && payload.message.trim()) {
+        return payload.message;
+      }
+      if (typeof payload.detail === 'string' && payload.detail.trim()) {
+        return payload.detail;
+      }
+      if (typeof payload.error === 'string' && payload.error.trim()) {
+        return payload.error;
+      }
+    }
+
+    if (typeof payload === 'string' && payload.trim()) {
+      return payload;
+    }
+
+    return fallbackMessage;
+  }
+
+  private static differentAccountsValidator(control: AbstractControl): ValidationErrors | null {
+    const sourceAccountId = control.get('sourceAccountId')?.value;
+    const targetAccountId = control.get('targetAccountId')?.value;
+    if (!sourceAccountId || !targetAccountId) {
+      return null;
+    }
+    return sourceAccountId === targetAccountId ? { sameAccount: true } : null;
   }
 }
