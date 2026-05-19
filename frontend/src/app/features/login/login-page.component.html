@@ -3,149 +3,258 @@
 >
   <div class="absolute right-6 top-6 z-10 sm:right-10"><app-theme-toggle /></div>
   <div
-    class="relative mx-auto grid min-h-[calc(100vh-5rem)] max-w-6xl items-center gap-10 lg:grid-cols-[1.15fr_0.85fr]"
+    aria-hidden="true"
+    class="pointer-events-none absolute inset-0 overflow-hidden"
   >
-    <div class="space-y-8">
-      <div class="space-y-4">
-        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-          Secure banking access
-        </p>
-        <h1
-          class="font-[var(--font-manrope)] font-bold tracking-[-0.03em] text-2xl leading-[1.08] tracking-tight text-foreground text-balance sm:text-3xl"
-        >
-          Banking operations with a clearer, more focused workspace.
-        </h1>
-        <p class="max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">
-          Use this workspace to review account activity, manage customers, and move through
-          protected banking tasks with a consistent, low-friction interface.
-        </p>
-      </div>
-      <div class="grid gap-4 sm:grid-cols-3">
-        <article
-          class="rounded-lg border border-[color-mix(in_oklab,var(--border)_92%,transparent)] p-5 [background:var(--surface-elevated)] [box-shadow:var(--surface-shadow)]"
-        >
-          <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-            Access control
-          </p>
-          <p
-            class="mt-3 font-[var(--font-manrope)] font-bold tracking-[-0.03em] text-xl leading-tight tracking-tight text-foreground text-balance sm:text-2xl"
-          >
-            Protected
-          </p>
-          <p class="mt-2 text-sm text-muted-foreground">
-            Authenticated entry for controlled banking workflows and user sessions.
-          </p>
-        </article>
-        <article
-          class="rounded-lg border border-[color-mix(in_oklab,var(--border)_92%,transparent)] p-5 [background:var(--surface-elevated)] [box-shadow:var(--surface-shadow)]"
-        >
-          <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-            Session security
-          </p>
-          <p
-            class="mt-3 font-[var(--font-manrope)] font-bold tracking-[-0.03em] text-xl leading-tight tracking-tight text-foreground text-balance sm:text-2xl"
-          >
-            Layered
-          </p>
-          <p class="mt-2 text-sm text-muted-foreground">
-            Short-lived tokens, protected refresh, and guarded routes are already in place.
-          </p>
-        </article>
-        <article
-          class="rounded-lg border border-[color-mix(in_oklab,var(--border)_92%,transparent)] p-5 [background:var(--surface-elevated)] [box-shadow:var(--surface-shadow)]"
-        >
-          <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-            Interface tone
-          </p>
-          <p
-            class="mt-3 font-[var(--font-manrope)] font-bold tracking-[-0.03em] text-xl leading-tight tracking-tight text-foreground text-balance sm:text-2xl"
-          >
-            Operational
-          </p>
-          <p class="mt-2 text-sm text-muted-foreground">
-            Clear navigation, visible states, and restrained surfaces built for daily use.
-          </p>
-        </article>
-      </div>
-    </div>
-    <form [formGroup]="form" (ngSubmit)="submit()" class="relative">
-      <section
-        hlmCard
-        class="rounded-lg border border-border/70 [background:var(--surface-hero)] [box-shadow:var(--surface-shadow)] backdrop-blur-xl"
-      >
-        <div hlmCardHeader class="gap-3 p-8 sm:p-10">
+    <div class="absolute left-1/2 top-0 h-72 w-72 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl"></div>
+    <div class="absolute bottom-10 right-10 h-56 w-56 rounded-full bg-accent/40 blur-3xl"></div>
+  </div>
+  <div
+    class="relative mx-auto flex min-h-[calc(100vh-5rem)] max-w-3xl items-center justify-center"
+  >
+    <section
+      hlmCard
+      class="w-full rounded-[1.1rem] border border-border/70 [background:color-mix(in_oklab,var(--surface-hero)_90%,transparent)] [box-shadow:var(--surface-shadow-strong)] backdrop-blur-xl"
+    >
+      <div hlmCardHeader class="gap-4 p-8 sm:p-10">
+        <div class="space-y-3">
           <p class="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-            Sign in
+            {{ activePanel() === 'login' ? 'Sign in' : 'Create account' }}
           </p>
           <h2
             hlmCardTitle
-            class="font-[var(--font-manrope)] font-bold tracking-[-0.03em] text-xl leading-tight tracking-tight text-card-foreground text-balance sm:text-2xl"
+            class="font-(--font-manrope) tracking-[-0.03em] text-xl leading-tight text-card-foreground text-balance sm:text-2xl"
           >
-            Sign in to continue
+            {{ activePanel() === 'login' ? 'Sign in to continue' : 'Open your banking account' }}
           </h2>
-          <p hlmCardDescription class="max-w-sm text-sm leading-6 text-muted-foreground">
-            Enter your credentials to access the banking workspace.
+          <p hlmCardDescription class="max-w-2xl text-sm leading-6 text-muted-foreground">
+            @if (activePanel() === 'login') {
+              Enter your credentials to access the banking workspace.
+            } @else {
+              Create a standard user account with your name, email, username, and password.
+            }
           </p>
         </div>
-        <div hlmCardContent class="flex flex-col gap-5 px-8 pb-8 sm:px-10">
-          <div class="flex flex-col gap-2">
-            <label
-              hlmLabel
-              for="username"
-              class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase"
-              >Username</label
-            >
-            <input
-              id="username"
-              name="username"
-              hlmInput
-              class="rounded-lg border border-border/80 px-4 py-3 text-base text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20 disabled:[background:var(--surface-control-disabled)]"
-              type="text"
-              formControlName="username"
-              autocomplete="username"
-            />
-          </div>
-          <div class="flex flex-col gap-2">
-            <label
-              hlmLabel
-              for="password"
-              class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase"
-              >Password</label
-            >
-            <input
-              id="password"
-              name="password"
-              hlmInput
-              class="rounded-lg border border-border/80 px-4 py-3 text-base text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20 disabled:[background:var(--surface-control-disabled)]"
-              type="password"
-              formControlName="password"
-              autocomplete="current-password"
-            />
-          </div>
-          @if (errorMessage()) {
-            <p class="rounded-lg border px-4 py-3 text-sm font-medium [border-color:var(--status-danger-border)] [background:var(--status-danger-surface)] [color:var(--status-danger-foreground)]">
-              {{ errorMessage() }}
-            </p>
-          }
-        </div>
-        <div hlmCardFooter class="flex flex-col gap-5 px-8 pb-8 sm:px-10">
+        <div class="grid grid-cols-2 gap-2 rounded-lg border border-border/70 p-1 [background:var(--surface-control)]">
           <button
             hlmBtn
-            class="w-full rounded-lg bg-primary text-primary-foreground shadow-lg shadow-primary/15 transition hover:-translate-y-0.5"
-            type="submit"
-            size="lg"
-            [disabled]="loading()"
+            type="button"
+            variant="ghost"
+            class="rounded-md"
+            [class.bg-background]="activePanel() === 'login'"
+            [class.shadow-sm]="activePanel() === 'login'"
+            (click)="switchPanel('login')"
           >
-            {{ loading() ? 'Signing in…' : 'Open banking workspace' }}
+            Sign in
           </button>
-          <div
-            class="flex items-center gap-4 text-xs tracking-[0.18em] text-muted-foreground uppercase"
+          <button
+            hlmBtn
+            type="button"
+            variant="ghost"
+            class="rounded-md"
+            [class.bg-background]="activePanel() === 'register'"
+            [class.shadow-sm]="activePanel() === 'register'"
+            (click)="switchPanel('register')"
           >
-            <hlm-separator decorative class="flex-1"></hlm-separator> Secure session
-            <hlm-separator decorative class="flex-1"></hlm-separator>
-          </div>
+            Create account
+          </button>
         </div>
-      </section>
-    </form>
+      </div>
+
+      @if (registrationSuccessMessage() && activePanel() === 'login') {
+        <div class="px-8 sm:px-10">
+          <p
+            aria-live="polite"
+            class="rounded-lg border px-4 py-3 text-sm font-medium border-(--status-success-border) [background:var(--status-success-surface)] text-(--status-success-foreground)"
+          >
+            {{ registrationSuccessMessage() }}
+          </p>
+        </div>
+      }
+
+      @if (activePanel() === 'login') {
+        <form [formGroup]="loginForm" (ngSubmit)="submitLogin()" class="relative">
+          <div hlmCardContent class="flex flex-col gap-5 px-8 pb-8 pt-6 sm:px-10">
+            <div class="flex flex-col gap-2">
+              <label
+                hlmLabel
+                for="username"
+                class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase"
+                >Username</label
+              >
+              <input
+                id="username"
+                name="username"
+                hlmInput
+                class="rounded-lg border border-border/80 px-4 py-3 text-base text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20 disabled:[background:var(--surface-control-disabled)]"
+                type="text"
+                formControlName="username"
+                autocomplete="username"
+                spellcheck="false"
+              />
+            </div>
+            <div class="flex flex-col gap-2">
+              <label
+                hlmLabel
+                for="password"
+                class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase"
+                >Password</label
+              >
+              <input
+                id="password"
+                name="password"
+                hlmInput
+                class="rounded-lg border border-border/80 px-4 py-3 text-base text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20 disabled:[background:var(--surface-control-disabled)]"
+                type="password"
+                formControlName="password"
+                autocomplete="current-password"
+              />
+            </div>
+            @if (loginErrorMessage()) {
+              <p
+                aria-live="polite"
+                class="rounded-lg border px-4 py-3 text-sm font-medium border-(--status-danger-border) [background:var(--status-danger-surface)] text-(--status-danger-foreground)"
+              >
+                {{ loginErrorMessage() }}
+              </p>
+            }
+          </div>
+          <div hlmCardFooter class="flex flex-col gap-5 px-8 pb-8 sm:px-10">
+            <button
+              hlmBtn
+              class="w-full rounded-lg bg-primary text-primary-foreground shadow-lg shadow-primary/15 transition hover:-translate-y-0.5"
+              type="submit"
+              size="lg"
+              [disabled]="loginLoading()"
+            >
+              {{ loginLoading() ? 'Signing in...' : 'Open banking workspace' }}
+            </button>
+            <div class="flex items-center gap-4 text-xs tracking-[0.18em] text-muted-foreground uppercase">
+              <hlm-separator decorative class="flex-1"></hlm-separator> Secure session
+              <hlm-separator decorative class="flex-1"></hlm-separator>
+            </div>
+          </div>
+        </form>
+      } @else {
+        <form [formGroup]="registerForm" (ngSubmit)="submitRegistration()" class="relative">
+          <div hlmCardContent class="grid gap-5 px-8 pb-8 pt-6 sm:px-10 lg:grid-cols-2">
+            <div class="flex flex-col gap-2">
+              <label
+                hlmLabel
+                for="fullName"
+                class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase"
+                >Full name</label
+              >
+              <input
+                id="fullName"
+                name="fullName"
+                hlmInput
+                class="rounded-lg border border-border/80 px-4 py-3 text-base text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20"
+                type="text"
+                formControlName="fullName"
+                autocomplete="name"
+              />
+            </div>
+            <div class="flex flex-col gap-2">
+              <label
+                hlmLabel
+                for="email"
+                class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase"
+                >Email</label
+              >
+              <input
+                id="email"
+                name="email"
+                hlmInput
+                class="rounded-lg border border-border/80 px-4 py-3 text-base text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20"
+                type="email"
+                formControlName="email"
+                autocomplete="email"
+                spellcheck="false"
+              />
+            </div>
+            <div class="flex flex-col gap-2">
+              <label
+                hlmLabel
+                for="registerUsername"
+                class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase"
+                >Username</label
+              >
+              <input
+                id="registerUsername"
+                name="registerUsername"
+                hlmInput
+                class="rounded-lg border border-border/80 px-4 py-3 text-base text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20"
+                type="text"
+                formControlName="username"
+                autocomplete="username"
+                spellcheck="false"
+              />
+            </div>
+            <div class="flex flex-col gap-2">
+              <label
+                hlmLabel
+                for="registerPassword"
+                class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase"
+                >Password</label
+              >
+              <input
+                id="registerPassword"
+                name="registerPassword"
+                hlmInput
+                class="rounded-lg border border-border/80 px-4 py-3 text-base text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20"
+                type="password"
+                formControlName="password"
+                autocomplete="new-password"
+              />
+            </div>
+            <div class="flex flex-col gap-2">
+              <label
+                hlmLabel
+                for="confirmPassword"
+                class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase"
+                >Confirm password</label
+              >
+              <input
+                id="confirmPassword"
+                name="confirmPassword"
+                hlmInput
+                class="rounded-lg border border-border/80 px-4 py-3 text-base text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20"
+                type="password"
+                formControlName="confirmPassword"
+                autocomplete="new-password"
+              />
+            </div>
+            @if (showPasswordMismatch()) {
+              <p class="text-sm font-medium lg:col-span-2 text-(--status-danger-foreground)">
+                Passwords must match before you can create the account.
+              </p>
+            }
+            @if (registerErrorMessage()) {
+              <p
+                aria-live="polite"
+                class="rounded-lg border px-4 py-3 text-sm font-medium lg:col-span-2 border-(--status-danger-border) [background:var(--status-danger-surface)] text-(--status-danger-foreground)"
+              >
+                {{ registerErrorMessage() }}
+              </p>
+            }
+          </div>
+          <div hlmCardFooter class="flex flex-col gap-5 px-8 pb-8 sm:px-10">
+            <button
+              hlmBtn
+              class="w-full rounded-lg bg-primary text-primary-foreground shadow-lg shadow-primary/15 transition hover:-translate-y-0.5"
+              type="submit"
+              size="lg"
+              [disabled]="registerLoading()"
+            >
+              {{ registerLoading() ? 'Creating account...' : 'Create account' }}
+            </button>
+            <p class="text-center text-xs leading-5 tracking-[0.12em] text-muted-foreground uppercase">
+              New accounts are created with standard user access.
+            </p>
+          </div>
+        </form>
+      }
+    </section>
   </div>
 </section>

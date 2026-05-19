@@ -9,8 +9,25 @@ export type LoginRequest = {
   password: string;
 };
 
+export type RegisterRequest = {
+  fullName: string;
+  username: string;
+  password: string;
+  email: string;
+};
+
 export type AuthTokens = {
   accessToken: string;
+};
+
+export type RegisteredUser = {
+  id: number;
+  fullName: string;
+  username: string;
+  email: string;
+  active: boolean;
+  role: string;
+  createdAt: string;
 };
 
 @Injectable({ providedIn: 'root' })
@@ -21,6 +38,13 @@ export class AuthApiService {
 
   login(payload: LoginRequest): Observable<AuthTokens> {
     return this.http.post<AuthTokens>(`${this.baseUrl}/auth/login`, payload, {
+      context: this.skipAuthContext,
+      withCredentials: true
+    });
+  }
+
+  register(payload: RegisterRequest): Observable<RegisteredUser> {
+    return this.http.post<RegisteredUser>(`${this.baseUrl}/auth/register`, payload, {
       context: this.skipAuthContext,
       withCredentials: true
     });
