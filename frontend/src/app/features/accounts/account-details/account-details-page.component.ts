@@ -8,6 +8,7 @@ import { catchError, distinctUntilChanged, EMPTY, finalize, map, startWith, swit
 import {
   AccountApiService,
   type AccountDetailsResponse,
+  type AccountHistoryTransactionResponse,
   type AccountStatementFilters,
   type AccountTransactionResponse
 } from '../../../core/services/account-api.service';
@@ -64,7 +65,7 @@ export class AccountDetailsPageComponent {
   protected readonly statementErrorMessage = signal<string | null>(null);
   protected readonly statementSuccessMessage = signal<string | null>(null);
   protected readonly details = signal<AccountDetailsResponse | null>(null);
-  protected readonly statementTransactions = signal<AccountTransactionResponse[]>([]);
+  protected readonly statementTransactions = signal<AccountHistoryTransactionResponse[]>([]);
   protected readonly statementDialogOpen = signal(false);
   protected readonly statementFiltersForm: StatementFiltersForm = this.fb.group({
     fromDate: this.fb.control<Date | null>(null),
@@ -188,32 +189,46 @@ export class AccountDetailsPageComponent {
     this.statementDialogOpen.set(open);
   }
 
-  protected trackByTransactionId(_: number, transaction: AccountTransactionResponse): number {
+  protected trackByTransactionId(_: number, transaction: AccountHistoryTransactionResponse): number {
     return transaction.id;
   }
 
-  protected movementSign(transaction: AccountTransactionResponse): '+' | '-' {
+  protected movementSign(transaction: AccountHistoryTransactionResponse): '+' | '-' {
     return transaction.direction === 'CREDIT' ? '+' : '-';
   }
 
-  protected movementTone(transaction: AccountTransactionResponse): string {
+  protected movementTone(transaction: AccountHistoryTransactionResponse): string {
     return transaction.direction === 'CREDIT'
       ? '[color:var(--status-inflow-foreground)]'
       : '[color:var(--status-outflow-foreground)]';
   }
 
-  protected senderLabel(details: AccountDetailsResponse, transaction: AccountTransactionResponse): string {
+  protected senderDescription(details: AccountDetailsResponse, transaction: AccountHistoryTransactionResponse): string {
     if (transaction.direction === 'CREDIT') {
       return transaction.counterpartyName ?? transaction.counterpartyAccount ?? 'External sender';
     }
     return details.account.name;
   }
 
-  protected receiverLabel(details: AccountDetailsResponse, transaction: AccountTransactionResponse): string {
+  protected senderNumber(details: AccountDetailsResponse, transaction: AccountHistoryTransactionResponse): string {
+    if (transaction.direction === 'CREDIT') {
+      return transaction.counterpartyAccount ?? 'Account unavailable';
+    }
+    return details.account.accountNumber;
+  }
+
+  protected receiverDescription(details: AccountDetailsResponse, transaction: AccountHistoryTransactionResponse): string {
     if (transaction.direction === 'DEBIT') {
       return transaction.counterpartyName ?? transaction.counterpartyAccount ?? 'External receiver';
     }
     return details.account.name;
+  }
+
+  protected receiverNumber(details: AccountDetailsResponse, transaction: AccountHistoryTransactionResponse): string {
+    if (transaction.direction === 'DEBIT') {
+      return transaction.counterpartyAccount ?? 'Account unavailable';
+    }
+    return details.account.accountNumber;
   }
 
   protected formatDateTime(value: string): string {

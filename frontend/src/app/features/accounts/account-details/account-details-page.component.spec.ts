@@ -6,6 +6,7 @@ import { vi } from 'vitest';
 import {
   AccountApiService,
   type AccountDetailsResponse,
+  type AccountHistoryTransactionResponse,
   type AccountTransactionResponse
 } from '../../../core/services/account-api.service';
 import { AccountDetailsPageComponent } from './account-details-page.component';
@@ -116,15 +117,13 @@ function createAccountDetailsResponse(): AccountDetailsResponse {
 
 function createTransactionResponse(
   transactionReference: string,
-  direction: AccountTransactionResponse['direction'],
+  direction: AccountHistoryTransactionResponse['direction'],
   amount: number
-): AccountTransactionResponse {
+): AccountHistoryTransactionResponse {
   return {
     id: direction === 'CREDIT' ? 1 : 2,
     transactionReference,
-    externalReference: null,
     type: direction === 'CREDIT' ? 'DEPOSIT' : 'PAYMENT',
-    status: 'BOOKED',
     direction,
     currency: 'EUR',
     amount,
@@ -132,10 +131,6 @@ function createTransactionResponse(
     counterpartyName: 'Counterparty',
     counterpartyAccount: 'AL000000000000000000001',
     bookingTimestamp: '2026-05-10T09:30:00Z',
-    valueDate: '2026-05-10',
-    balanceAfter: direction === 'CREDIT' ? 1200 : 1120,
-    fxRate: null,
-    fxReferenceAmount: null,
-    fxReferenceCurrency: null
+    balanceAfter: direction === 'CREDIT' ? 1200 : 1120
   };
 }

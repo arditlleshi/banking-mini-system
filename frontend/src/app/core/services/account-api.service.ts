@@ -51,13 +51,27 @@ export type AccountTransactionResponse = {
   fxReferenceCurrency: AccountCurrency | null;
 };
 
+export type AccountHistoryTransactionResponse = {
+  id: number;
+  transactionReference: string;
+  type: string;
+  direction: 'DEBIT' | 'CREDIT';
+  currency: AccountCurrency;
+  amount: number;
+  description: string;
+  counterpartyName: string | null;
+  counterpartyAccount: string | null;
+  bookingTimestamp: string;
+  balanceAfter: number;
+};
+
 export type AccountDetailsResponse = {
   account: AccountResponse;
   transactionCount: number;
   totalCredits: number;
   totalDebits: number;
   netMovement: number;
-  transactions: AccountTransactionResponse[];
+  transactions: AccountHistoryTransactionResponse[];
 };
 
 export type AccountStatementFilters = {

@@ -3,9 +3,9 @@ package com.ardit.banking.account.service;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.Arrays;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
@@ -20,6 +20,7 @@ import com.ardit.banking.account.domain.AccountStatus;
 import com.ardit.banking.account.domain.AccountType;
 import com.ardit.banking.account.dto.AccountCurrencyDistributionResponse;
 import com.ardit.banking.account.dto.AccountDetailsResponse;
+import com.ardit.banking.account.dto.AccountHistoryTransactionResponse;
 import com.ardit.banking.account.dto.AccountResponse;
 import com.ardit.banking.account.dto.CreateAccountRequest;
 import com.ardit.banking.account.dto.UpdateAccountRequest;
@@ -28,7 +29,6 @@ import com.ardit.banking.security.user.domain.UserEntity;
 import com.ardit.banking.security.user.repository.UserRepository;
 import com.ardit.banking.transaction.statement.AccountStatement;
 import com.ardit.banking.transaction.statement.AccountStatementService;
-import com.ardit.banking.transaction.dto.TransactionResponse;
 import com.ardit.banking.transaction.service.TransactionService;
 
 @Service
@@ -130,8 +130,20 @@ public class AccountService {
             null,
             null
         );
-        List<TransactionResponse> transactionResponses = statement.transactions().stream()
-            .map(transaction -> transaction.toTransactionResponse())
+        List<AccountHistoryTransactionResponse> transactionResponses = statement.transactions().reversed().stream()
+            .map(transaction -> new AccountHistoryTransactionResponse(
+                transaction.id(),
+                transaction.transactionReference(),
+                transaction.type(),
+                transaction.direction(),
+                transaction.currency(),
+                transaction.amount(),
+                transaction.description(),
+                transaction.counterpartyName(),
+                transaction.counterpartyAccount(),
+                transaction.bookingTimestamp(),
+                transaction.balanceAfter()
+            ))
             .toList();
 
         return new AccountDetailsResponse(

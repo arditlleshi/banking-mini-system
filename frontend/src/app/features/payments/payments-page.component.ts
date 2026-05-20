@@ -796,8 +796,8 @@ export class PaymentsPageComponent {
         description: confirmation.bookingDescription
       })
       .subscribe({
-        next: (response) => {
-          this.showTransferSuccessToast(response);
+        next: () => {
+          this.showSuccessToast();
           this.submitting.set(false);
           this.confirmationOpen.set(false);
           this.pendingConfirmation.set(null);
@@ -827,8 +827,8 @@ export class PaymentsPageComponent {
         counterpartyAccount: confirmation.counterpartyAccount
       })
       .subscribe({
-        next: (response) => {
-          this.showPaymentSuccessToast(response);
+        next: () => {
+          this.showSuccessToast();
           this.submitting.set(false);
           this.confirmationOpen.set(false);
           this.pendingConfirmation.set(null);
@@ -869,14 +869,8 @@ export class PaymentsPageComponent {
     return fallbackMessage;
   }
 
-  private showPaymentSuccessToast(response: PaymentResponse): void {
-    void response;
-    toast.success('Event has been created');
-  }
-
-  private showTransferSuccessToast(response: TransferResponse): void {
-    void response;
-    toast.success('Event has been created');
+  private showSuccessToast(): void {
+    toast.success('Payment completed successfully');
   }
 
   private static differentAccountsValidator(control: AbstractControl): ValidationErrors | null {

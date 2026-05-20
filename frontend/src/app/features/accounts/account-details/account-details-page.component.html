@@ -147,10 +147,11 @@
           } @else {
             <div class="overflow-hidden rounded-lg border border-border/70">
               <div
-                class="hidden grid-cols-[0.9fr_1.2fr_1.2fr_0.7fr_0.8fr] gap-4 bg-background/85 px-4 py-3 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground md:grid"
+                class="hidden grid-cols-[0.9fr_1.1fr_1.1fr_1.2fr_0.8fr_0.9fr] gap-4 bg-background/85 px-4 py-3 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground md:grid"
               >
                 <p>Booking</p>
                 <p>Sender</p>
+                <p>Description</p>
                 <p>Receiver</p>
                 <p class="text-right">Movement</p>
                 <p class="text-right">Balance</p>
@@ -158,7 +159,7 @@
               @for (transaction of statementTransactions(); track trackByTransactionId($index, transaction)) {
                 <article class="border-t border-border/60 bg-background/70 first:border-t-0">
                   <div
-                    class="hidden grid-cols-[0.9fr_1.2fr_1.2fr_0.7fr_0.8fr] gap-4 px-4 py-3 md:grid"
+                    class="hidden grid-cols-[0.9fr_1.1fr_1.1fr_1.2fr_0.8fr_0.9fr] gap-4 px-4 py-3 md:grid"
                   >
                     <div class="min-w-0">
                       <p class="text-xs font-medium text-foreground">
@@ -170,37 +171,36 @@
                     </div>
                     <div class="min-w-0">
                       <p class="truncate text-xs font-medium text-foreground">
-                        {{ senderLabel(detailsData, transaction) }}
+                        {{ senderDescription(detailsData, transaction) }}
                       </p>
                       <p class="mt-1 truncate text-[0.68rem] leading-4 text-muted-foreground">
-                        {{ transaction.counterpartyAccount ?? 'Internal transfer' }}
+                        {{ senderNumber(detailsData, transaction) }}
                       </p>
                     </div>
-                    <div class="min-w-0">
-                      <p class="truncate text-xs font-medium text-foreground">
-                        {{ receiverLabel(detailsData, transaction) }}
-                      </p>
-                      <p class="mt-1 text-[0.68rem] leading-4 text-muted-foreground">
+                    <div class="min-w-0 self-center">
+                      <p class="text-xs font-medium text-foreground text-pretty">
                         {{ transaction.description }}
                       </p>
                     </div>
-                    <div class="text-right">
-                      <p
-                        class="text-sm font-semibold [font-variant-numeric:tabular-nums]"
-                        [class]="movementTone(transaction)"
-                      >
-                        {{ movementSign(transaction) }}{{ formatMoney(transaction.amount) }}
+                    <div class="min-w-0 self-center">
+                      <p class="truncate text-xs font-medium text-foreground">
+                        {{ receiverDescription(detailsData, transaction) }}
                       </p>
-                      <p class="mt-1 text-[0.68rem] text-muted-foreground">
-                        {{ transaction.currency }}
+                      <p class="mt-1 truncate text-[0.68rem] leading-4 text-muted-foreground">
+                        {{ receiverNumber(detailsData, transaction) }}
                       </p>
                     </div>
-                    <div class="text-right">
-                      <p class="text-sm font-semibold text-foreground [font-variant-numeric:tabular-nums]">
-                        {{ formatMoney(transaction.balanceAfter) }}
+                    <div class="self-center text-right">
+                      <p
+                        class="whitespace-nowrap text-sm font-semibold [font-variant-numeric:tabular-nums]"
+                        [class]="movementTone(transaction)"
+                      >
+                        {{ movementSign(transaction) }}{{ formatMoney(transaction.amount, transaction.currency) }}
                       </p>
-                      <p class="mt-1 text-[0.68rem] text-muted-foreground">
-                        {{ transaction.currency }}
+                    </div>
+                    <div class="self-center text-right">
+                      <p class="whitespace-nowrap text-sm font-semibold text-foreground [font-variant-numeric:tabular-nums]">
+                        {{ formatMoney(transaction.balanceAfter, transaction.currency) }}
                       </p>
                     </div>
                   </div>
@@ -221,11 +221,17 @@
                     </p>
                     <p class="text-xs text-foreground">
                       <span class="text-muted-foreground">Sender:</span>
-                      {{ senderLabel(detailsData, transaction) }}
+                      {{ senderDescription(detailsData, transaction) }}
+                    </p>
+                    <p class="text-[0.68rem] leading-4 text-muted-foreground">
+                      {{ senderNumber(detailsData, transaction) }}
                     </p>
                     <p class="text-xs text-foreground">
                       <span class="text-muted-foreground">Receiver:</span>
-                      {{ receiverLabel(detailsData, transaction) }}
+                      {{ receiverDescription(detailsData, transaction) }}
+                    </p>
+                    <p class="text-[0.68rem] leading-4 text-muted-foreground">
+                      {{ receiverNumber(detailsData, transaction) }}
                     </p>
                     <p class="text-xs text-foreground">
                       <span class="text-muted-foreground">Balance:</span>
