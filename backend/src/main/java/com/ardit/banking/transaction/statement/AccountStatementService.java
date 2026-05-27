@@ -23,7 +23,7 @@ import com.ardit.banking.transaction.repository.TransactionRepository;
 @Service
 public class AccountStatementService {
 
-    public static final int DEFAULT_BOOKED_TRANSACTION_PAGE_SIZE = 10;
+    public static final int DEFAULT_BOOKED_TRANSACTION_PAGE_SIZE = 5;
 
     private final OwnedAccountAccessService ownedAccountAccessService;
     private final TransactionRepository transactionRepository;

@@ -124,7 +124,7 @@ class AccountStatementServiceTests {
 
         when(ownedAccountAccessService.getOwnedAccountById("statement-user", 7L)).thenReturn(account);
         when(transactionRepository.findStatementEntries(eq(7L), eq(fromDate), eq(toDate), any(Pageable.class)))
-            .thenReturn(new PageImpl<>(List.of(latestInRange, oldestInRange), PageRequest.of(0, 10), 2));
+            .thenReturn(new PageImpl<>(List.of(latestInRange, oldestInRange), PageRequest.of(0, 5), 2));
         when(transactionRepository.sumStatementAmountByDirection(7L, fromDate, toDate, TransactionDirection.CREDIT))
             .thenReturn(new BigDecimal("200.00"));
         when(transactionRepository.sumStatementAmountByDirection(7L, fromDate, toDate, TransactionDirection.DEBIT))
@@ -136,15 +136,15 @@ class AccountStatementServiceTests {
             fromDate,
             toDate,
             1,
-            10
+            5
         );
 
         ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
         verify(transactionRepository).findStatementEntries(eq(7L), eq(fromDate), eq(toDate), pageableCaptor.capture());
 
-        assertThat(pageableCaptor.getValue()).isEqualTo(PageRequest.of(0, 10, Sort.by(Sort.Order.desc("bookingTimestamp"), Sort.Order.desc("id"))));
+        assertThat(pageableCaptor.getValue()).isEqualTo(PageRequest.of(0, 5, Sort.by(Sort.Order.desc("bookingTimestamp"), Sort.Order.desc("id"))));
         assertThat(statement.pageNumber()).isEqualTo(1);
-        assertThat(statement.pageSize()).isEqualTo(10);
+        assertThat(statement.pageSize()).isEqualTo(5);
         assertThat(statement.transactionCount()).isEqualTo(2);
         assertThat(statement.totalCredits()).isEqualByComparingTo("200.00");
         assertThat(statement.totalDebits()).isEqualByComparingTo("50.00");

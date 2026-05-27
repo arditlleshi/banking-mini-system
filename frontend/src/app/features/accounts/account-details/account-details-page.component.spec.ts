@@ -113,7 +113,7 @@ function createAccountDetailsResponse(): AccountDetailsResponse {
     },
     transactionCount: 2,
     transactionPage: 1,
-    transactionPageSize: 10,
+    transactionPageSize: 5,
     totalCredits: 200,
     totalDebits: 80,
     netMovement: 120,

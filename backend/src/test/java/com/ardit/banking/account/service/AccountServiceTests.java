@@ -77,10 +77,10 @@ class AccountServiceTests {
         );
 
         when(ownedAccountAccessService.getOwnedAccountByNumber("details-user", "123456STD01")).thenReturn(account);
-        when(accountStatementService.getPagedStatementForUsernameAndAccount("details-user", 7L, null, null, 1, 10))
+        when(accountStatementService.getPagedStatementForUsernameAndAccount("details-user", 7L, null, null, 1, 5))
             .thenReturn(new AccountStatementPage(
                 1,
-                10,
+                5,
                 2,
                 new BigDecimal("200.00"),
                 new BigDecimal("50.00"),
@@ -95,7 +95,7 @@ class AccountServiceTests {
         );
 
         assertThat(response.transactionPage()).isEqualTo(1);
-        assertThat(response.transactionPageSize()).isEqualTo(10);
+        assertThat(response.transactionPageSize()).isEqualTo(5);
         assertThat(response.transactions()).extracting(transaction -> transaction.transactionReference())
             .containsExactly("ref-debit", "ref-credit");
         assertThat(response.transactions().getFirst().counterpartyAccount()).isEqualTo("AL0000000000000000000000");

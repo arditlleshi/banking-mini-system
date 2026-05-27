@@ -85,7 +85,7 @@ export class AccountDetailsPageComponent {
   protected readonly details = signal<AccountDetailsResponse | null>(null);
   protected readonly statementTransactions = signal<AccountHistoryTransactionResponse[]>([]);
   protected readonly transactionPage = signal(1);
-  protected readonly transactionPageSize = signal(10);
+  protected readonly transactionPageSize = signal(5);
   protected readonly statementDialogOpen = signal(false);
   private readonly loadedAccountNumber = signal<string | null>(null);
   protected readonly statementFiltersForm: StatementFiltersForm = this.fb.group({
