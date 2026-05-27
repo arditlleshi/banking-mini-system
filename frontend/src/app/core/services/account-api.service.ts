@@ -62,7 +62,6 @@ export type AccountHistoryTransactionResponse = {
   counterpartyName: string | null;
   counterpartyAccount: string | null;
   bookingTimestamp: string;
-  balanceAfter: number;
 };
 
 export type AccountDetailsResponse = {

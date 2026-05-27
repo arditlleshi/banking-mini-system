@@ -1,30 +1,24 @@
 import { TestBed } from '@angular/core/testing';
-import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
+import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { of } from 'rxjs';
 import { vi } from 'vitest';
 
 import {
   AccountApiService,
   type AccountDetailsResponse,
-  type AccountHistoryTransactionResponse,
-  type AccountTransactionResponse
+  type AccountHistoryTransactionResponse
 } from '../../../core/services/account-api.service';
 import { AccountDetailsPageComponent } from './account-details-page.component';
 
 describe('AccountDetailsPageComponent', () => {
   const getAccountDetails = vi.fn();
-  const getAccountTransactions = vi.fn();
   const downloadAccountStatement = vi.fn();
-  const navigate = vi.fn().mockResolvedValue(true);
 
   beforeEach(async () => {
     getAccountDetails.mockReset();
-    getAccountTransactions.mockReset();
     downloadAccountStatement.mockReset();
-    navigate.mockClear();
 
     getAccountDetails.mockReturnValue(of(createAccountDetailsResponse()));
-    getAccountTransactions.mockReturnValue(of([createTransactionResponse('filtered-ref', 'DEBIT', 80)]));
     downloadAccountStatement.mockReturnValue(of(new Blob(['statement'])));
 
     await TestBed.configureTestingModule({
@@ -34,7 +28,6 @@ describe('AccountDetailsPageComponent', () => {
           provide: AccountApiService,
           useValue: {
             getAccountDetails,
-            getAccountTransactions,
             downloadAccountStatement
           }
         },
@@ -49,40 +42,47 @@ describe('AccountDetailsPageComponent', () => {
               })
             } as ActivatedRoute['snapshot']
           } satisfies Partial<ActivatedRoute>
-        },
-        {
-          provide: Router,
-          useValue: { navigate } satisfies Partial<Router>
         }
       ]
     }).compileComponents();
   });
 
-  it('loads filtered transactions from query parameters on init', async () => {
+  it('loads account details and statement transactions on init', async () => {
     const fixture = TestBed.createComponent(AccountDetailsPageComponent);
     await fixture.whenStable();
 
     expect(getAccountDetails).toHaveBeenCalledWith('AL123456789');
-    expect(getAccountTransactions).toHaveBeenCalledWith(7, {
-      fromDate: '2026-05-01',
-      toDate: '2026-05-31'
-    });
+    const component = fixture.componentInstance as unknown as {
+      details: () => AccountDetailsResponse | null;
+      statementTransactions: () => AccountHistoryTransactionResponse[];
+    };
+
+    expect(component.details()?.account.accountNumber).toBe('AL123456789');
+    expect(component.statementTransactions()).toHaveLength(2);
+    expect(component.statementTransactions()[0].transactionReference).toBe('full-ref-1');
   });
 
-  it('clears the query parameters when the filters are reset', async () => {
+  it('clears the statement filters when they are reset', async () => {
     const fixture = TestBed.createComponent(AccountDetailsPageComponent);
     await fixture.whenStable();
 
-    (fixture.componentInstance as unknown as { resetStatementFilters: () => void }).resetStatementFilters();
+    const component = fixture.componentInstance as unknown as {
+      statementFiltersForm: {
+        setValue: (value: { fromDate: Date | null; toDate: Date | null }) => void;
+        getRawValue: () => { fromDate: Date | null; toDate: Date | null };
+      };
+      resetStatementFilters: () => void;
+    };
 
-    expect(navigate).toHaveBeenCalledWith([], {
-      relativeTo: expect.anything(),
-      queryParams: {
-        fromDate: null,
-        toDate: null
-      },
-      queryParamsHandling: 'merge',
-      replaceUrl: true
+    component.statementFiltersForm.setValue({
+      fromDate: new Date('2026-05-15T00:00:00Z'),
+      toDate: new Date('2026-05-20T00:00:00Z')
+    });
+    component.resetStatementFilters();
+
+    expect(component.statementFiltersForm.getRawValue()).toEqual({
+      fromDate: null,
+      toDate: null
     });
   });
 });
@@ -130,7 +130,6 @@ function createTransactionResponse(
     description: 'Statement test transaction',
     counterpartyName: 'Counterparty',
     counterpartyAccount: 'AL000000000000000000001',
-    bookingTimestamp: '2026-05-10T09:30:00Z',
-    balanceAfter: direction === 'CREDIT' ? 1200 : 1120
+    bookingTimestamp: '2026-05-10T09:30:00Z'
   };
 }

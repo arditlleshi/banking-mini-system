@@ -13,7 +13,6 @@ public record AccountHistoryTransactionResponse(
     String description,
     String counterpartyName,
     String counterpartyAccount,
-    Instant bookingTimestamp,
-    BigDecimal balanceAfter
+    Instant bookingTimestamp
 ) {
 }

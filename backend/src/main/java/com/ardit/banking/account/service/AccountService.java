@@ -141,8 +141,7 @@ public class AccountService {
                 transaction.description(),
                 transaction.counterpartyName(),
                 transaction.counterpartyAccount(),
-                transaction.bookingTimestamp(),
-                transaction.balanceAfter()
+                transaction.bookingTimestamp()
             ))
             .toList();
 
