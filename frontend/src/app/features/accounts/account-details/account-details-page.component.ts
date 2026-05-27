@@ -3,17 +3,33 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { catchError, distinctUntilChanged, EMPTY, finalize, map, startWith, switchMap, tap } from 'rxjs';
+import {
+  catchError,
+  combineLatest,
+  distinctUntilChanged,
+  EMPTY,
+  finalize,
+  map,
+  startWith,
+  switchMap,
+  tap,
+} from 'rxjs';
 
 import {
   AccountApiService,
   type AccountDetailsResponse,
   type AccountHistoryTransactionResponse,
   type AccountStatementFilters,
-  type AccountTransactionResponse
 } from '../../../core/services/account-api.service';
 import { HlmButton } from '../../../shared/ui/spartan/button';
-import { HlmCard, HlmCardContent, HlmCardDescription, HlmCardHeader, HlmCardTitle } from '../../../shared/ui/spartan/card';
+import {
+  HlmCard,
+  HlmCardContent,
+  HlmCardDescription,
+  HlmCardHeader,
+  HlmCardTitle,
+} from '../../../shared/ui/spartan/card';
+import { HlmNumberedPaginationQueryParams } from '../../../shared/ui/spartan/pagination';
 import { AccountStatementDialogComponent } from './account-statement-dialog.component';
 
 type StatementSummary = {
@@ -37,10 +53,11 @@ type StatementFiltersForm = FormGroup<{
     HlmCardDescription,
     HlmCardHeader,
     HlmCardTitle,
-    AccountStatementDialogComponent
+    HlmNumberedPaginationQueryParams,
+    AccountStatementDialogComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './account-details-page.component.html'
+  templateUrl: './account-details-page.component.html',
 })
 export class AccountDetailsPageComponent {
   private static readonly dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
@@ -48,11 +65,11 @@ export class AccountDetailsPageComponent {
     month: 'short',
     year: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   });
   private static readonly numberFormatter = new Intl.NumberFormat(undefined, {
     minimumFractionDigits: 2,
-    maximumFractionDigits: 2
+    maximumFractionDigits: 2,
   });
 
   private readonly fb = new FormBuilder();
@@ -61,27 +78,37 @@ export class AccountDetailsPageComponent {
 
   protected readonly loading = signal(true);
   protected readonly downloadingStatement = signal(false);
+  protected readonly statementLoading = signal(true);
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly statementErrorMessage = signal<string | null>(null);
   protected readonly statementSuccessMessage = signal<string | null>(null);
   protected readonly details = signal<AccountDetailsResponse | null>(null);
   protected readonly statementTransactions = signal<AccountHistoryTransactionResponse[]>([]);
+  protected readonly transactionPage = signal(1);
+  protected readonly transactionPageSize = signal(10);
   protected readonly statementDialogOpen = signal(false);
+  private readonly loadedAccountNumber = signal<string | null>(null);
   protected readonly statementFiltersForm: StatementFiltersForm = this.fb.group({
     fromDate: this.fb.control<Date | null>(null),
-    toDate: this.fb.control<Date | null>(null)
+    toDate: this.fb.control<Date | null>(null),
   });
 
   private readonly fromDateValue = toSignal(
-    this.statementFiltersForm.controls.fromDate.valueChanges.pipe(startWith(this.statementFiltersForm.controls.fromDate.value)),
-    { initialValue: this.statementFiltersForm.controls.fromDate.value }
+    this.statementFiltersForm.controls.fromDate.valueChanges.pipe(
+      startWith(this.statementFiltersForm.controls.fromDate.value),
+    ),
+    { initialValue: this.statementFiltersForm.controls.fromDate.value },
   );
   private readonly toDateValue = toSignal(
-    this.statementFiltersForm.controls.toDate.valueChanges.pipe(startWith(this.statementFiltersForm.controls.toDate.value)),
-    { initialValue: this.statementFiltersForm.controls.toDate.value }
+    this.statementFiltersForm.controls.toDate.valueChanges.pipe(
+      startWith(this.statementFiltersForm.controls.toDate.value),
+    ),
+    { initialValue: this.statementFiltersForm.controls.toDate.value },
   );
 
-  protected readonly hasDateFilters = computed(() => Boolean(this.fromDateValue() || this.toDateValue()));
+  protected readonly hasDateFilters = computed(() =>
+    Boolean(this.fromDateValue() || this.toDateValue()),
+  );
   protected readonly statementRangeError = computed(() => {
     const fromDate = this.fromDateValue();
     const toDate = this.toDateValue();
@@ -93,45 +120,82 @@ export class AccountDetailsPageComponent {
     return null;
   });
   protected readonly statementSummary = computed<StatementSummary>(() => {
-    const transactions = this.statementTransactions();
-    const totalCredits = transactions
-      .filter((transaction) => transaction.direction === 'CREDIT')
-      .reduce((sum, transaction) => sum + transaction.amount, 0);
-    const totalDebits = transactions
-      .filter((transaction) => transaction.direction === 'DEBIT')
-      .reduce((sum, transaction) => sum + transaction.amount, 0);
+    const details = this.details();
+    if (!details) {
+      return {
+        transactionCount: 0,
+        totalCredits: 0,
+        totalDebits: 0,
+        netMovement: 0,
+      };
+    }
 
     return {
-      transactionCount: transactions.length,
-      totalCredits,
-      totalDebits,
-      netMovement: totalCredits - totalDebits
+      transactionCount: details.transactionCount,
+      totalCredits: details.totalCredits,
+      totalDebits: details.totalDebits,
+      netMovement: details.netMovement,
     };
   });
 
   constructor() {
-    this.route.paramMap
+    combineLatest([this.route.paramMap, this.route.queryParamMap])
       .pipe(
-        map((params) => params.get('accountNumber') ?? ''),
-        distinctUntilChanged(),
-        tap(() => this.prepareForAccountLoad()),
-        switchMap((accountNumber) =>
-          this.accountApi.getAccountDetails(accountNumber).pipe(
-            catchError((error: HttpErrorResponse) => {
-              this.handleAccountLoadError(error);
-              return EMPTY;
-            })
-          )
+        map(([params, queryParams]) => ({
+          accountNumber: params.get('accountNumber') ?? '',
+          page: this.parsePageNumber(queryParams.get('page')),
+        })),
+        distinctUntilChanged(
+          (previous, current) =>
+            previous.accountNumber === current.accountNumber && previous.page === current.page,
         ),
-        takeUntilDestroyed()
+        tap(({ accountNumber, page }) => {
+          this.transactionPage.set(page);
+
+          const isSameAccount = this.loadedAccountNumber() === accountNumber;
+          this.statementErrorMessage.set(null);
+          this.statementSuccessMessage.set(null);
+
+          if (isSameAccount) {
+            this.statementLoading.set(true);
+            return;
+          }
+
+          this.loading.set(true);
+          this.statementLoading.set(true);
+          this.errorMessage.set(null);
+          this.details.set(null);
+          this.statementTransactions.set([]);
+          this.statementFiltersForm.reset({
+            fromDate: this.parseStatementDate(this.route.snapshot.queryParamMap.get('fromDate')),
+            toDate: this.parseStatementDate(this.route.snapshot.queryParamMap.get('toDate')),
+          });
+        }),
+        switchMap(({ accountNumber, page }) => {
+          const isSameAccount = this.loadedAccountNumber() === accountNumber;
+
+          return this.accountApi.getAccountDetails(accountNumber, page).pipe(
+            map((details) => ({ details, isSameAccount })),
+            catchError((error: HttpErrorResponse) => {
+              this.handleAccountLoadError(error, isSameAccount);
+              return EMPTY;
+            }),
+          );
+        }),
+        takeUntilDestroyed(),
       )
       .subscribe({
-        next: (details) => {
+        next: ({ details }) => {
           this.details.set(details);
           this.statementTransactions.set(details.transactions);
+          this.transactionPage.set(details.transactionPage);
+          this.transactionPageSize.set(details.transactionPageSize);
+          this.loadedAccountNumber.set(details.account.accountNumber);
           this.loading.set(false);
+          this.statementLoading.set(false);
           this.errorMessage.set(null);
-        }
+          this.statementErrorMessage.set(null);
+        },
       });
   }
 
@@ -172,12 +236,15 @@ export class AccountDetailsPageComponent {
       .pipe(finalize(() => this.downloadingStatement.set(false)))
       .subscribe({
         next: (statementFile) => {
-          this.saveStatementFile(statementFile, this.buildStatementFileName(details.account.accountNumber, filters));
+          this.saveStatementFile(
+            statementFile,
+            this.buildStatementFileName(details.account.accountNumber, filters),
+          );
           this.statementSuccessMessage.set('Statement download started.');
         },
         error: (error: HttpErrorResponse) => {
           this.statementErrorMessage.set(this.resolveStatementErrorMessage(error));
-        }
+        },
       });
   }
 
@@ -189,7 +256,10 @@ export class AccountDetailsPageComponent {
     this.statementDialogOpen.set(open);
   }
 
-  protected trackByTransactionId(_: number, transaction: AccountHistoryTransactionResponse): number {
+  protected trackByTransactionId(
+    _: number,
+    transaction: AccountHistoryTransactionResponse,
+  ): number {
     return transaction.id;
   }
 
@@ -203,28 +273,40 @@ export class AccountDetailsPageComponent {
       : '[color:var(--status-outflow-foreground)]';
   }
 
-  protected senderDescription(details: AccountDetailsResponse, transaction: AccountHistoryTransactionResponse): string {
+  protected senderDescription(
+    details: AccountDetailsResponse,
+    transaction: AccountHistoryTransactionResponse,
+  ): string {
     if (transaction.direction === 'CREDIT') {
       return transaction.counterpartyName ?? transaction.counterpartyAccount ?? 'External sender';
     }
     return details.account.name;
   }
 
-  protected senderNumber(details: AccountDetailsResponse, transaction: AccountHistoryTransactionResponse): string {
+  protected senderNumber(
+    details: AccountDetailsResponse,
+    transaction: AccountHistoryTransactionResponse,
+  ): string {
     if (transaction.direction === 'CREDIT') {
       return transaction.counterpartyAccount ?? 'Account unavailable';
     }
     return details.account.accountNumber;
   }
 
-  protected receiverDescription(details: AccountDetailsResponse, transaction: AccountHistoryTransactionResponse): string {
+  protected receiverDescription(
+    details: AccountDetailsResponse,
+    transaction: AccountHistoryTransactionResponse,
+  ): string {
     if (transaction.direction === 'DEBIT') {
       return transaction.counterpartyName ?? transaction.counterpartyAccount ?? 'External receiver';
     }
     return details.account.name;
   }
 
-  protected receiverNumber(details: AccountDetailsResponse, transaction: AccountHistoryTransactionResponse): string {
+  protected receiverNumber(
+    details: AccountDetailsResponse,
+    transaction: AccountHistoryTransactionResponse,
+  ): string {
     if (transaction.direction === 'DEBIT') {
       return transaction.counterpartyAccount ?? 'Account unavailable';
     }
@@ -251,27 +333,34 @@ export class AccountDetailsPageComponent {
     return reference.slice(0, 8);
   }
 
-  private prepareForAccountLoad(): void {
-    this.loading.set(true);
-    this.errorMessage.set(null);
-    this.statementErrorMessage.set(null);
-    this.statementSuccessMessage.set(null);
-    this.details.set(null);
-    this.statementTransactions.set([]);
-    this.statementFiltersForm.reset({
-      fromDate: this.parseStatementDate(this.route.snapshot.queryParamMap.get('fromDate')),
-      toDate: this.parseStatementDate(this.route.snapshot.queryParamMap.get('toDate'))
-    });
-  }
+  private handleAccountLoadError(error: HttpErrorResponse, statementLoad: boolean): void {
+    if (statementLoad) {
+      this.statementLoading.set(false);
+    } else {
+      this.loading.set(false);
+      this.statementLoading.set(false);
+    }
 
-  private handleAccountLoadError(error: HttpErrorResponse): void {
-    this.loading.set(false);
     if (error.status === 0) {
+      if (statementLoad) {
+        this.statementErrorMessage.set('Backend is not reachable. Start backend and retry.');
+        return;
+      }
       this.errorMessage.set('Backend is not reachable. Start backend and refresh the page.');
       return;
     }
     if (error.status === 404) {
+      if (statementLoad) {
+        this.statementErrorMessage.set(
+          'Booked transactions could not be loaded for the selected page.',
+        );
+        return;
+      }
       this.errorMessage.set('Account was not found or is not accessible for this user.');
+      return;
+    }
+    if (statementLoad) {
+      this.statementErrorMessage.set('Booked transactions could not be loaded at the moment.');
       return;
     }
     this.errorMessage.set('Account details could not be loaded at the moment.');
@@ -281,7 +370,7 @@ export class AccountDetailsPageComponent {
     const rawValue = this.statementFiltersForm.getRawValue();
     return {
       fromDate: this.formatStatementDate(rawValue.fromDate),
-      toDate: this.formatStatementDate(rawValue.toDate)
+      toDate: this.formatStatementDate(rawValue.toDate),
     };
   }
 
@@ -316,8 +405,21 @@ export class AccountDetailsPageComponent {
     }
 
     const parsed = new Date(year, month - 1, day);
-    if (parsed.getFullYear() !== year || parsed.getMonth() !== month - 1 || parsed.getDate() !== day) {
+    if (
+      parsed.getFullYear() !== year ||
+      parsed.getMonth() !== month - 1 ||
+      parsed.getDate() !== day
+    ) {
       return null;
+    }
+
+    return parsed;
+  }
+
+  private parsePageNumber(value: string | null): number {
+    const parsed = Number.parseInt(value ?? '', 10);
+    if (!Number.isInteger(parsed) || parsed < 1) {
+      return 1;
     }
 
     return parsed;

@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,10 +58,16 @@ class TransactionRepositoryTests {
         entityManager.flush();
         entityManager.clear();
 
-        List<TransactionEntity> transactions = transactionRepository.findStatementEntries(account.getId(), null, null);
+        Page<TransactionEntity> transactions = transactionRepository.findStatementEntries(
+            account.getId(),
+            null,
+            null,
+            PageRequest.of(0, 2)
+        );
 
-        assertThat(transactions).extracting(TransactionEntity::getId)
-            .containsExactly(sameTimestampButLaterId.getId(), newer.getId(), older.getId());
+        assertThat(transactions.getTotalElements()).isEqualTo(3);
+        assertThat(transactions.getContent()).extracting(TransactionEntity::getId)
+            .containsExactly(sameTimestampButLaterId.getId(), newer.getId());
     }
 
     private UserEntity persistUser(String username) {

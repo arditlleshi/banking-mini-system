@@ -9,6 +9,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,8 @@ import com.ardit.banking.transaction.repository.TransactionRepository;
 
 @Service
 public class AccountStatementService {
+
+    public static final int DEFAULT_BOOKED_TRANSACTION_PAGE_SIZE = 10;
 
     private final OwnedAccountAccessService ownedAccountAccessService;
     private final TransactionRepository transactionRepository;
@@ -51,6 +55,20 @@ public class AccountStatementService {
         StatementDateRange dateRange = StatementDateRange.of(fromDate, toDate);
         AccountEntity account = ownedAccountAccessService.getOwnedAccountByNumber(username, accountNumber);
         return buildStatement(account, username, dateRange);
+    }
+
+    @Transactional(readOnly = true)
+    public AccountStatementPage getPagedStatementForUsernameAndAccount(
+        String username,
+        Long accountId,
+        LocalDate fromDate,
+        LocalDate toDate,
+        int pageNumber,
+        int pageSize
+    ) {
+        StatementDateRange dateRange = StatementDateRange.of(fromDate, toDate);
+        AccountEntity account = ownedAccountAccessService.getOwnedAccountById(username, accountId);
+        return buildPagedStatement(account, dateRange, pageNumber, pageSize);
     }
 
     private AccountStatement buildStatement(AccountEntity account, String username, StatementDateRange dateRange) {
@@ -85,6 +103,74 @@ public class AccountStatementService {
             dateRange.toDate(),
             Instant.now(),
             transactions.size(),
+            totalCredits,
+            totalDebits,
+            normalizeMoney(totalCredits.subtract(totalDebits)),
+            transactions
+        );
+    }
+
+    private AccountStatementPage buildPagedStatement(
+        AccountEntity account,
+        StatementDateRange dateRange,
+        int pageNumber,
+        int pageSize
+    ) {
+        int normalizedPageNumber = Math.max(pageNumber, 1);
+        int normalizedPageSize = Math.max(pageSize, 1);
+        var pageable = PageRequest.of(
+            normalizedPageNumber - 1,
+            normalizedPageSize,
+            Sort.by(Sort.Order.desc("bookingTimestamp"), Sort.Order.desc("id"))
+        );
+
+        var statementPage = transactionRepository.findStatementEntries(
+            account.getId(),
+            dateRange.fromDate(),
+            dateRange.toDate(),
+            pageable
+        );
+
+        if (statementPage.getTotalPages() > 0 && normalizedPageNumber > statementPage.getTotalPages()) {
+            pageable = PageRequest.of(
+                statementPage.getTotalPages() - 1,
+                normalizedPageSize,
+                Sort.by(Sort.Order.desc("bookingTimestamp"), Sort.Order.desc("id"))
+            );
+            statementPage = transactionRepository.findStatementEntries(
+                account.getId(),
+                dateRange.fromDate(),
+                dateRange.toDate(),
+                pageable
+            );
+            normalizedPageNumber = statementPage.getTotalPages();
+        }
+
+        List<AccountStatementTransaction> transactions = statementPage.stream()
+            .map(AccountStatementService::toStatementTransaction)
+            .toList();
+
+        BigDecimal totalCredits = normalizeMoney(
+            transactionRepository.sumStatementAmountByDirection(
+                account.getId(),
+                dateRange.fromDate(),
+                dateRange.toDate(),
+                TransactionDirection.CREDIT
+            )
+        );
+        BigDecimal totalDebits = normalizeMoney(
+            transactionRepository.sumStatementAmountByDirection(
+                account.getId(),
+                dateRange.fromDate(),
+                dateRange.toDate(),
+                TransactionDirection.DEBIT
+            )
+        );
+
+        return new AccountStatementPage(
+            normalizedPageNumber,
+            normalizedPageSize,
+            Math.toIntExact(statementPage.getTotalElements()),
             totalCredits,
             totalDebits,
             normalizeMoney(totalCredits.subtract(totalDebits)),

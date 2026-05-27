@@ -35,6 +35,13 @@ describe('AccountDetailsPageComponent', () => {
           provide: ActivatedRoute,
           useValue: {
             paramMap: of(convertToParamMap({ accountNumber: 'AL123456789' })),
+            queryParamMap: of(
+              convertToParamMap({
+                page: '1',
+                fromDate: '2026-05-01',
+                toDate: '2026-05-31'
+              })
+            ),
             snapshot: {
               queryParamMap: convertToParamMap({
                 fromDate: '2026-05-01',
@@ -51,7 +58,7 @@ describe('AccountDetailsPageComponent', () => {
     const fixture = TestBed.createComponent(AccountDetailsPageComponent);
     await fixture.whenStable();
 
-    expect(getAccountDetails).toHaveBeenCalledWith('AL123456789');
+    expect(getAccountDetails).toHaveBeenCalledWith('AL123456789', 1);
     const component = fixture.componentInstance as unknown as {
       details: () => AccountDetailsResponse | null;
       statementTransactions: () => AccountHistoryTransactionResponse[];
@@ -105,6 +112,8 @@ function createAccountDetailsResponse(): AccountDetailsResponse {
       closedAt: null
     },
     transactionCount: 2,
+    transactionPage: 1,
+    transactionPageSize: 10,
     totalCredits: 200,
     totalDebits: 80,
     netMovement: 120,

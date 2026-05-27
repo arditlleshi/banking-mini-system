@@ -27,7 +27,7 @@ import com.ardit.banking.account.dto.UpdateAccountRequest;
 import com.ardit.banking.account.repository.AccountRepository;
 import com.ardit.banking.security.user.domain.UserEntity;
 import com.ardit.banking.security.user.repository.UserRepository;
-import com.ardit.banking.transaction.statement.AccountStatement;
+import com.ardit.banking.transaction.statement.AccountStatementPage;
 import com.ardit.banking.transaction.statement.AccountStatementService;
 import com.ardit.banking.transaction.service.TransactionService;
 
@@ -35,6 +35,7 @@ import com.ardit.banking.transaction.service.TransactionService;
 public class AccountService {
 
     private static final BigDecimal ZERO_MONEY = new BigDecimal("0.00");
+    private static final int BOOKED_TRANSACTION_PAGE_SIZE = AccountStatementService.DEFAULT_BOOKED_TRANSACTION_PAGE_SIZE;
 
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
@@ -122,15 +123,17 @@ public class AccountService {
     }
 
     @Transactional(readOnly = true)
-    public AccountDetailsResponse getAccountDetailsByNumberForUsername(String username, String accountNumber) {
+    public AccountDetailsResponse getAccountDetailsByNumberForUsername(String username, String accountNumber, int page) {
         AccountEntity account = ownedAccountAccessService.getOwnedAccountByNumber(username, accountNumber);
-        AccountStatement statement = accountStatementService.getStatementForAccount(
-            account,
+        AccountStatementPage statementPage = accountStatementService.getPagedStatementForUsernameAndAccount(
             username,
+            account.getId(),
             null,
-            null
+            null,
+            page,
+            BOOKED_TRANSACTION_PAGE_SIZE
         );
-        List<AccountHistoryTransactionResponse> transactionResponses = statement.transactions().reversed().stream()
+        List<AccountHistoryTransactionResponse> transactionResponses = statementPage.transactions().stream()
             .map(transaction -> new AccountHistoryTransactionResponse(
                 transaction.id(),
                 transaction.transactionReference(),
@@ -147,10 +150,12 @@ public class AccountService {
 
         return new AccountDetailsResponse(
             toResponse(account),
-            statement.transactionCount(),
-            statement.totalCredits(),
-            statement.totalDebits(),
-            statement.netMovement(),
+            statementPage.transactionCount(),
+            statementPage.pageNumber(),
+            statementPage.pageSize(),
+            statementPage.totalCredits(),
+            statementPage.totalDebits(),
+            statementPage.netMovement(),
             transactionResponses
         );
     }

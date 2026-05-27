@@ -6,6 +6,8 @@ import java.util.List;
 public record AccountDetailsResponse(
     AccountResponse account,
     int transactionCount,
+    int transactionPage,
+    int transactionPageSize,
     BigDecimal totalCredits,
     BigDecimal totalDebits,
     BigDecimal netMovement,

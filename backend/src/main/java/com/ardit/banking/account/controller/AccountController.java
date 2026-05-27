@@ -3,6 +3,7 @@ package com.ardit.banking.account.controller;
 import java.util.List;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -11,11 +12,13 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
 
 import com.ardit.banking.account.dto.AccountResponse;
 import com.ardit.banking.account.dto.AccountCurrencyDistributionResponse;
@@ -26,6 +29,7 @@ import com.ardit.banking.account.service.AccountService;
 
 @RestController
 @RequestMapping("/api/accounts")
+@Validated
 public class AccountController {
 
     private final AccountService accountService;
@@ -59,8 +63,12 @@ public class AccountController {
     }
 
     @GetMapping("/{accountNumber}/details")
-    public AccountDetailsResponse getMyAccountByNumber(@AuthenticationPrincipal UserDetails user, @PathVariable String accountNumber) {
-        return accountService.getAccountDetailsByNumberForUsername(user.getUsername(), accountNumber);
+    public AccountDetailsResponse getMyAccountByNumber(
+        @AuthenticationPrincipal UserDetails user,
+        @PathVariable String accountNumber,
+        @RequestParam(defaultValue = "1") @Min(1) int page
+    ) {
+        return accountService.getAccountDetailsByNumberForUsername(user.getUsername(), accountNumber, page);
     }
 
     @PutMapping("/{accountId}")

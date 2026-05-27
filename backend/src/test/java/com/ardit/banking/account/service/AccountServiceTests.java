@@ -20,7 +20,7 @@ import com.ardit.banking.account.dto.AccountDetailsResponse;
 import com.ardit.banking.security.user.domain.UserEntity;
 import com.ardit.banking.security.user.domain.UserRole;
 import com.ardit.banking.security.user.repository.UserRepository;
-import com.ardit.banking.transaction.statement.AccountStatement;
+import com.ardit.banking.transaction.statement.AccountStatementPage;
 import com.ardit.banking.transaction.statement.AccountStatementService;
 import com.ardit.banking.transaction.statement.AccountStatementTransaction;
 import com.ardit.banking.transaction.service.TransactionService;
@@ -77,35 +77,25 @@ class AccountServiceTests {
         );
 
         when(ownedAccountAccessService.getOwnedAccountByNumber("details-user", "123456STD01")).thenReturn(account);
-        when(accountStatementService.getStatementForAccount(account, "details-user", null, null))
-            .thenReturn(new AccountStatement(
-                account.getId(),
-                account.getAccountNumber(),
-                account.getIban(),
-                account.getName(),
-                account.getType().name(),
-                account.getCurrency().name(),
-                account.getStatus().name(),
-                account.getCurrentBalance(),
-                account.getAvailableBalance(),
-                user.getFullName(),
-                user.getUsername(),
-                account.getOpenedAt(),
-                null,
-                null,
-                Instant.parse("2026-05-20T10:00:00Z"),
+        when(accountStatementService.getPagedStatementForUsernameAndAccount("details-user", 7L, null, null, 1, 10))
+            .thenReturn(new AccountStatementPage(
+                1,
+                10,
                 2,
                 new BigDecimal("200.00"),
                 new BigDecimal("50.00"),
                 new BigDecimal("150.00"),
-                List.of(oldest, newest)
+                List.of(newest, oldest)
             ));
 
         AccountDetailsResponse response = accountService.getAccountDetailsByNumberForUsername(
             "details-user",
-            "123456STD01"
+            "123456STD01",
+            1
         );
 
+        assertThat(response.transactionPage()).isEqualTo(1);
+        assertThat(response.transactionPageSize()).isEqualTo(10);
         assertThat(response.transactions()).extracting(transaction -> transaction.transactionReference())
             .containsExactly("ref-debit", "ref-credit");
         assertThat(response.transactions().getFirst().counterpartyAccount()).isEqualTo("AL0000000000000000000000");

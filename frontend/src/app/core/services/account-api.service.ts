@@ -67,6 +67,8 @@ export type AccountHistoryTransactionResponse = {
 export type AccountDetailsResponse = {
   account: AccountResponse;
   transactionCount: number;
+  transactionPage: number;
+  transactionPageSize: number;
   totalCredits: number;
   totalDebits: number;
   netMovement: number;
@@ -100,8 +102,10 @@ export class AccountApiService {
     return this.http.post<AccountResponse>(`${this.baseUrl}/accounts`, payload);
   }
 
-  getAccountDetails(accountNumber: string): Observable<AccountDetailsResponse> {
-    return this.http.get<AccountDetailsResponse>(`${this.baseUrl}/accounts/${accountNumber}/details`);
+  getAccountDetails(accountNumber: string, page = 1): Observable<AccountDetailsResponse> {
+    return this.http.get<AccountDetailsResponse>(`${this.baseUrl}/accounts/${accountNumber}/details`, {
+      params: new HttpParams().set('page', page.toString())
+    });
   }
 
   getAccountTransactions(accountId: number, filters: AccountStatementFilters = {}): Observable<AccountTransactionResponse[]> {

@@ -15,3 +15,4 @@ export * from './skeleton/src';
 export * from './sonner';
 export * from './switch';
 export * from './tooltip/src';
+export * from './pagination';

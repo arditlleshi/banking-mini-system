@@ -140,6 +140,12 @@
           </button>
         </div>
         <div hlmCardContent>
+          @if (statementLoading()) {
+            <p class="text-xs font-medium text-muted-foreground">
+              Loading booked transactions for page {{ transactionPage() }}...
+            </p>
+          }
+
           @if (!statementTransactions().length) {
             <p class="text-sm text-muted-foreground">
               No transactions were found for the selected statement range.
@@ -230,6 +236,17 @@
                   </div>
                 </article>
               }
+            </div>
+          }
+
+          @if (detailsData.transactionCount > detailsData.transactionPageSize) {
+            <div class="mt-5 flex justify-center">
+              <hlm-numbered-pagination-query-params
+                [(currentPage)]="transactionPage"
+                [(itemsPerPage)]="transactionPageSize"
+                [totalItems]="detailsData.transactionCount"
+                [link]="'.'"
+              />
             </div>
           }
         </div>

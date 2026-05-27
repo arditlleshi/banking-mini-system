@@ -6,6 +6,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -26,10 +28,40 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
           and transaction.valueDate <= coalesce(:toDate, transaction.valueDate)
         order by transaction.bookingTimestamp desc, transaction.id desc
         """)
+    Page<TransactionEntity> findStatementEntries(
+        @Param("accountId") Long accountId,
+        @Param("fromDate") LocalDate fromDate,
+        @Param("toDate") LocalDate toDate,
+        Pageable pageable
+    );
+
+    @Query("""
+        select transaction
+        from TransactionEntity transaction
+        where transaction.account.id = :accountId
+          and transaction.valueDate >= coalesce(:fromDate, transaction.valueDate)
+          and transaction.valueDate <= coalesce(:toDate, transaction.valueDate)
+        order by transaction.bookingTimestamp desc, transaction.id desc
+        """)
     List<TransactionEntity> findStatementEntries(
         @Param("accountId") Long accountId,
         @Param("fromDate") LocalDate fromDate,
         @Param("toDate") LocalDate toDate
+    );
+
+    @Query("""
+        select coalesce(sum(transaction.amount), 0)
+        from TransactionEntity transaction
+        where transaction.account.id = :accountId
+          and transaction.valueDate >= coalesce(:fromDate, transaction.valueDate)
+          and transaction.valueDate <= coalesce(:toDate, transaction.valueDate)
+          and transaction.direction = :direction
+        """)
+    BigDecimal sumStatementAmountByDirection(
+        @Param("accountId") Long accountId,
+        @Param("fromDate") LocalDate fromDate,
+        @Param("toDate") LocalDate toDate,
+        @Param("direction") TransactionDirection direction
     );
 
     Optional<TransactionEntity> findTopByAccountIdOrderByValueDateAscBookingTimestampAscIdAsc(Long accountId);

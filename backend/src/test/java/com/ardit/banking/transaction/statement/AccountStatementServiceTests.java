@@ -7,9 +7,14 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import com.ardit.banking.account.domain.AccountCurrency;
@@ -25,6 +30,9 @@ import com.ardit.banking.transaction.domain.TransactionType;
 import com.ardit.banking.transaction.repository.TransactionRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -84,6 +92,65 @@ class AccountStatementServiceTests {
         assertThat(statement.netMovement()).isEqualByComparingTo("150.00");
         assertThat(statement.transactions()).extracting(AccountStatementTransaction::transactionReference)
             .containsExactly("ref-credit", "ref-debit");
+    }
+
+    @Test
+    void buildsPagedStatementWithTransactionsAndTotalsForRequestedPeriod() {
+        UserEntity user = createUser(11L, "statement-user", "Statement User");
+        AccountEntity account = createAccount(7L, user, "123456STD01", new BigDecimal("1150.00"));
+        LocalDate fromDate = LocalDate.of(2026, 5, 3);
+        LocalDate toDate = LocalDate.of(2026, 5, 4);
+
+        TransactionEntity latestInRange = createTransaction(
+            3L,
+            account,
+            "ref-debit",
+            TransactionDirection.DEBIT,
+            new BigDecimal("50.00"),
+            new BigDecimal("1150.00"),
+            LocalDate.of(2026, 5, 4),
+            Instant.parse("2026-05-04T09:00:00Z")
+        );
+        TransactionEntity oldestInRange = createTransaction(
+            2L,
+            account,
+            "ref-credit",
+            TransactionDirection.CREDIT,
+            new BigDecimal("200.00"),
+            new BigDecimal("1200.00"),
+            LocalDate.of(2026, 5, 3),
+            Instant.parse("2026-05-03T09:00:00Z")
+        );
+
+        when(ownedAccountAccessService.getOwnedAccountById("statement-user", 7L)).thenReturn(account);
+        when(transactionRepository.findStatementEntries(eq(7L), eq(fromDate), eq(toDate), any(Pageable.class)))
+            .thenReturn(new PageImpl<>(List.of(latestInRange, oldestInRange), PageRequest.of(0, 10), 2));
+        when(transactionRepository.sumStatementAmountByDirection(7L, fromDate, toDate, TransactionDirection.CREDIT))
+            .thenReturn(new BigDecimal("200.00"));
+        when(transactionRepository.sumStatementAmountByDirection(7L, fromDate, toDate, TransactionDirection.DEBIT))
+            .thenReturn(new BigDecimal("50.00"));
+
+        AccountStatementPage statement = accountStatementService.getPagedStatementForUsernameAndAccount(
+            "statement-user",
+            7L,
+            fromDate,
+            toDate,
+            1,
+            10
+        );
+
+        ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
+        verify(transactionRepository).findStatementEntries(eq(7L), eq(fromDate), eq(toDate), pageableCaptor.capture());
+
+        assertThat(pageableCaptor.getValue()).isEqualTo(PageRequest.of(0, 10, Sort.by(Sort.Order.desc("bookingTimestamp"), Sort.Order.desc("id"))));
+        assertThat(statement.pageNumber()).isEqualTo(1);
+        assertThat(statement.pageSize()).isEqualTo(10);
+        assertThat(statement.transactionCount()).isEqualTo(2);
+        assertThat(statement.totalCredits()).isEqualByComparingTo("200.00");
+        assertThat(statement.totalDebits()).isEqualByComparingTo("50.00");
+        assertThat(statement.netMovement()).isEqualByComparingTo("150.00");
+        assertThat(statement.transactions()).extracting(AccountStatementTransaction::transactionReference)
+            .containsExactly("ref-debit", "ref-credit");
     }
 
     private static UserEntity createUser(Long id, String username, String fullName) {
