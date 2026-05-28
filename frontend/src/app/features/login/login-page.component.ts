@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
   AbstractControl,
@@ -22,7 +22,6 @@ import {
 } from '../../shared/ui/spartan/card';
 import { HlmInput } from '../../shared/ui/spartan/input';
 import { HlmLabel } from '../../shared/ui/spartan/label';
-import { HlmSeparator } from '../../shared/ui/spartan/separator';
 import { ThemeToggleComponent } from '../../shared/theme/theme-toggle.component';
 
 @Component({
@@ -38,7 +37,6 @@ import { ThemeToggleComponent } from '../../shared/theme/theme-toggle.component'
     HlmCardTitle,
     HlmInput,
     HlmLabel,
-    HlmSeparator,
     ThemeToggleComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -50,6 +48,7 @@ export class LoginPageComponent {
   private readonly authApi = inject(AuthApiService);
   private readonly authState = inject(AuthStateService);
   private readonly router = inject(Router);
+  private readonly host = inject(ElementRef<HTMLElement>);
 
   protected readonly activePanel = signal<'login' | 'register'>('login');
   protected readonly loginLoading = signal(false);
@@ -87,6 +86,7 @@ export class LoginPageComponent {
   protected submitLogin(): void {
     if (this.loginForm.invalid || this.loginLoading()) {
       this.loginForm.markAllAsTouched();
+      this.focusFirstInvalidControl(['username', 'password']);
       return;
     }
 
@@ -117,6 +117,13 @@ export class LoginPageComponent {
   protected submitRegistration(): void {
     if (this.registerForm.invalid || this.registerLoading()) {
       this.registerForm.markAllAsTouched();
+      this.focusFirstInvalidControl([
+        'fullName',
+        'email',
+        'username',
+        'password',
+        'confirmPassword',
+      ]);
       return;
     }
 
@@ -163,7 +170,75 @@ export class LoginPageComponent {
         this.registerForm.controls.confirmPassword.dirty)
     );
   }
+
+  protected loginFieldError(controlName: LoginControlName): string | null {
+    return resolveFieldError(this.loginForm.controls[controlName], LOGIN_FIELD_ERRORS[controlName]);
+  }
+
+  protected registerFieldError(controlName: RegisterControlName): string | null {
+    return resolveFieldError(
+      this.registerForm.controls[controlName],
+      REGISTER_FIELD_ERRORS[controlName],
+    );
+  }
+
+  private focusFirstInvalidControl(controlNames: readonly string[]): void {
+    queueMicrotask(() => {
+      const firstInvalidControl = controlNames.find(
+        (controlName) =>
+          this.loginForm.get(controlName)?.invalid || this.registerForm.get(controlName)?.invalid,
+      );
+
+      if (!firstInvalidControl) {
+        return;
+      }
+
+      const invalidElement = this.host.nativeElement.querySelector(
+        `[formControlName="${firstInvalidControl}"]`,
+      );
+
+      if (invalidElement instanceof HTMLElement) {
+        invalidElement.focus();
+      }
+    });
+  }
 }
+
+const LOGIN_FIELD_ERRORS = {
+  username: {
+    required: 'Enter your username.',
+  },
+  password: {
+    required: 'Enter your password.',
+  },
+} as const;
+
+const REGISTER_FIELD_ERRORS = {
+  fullName: {
+    required: 'Enter your full name.',
+    maxlength: 'Use 120 characters or fewer.',
+  },
+  email: {
+    required: 'Enter your email address.',
+    email: 'Enter a valid email address.',
+    maxlength: 'Use 255 characters or fewer.',
+  },
+  username: {
+    required: 'Choose a username.',
+    maxlength: 'Use 50 characters or fewer.',
+  },
+  password: {
+    required: 'Create a password.',
+    minlength: 'Use at least 6 characters.',
+    maxlength: 'Use 72 characters or fewer.',
+  },
+  confirmPassword: {
+    required: 'Confirm your password.',
+  },
+} as const;
+
+type LoginControlName = keyof typeof LOGIN_FIELD_ERRORS;
+type RegisterControlName = keyof typeof REGISTER_FIELD_ERRORS;
 
 function passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
   const password = control.get('password')?.value;
@@ -195,4 +270,21 @@ function extractErrorMessage(error: HttpErrorResponse, fallbackMessage: string):
   }
 
   return fallbackMessage;
+}
+
+function resolveFieldError(
+  control: AbstractControl | null,
+  messages: Record<string, string>,
+): string | null {
+  if (!control?.errors || (!control.touched && !control.dirty)) {
+    return null;
+  }
+
+  for (const [errorKey, message] of Object.entries(messages)) {
+    if (control.hasError(errorKey)) {
+      return message;
+    }
+  }
+
+  return null;
 }

@@ -1,263 +1,383 @@
-<section
-  class="before:pointer-events-none before:absolute before:inset-8 before:rounded-lg before:border before:border-[color-mix(in_oklab,var(--border)_70%,transparent)] before:content-[''] relative min-h-screen overflow-hidden px-6 py-10 sm:px-10 lg:px-14"
->
-  <div class="absolute right-6 top-6 z-10 sm:right-10"><app-theme-toggle /></div>
-  <div aria-hidden="true" class="pointer-events-none absolute inset-0 overflow-hidden">
-    <div
-      class="absolute left-1/2 top-0 h-72 w-72 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl"
-    ></div>
-    <div class="absolute bottom-10 right-10 h-56 w-56 rounded-full bg-accent/40 blur-3xl"></div>
+<main class="login-shell relative min-h-screen overflow-hidden px-4 py-6 sm:px-6 lg:px-8">
+  <div aria-hidden="true" class="login-shell__backdrop absolute inset-0">
+    <div class="login-shell__orb login-shell__orb--primary"></div>
+    <div class="login-shell__orb login-shell__orb--accent"></div>
+    <div class="login-shell__grid"></div>
   </div>
-  <div class="relative mx-auto flex min-h-[calc(100vh-5rem)] max-w-3xl items-center justify-center">
-    <section
-      hlmCard
-      class="w-full rounded-[1.1rem] border border-border/70 [background:color-mix(in_oklab,var(--surface-hero)_90%,transparent)] [box-shadow:var(--surface-shadow-strong)] backdrop-blur-xl"
-    >
-      <div hlmCardHeader class="gap-4 p-8 sm:p-10">
-        <div class="space-y-3">
-          <p class="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-            {{ activePanel() === 'login' ? 'Sign in' : 'Create account' }}
+
+  <div
+    class="absolute right-2 top-2 z-10 origin-top-right scale-[0.86] sm:right-6 sm:top-6 sm:scale-100"
+  >
+    <app-theme-toggle />
+  </div>
+
+  <section
+    class="relative mx-auto flex min-h-[calc(100svh-3rem)] w-full items-center justify-center"
+    [style.max-width]="activePanel() === 'login' ? '22.75rem' : '37.5rem'"
+  >
+    <div class="w-full">
+      <div
+        class="mb-2.5 flex flex-col items-start gap-1.5 px-1 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div class="min-w-0">
+          <p class="text-[0.69rem] font-semibold uppercase tracking-[0.26em] text-muted-foreground">
+            Banking Mini System
           </p>
-          <h2
-            hlmCardTitle
-            class="font-(--font-manrope) tracking-[-0.03em] text-xl leading-tight text-card-foreground text-balance sm:text-2xl"
-          >
-            {{ activePanel() === 'login' ? 'Sign in to continue' : 'Open your banking account' }}
-          </h2>
-          <p hlmCardDescription class="max-w-2xl text-sm leading-6 text-muted-foreground">
-            @if (activePanel() === 'login') {
-              Enter your credentials to access the banking workspace.
-            } @else {
-              Create a standard user account with your name, email, username, and password.
-            }
+          <p class="mt-0.5 text-[0.9rem] leading-5 text-muted-foreground">
+            {{
+              activePanel() === 'login'
+                ? 'Secure access for daily operations.'
+                : 'Create a standard user account.'
+            }}
           </p>
         </div>
-        <div
-          class="grid grid-cols-2 gap-2 rounded-lg border border-border/70 p-1 [background:var(--surface-control)]"
+        <span
+          class="inline-flex shrink-0 items-center rounded-full border border-border/70 bg-background/80 px-2.5 py-1 text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-foreground/80 backdrop-blur"
         >
-          <button
-            hlmBtn
-            type="button"
-            variant="ghost"
-            class="rounded-md"
-            [class.bg-background]="activePanel() === 'login'"
-            [class.shadow-sm]="activePanel() === 'login'"
-            (click)="switchPanel('login')"
-          >
-            Sign in
-          </button>
-          <button
-            hlmBtn
-            type="button"
-            variant="ghost"
-            class="rounded-md"
-            [class.bg-background]="activePanel() === 'register'"
-            [class.shadow-sm]="activePanel() === 'register'"
-            (click)="switchPanel('register')"
-          >
-            Create account
-          </button>
-        </div>
+          {{ activePanel() === 'login' ? 'Secure' : 'Standard' }}
+        </span>
       </div>
 
-      @if (registrationSuccessMessage() && activePanel() === 'login') {
-        <div class="px-8 sm:px-10">
-          <p
-            aria-live="polite"
-            class="rounded-lg border px-4 py-3 text-sm font-medium border-(--status-success-border) [background:var(--status-success-surface)] text-(--status-success-foreground)"
+      <section
+        hlmCard
+        class="login-card rounded-[1.35rem] border border-border/70 [background:color-mix(in_oklab,var(--card)_90%,transparent)]"
+      >
+        <div hlmCardHeader class="gap-2 p-4 sm:p-5">
+          <h1
+            hlmCardTitle
+            class="font-(--font-manrope) text-[1.65rem] tracking-[-0.03em] text-card-foreground text-balance sm:text-[1.75rem]"
           >
-            {{ registrationSuccessMessage() }}
+            {{ activePanel() === 'login' ? 'Sign In to Your Workspace' : 'Create Your Account' }}
+          </h1>
+          <p hlmCardDescription class="text-[0.9rem] leading-5.5 text-muted-foreground">
+            @if (activePanel() === 'login') {
+              Use your username and password to access accounts, customers, and payments.
+            } @else {
+              Start with standard access. You can update profile details after sign-in.
+            }
           </p>
         </div>
-      }
 
-      @if (activePanel() === 'login') {
-        <form [formGroup]="loginForm" (ngSubmit)="submitLogin()" class="relative">
-          <div hlmCardContent class="flex flex-col gap-5 px-8 pb-8 pt-6 sm:px-10">
-            <div class="flex flex-col gap-2">
-              <label
-                hlmLabel
-                for="username"
-                class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase"
-                >Username</label
-              >
-              <input
-                id="username"
-                name="username"
-                hlmInput
-                class="rounded-lg border border-border/80 px-4 py-3 text-base text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20 disabled:[background:var(--surface-control-disabled)]"
-                type="text"
-                formControlName="username"
-                autocomplete="username"
-                spellcheck="false"
-              />
-            </div>
-            <div class="flex flex-col gap-2">
-              <label
-                hlmLabel
-                for="password"
-                class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase"
-                >Password</label
-              >
-              <input
-                id="password"
-                name="password"
-                hlmInput
-                class="rounded-lg border border-border/80 px-4 py-3 text-base text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20 disabled:[background:var(--surface-control-disabled)]"
-                type="password"
-                formControlName="password"
-                autocomplete="current-password"
-              />
-            </div>
-            @if (loginErrorMessage()) {
-              <p
-                aria-live="polite"
-                class="rounded-lg border px-4 py-3 text-sm font-medium border-(--status-danger-border) [background:var(--status-danger-surface)] text-(--status-danger-foreground)"
-              >
-                {{ loginErrorMessage() }}
-              </p>
-            }
-          </div>
-          <div hlmCardFooter class="flex flex-col gap-5 px-8 pb-8 sm:px-10">
-            <button
-              hlmBtn
-              class="w-full rounded-lg bg-primary text-primary-foreground shadow-lg shadow-primary/15 transition hover:-translate-y-0.5"
-              type="submit"
-              size="lg"
-              [disabled]="loginLoading()"
-            >
-              {{ loginLoading() ? 'Signing in...' : 'Open banking workspace' }}
-            </button>
-            <div
-              class="flex items-center gap-4 text-xs tracking-[0.18em] text-muted-foreground uppercase"
-            >
-              <hlm-separator decorative class="flex-1"></hlm-separator> Secure session
-              <hlm-separator decorative class="flex-1"></hlm-separator>
-            </div>
-          </div>
-        </form>
-      } @else {
-        <form [formGroup]="registerForm" (ngSubmit)="submitRegistration()" class="relative">
-          <div hlmCardContent class="grid gap-5 px-8 pb-8 pt-6 sm:px-10 lg:grid-cols-2">
-            <div class="flex flex-col gap-2">
-              <label
-                hlmLabel
-                for="fullName"
-                class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase"
-                >Full name</label
-              >
-              <input
-                id="fullName"
-                name="fullName"
-                hlmInput
-                class="rounded-lg border border-border/80 px-4 py-3 text-base text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20"
-                type="text"
-                formControlName="fullName"
-                autocomplete="name"
-              />
-            </div>
-            <div class="flex flex-col gap-2">
-              <label
-                hlmLabel
-                for="email"
-                class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase"
-                >Email</label
-              >
-              <input
-                id="email"
-                name="email"
-                hlmInput
-                class="rounded-lg border border-border/80 px-4 py-3 text-base text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20"
-                type="email"
-                formControlName="email"
-                autocomplete="email"
-                spellcheck="false"
-              />
-            </div>
-            <div class="flex flex-col gap-2">
-              <label
-                hlmLabel
-                for="registerUsername"
-                class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase"
-                >Username</label
-              >
-              <input
-                id="registerUsername"
-                name="registerUsername"
-                hlmInput
-                class="rounded-lg border border-border/80 px-4 py-3 text-base text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20"
-                type="text"
-                formControlName="username"
-                autocomplete="username"
-                spellcheck="false"
-              />
-            </div>
-            <div class="flex flex-col gap-2">
-              <label
-                hlmLabel
-                for="registerPassword"
-                class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase"
-                >Password</label
-              >
-              <input
-                id="registerPassword"
-                name="registerPassword"
-                hlmInput
-                class="rounded-lg border border-border/80 px-4 py-3 text-base text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20"
-                type="password"
-                formControlName="password"
-                autocomplete="new-password"
-              />
-            </div>
-            <div class="flex flex-col gap-2">
-              <label
-                hlmLabel
-                for="confirmPassword"
-                class="text-sm font-semibold tracking-[0.18em] text-muted-foreground uppercase"
-                >Confirm password</label
-              >
-              <input
-                id="confirmPassword"
-                name="confirmPassword"
-                hlmInput
-                class="rounded-lg border border-border/80 px-4 py-3 text-base text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20"
-                type="password"
-                formControlName="confirmPassword"
-                autocomplete="new-password"
-              />
-            </div>
-            @if (showPasswordMismatch()) {
-              <p class="text-sm font-medium lg:col-span-2 text-(--status-danger-foreground)">
-                Passwords must match before you can create the account.
-              </p>
-            }
-            @if (registerErrorMessage()) {
-              <p
-                aria-live="polite"
-                class="rounded-lg border px-4 py-3 text-sm font-medium lg:col-span-2 border-(--status-danger-border) [background:var(--status-danger-surface)] text-(--status-danger-foreground)"
-              >
-                {{ registerErrorMessage() }}
-              </p>
-            }
-          </div>
-          <div hlmCardFooter class="flex flex-col gap-5 px-8 pb-8 sm:px-10">
-            <button
-              hlmBtn
-              class="w-full rounded-lg bg-primary text-primary-foreground shadow-lg shadow-primary/15 transition hover:-translate-y-0.5"
-              type="submit"
-              size="lg"
-              [disabled]="registerLoading()"
-            >
-              {{ registerLoading() ? 'Creating account...' : 'Create account' }}
-            </button>
+        @if (registrationSuccessMessage() && activePanel() === 'login') {
+          <div class="px-4 sm:px-5">
             <p
-              class="text-center text-xs leading-5 tracking-[0.12em] text-muted-foreground uppercase"
+              aria-live="polite"
+              class="rounded-xl border px-3.5 py-2.5 text-[0.88rem] font-medium border-(--status-success-border) [background:var(--status-success-surface)] text-(--status-success-foreground)"
             >
-              New accounts are created with standard user access.
+              {{ registrationSuccessMessage() }}
             </p>
           </div>
-        </form>
-      }
-    </section>
-  </div>
-</section>
+        }
+
+        @if (activePanel() === 'login') {
+          <form [formGroup]="loginForm" (ngSubmit)="submitLogin()" class="space-y-4">
+            <div hlmCardContent class="space-y-3 px-4 pb-0 sm:px-5">
+              <div class="space-y-2">
+                <label
+                  hlmLabel
+                  for="username"
+                  class="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-muted-foreground"
+                  >Username</label
+                >
+                <input
+                  id="username"
+                  name="username"
+                  hlmInput
+                  class="min-h-10 rounded-xl border border-border/80 px-3.5 text-[0.92rem] text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20 disabled:[background:var(--surface-control-disabled)]"
+                  type="text"
+                  formControlName="username"
+                  autocomplete="username"
+                  autocapitalize="none"
+                  spellcheck="false"
+                  [attr.aria-describedby]="
+                    loginFieldError('username') ? 'login-username-error' : null
+                  "
+                  [attr.aria-invalid]="loginFieldError('username') ? 'true' : null"
+                />
+                @if (loginFieldError('username'); as error) {
+                  <p
+                    id="login-username-error"
+                    aria-live="polite"
+                    class="text-sm font-medium text-(--status-danger-foreground)"
+                  >
+                    {{ error }}
+                  </p>
+                }
+              </div>
+
+              <div class="space-y-2">
+                <label
+                  hlmLabel
+                  for="password"
+                  class="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-muted-foreground"
+                  >Password</label
+                >
+                <input
+                  id="password"
+                  name="password"
+                  hlmInput
+                  class="min-h-10 rounded-xl border border-border/80 px-3.5 text-[0.92rem] text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20 disabled:[background:var(--surface-control-disabled)]"
+                  type="password"
+                  formControlName="password"
+                  autocomplete="current-password"
+                  [attr.aria-describedby]="
+                    loginFieldError('password') ? 'login-password-error' : null
+                  "
+                  [attr.aria-invalid]="loginFieldError('password') ? 'true' : null"
+                />
+                @if (loginFieldError('password'); as error) {
+                  <p
+                    id="login-password-error"
+                    aria-live="polite"
+                    class="text-sm font-medium text-(--status-danger-foreground)"
+                  >
+                    {{ error }}
+                  </p>
+                }
+              </div>
+
+              @if (loginErrorMessage()) {
+                <p
+                  aria-live="polite"
+                  class="rounded-xl border px-3.5 py-2.5 text-[0.88rem] font-medium border-(--status-danger-border) [background:var(--status-danger-surface)] text-(--status-danger-foreground)"
+                >
+                  {{ loginErrorMessage() }}
+                </p>
+              }
+            </div>
+
+            <div hlmCardFooter class="flex flex-col gap-2.5 px-4 pb-4 pt-4 sm:px-5 sm:pb-5">
+              <button
+                hlmBtn
+                class="min-h-10 w-full rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/15 transition-[transform,background-color,box-shadow] hover:-translate-y-0.5"
+                type="submit"
+                size="lg"
+                [disabled]="loginLoading()"
+              >
+                {{ loginLoading() ? 'Signing In…' : 'Open Workspace' }}
+              </button>
+              <button
+                hlmBtn
+                type="button"
+                variant="outline"
+                class="min-h-10 w-full rounded-xl"
+                (click)="switchPanel('register')"
+              >
+                Create Account
+              </button>
+              <p class="text-center text-[0.88rem] leading-5 text-muted-foreground">
+                Need password help? Contact an administrator.
+              </p>
+            </div>
+          </form>
+        } @else {
+          <form [formGroup]="registerForm" (ngSubmit)="submitRegistration()" class="space-y-4">
+            <div hlmCardContent class="grid gap-3 px-4 pb-0 sm:grid-cols-2 sm:px-5">
+              <div class="space-y-2 sm:min-w-0">
+                <label
+                  hlmLabel
+                  for="fullName"
+                  class="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-muted-foreground"
+                  >Full Name</label
+                >
+                <input
+                  id="fullName"
+                  name="fullName"
+                  hlmInput
+                  class="min-h-10 rounded-xl border border-border/80 px-3.5 text-[0.92rem] text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20"
+                  type="text"
+                  formControlName="fullName"
+                  autocomplete="name"
+                  [attr.aria-describedby]="
+                    registerFieldError('fullName') ? 'register-full-name-error' : null
+                  "
+                  [attr.aria-invalid]="registerFieldError('fullName') ? 'true' : null"
+                />
+                @if (registerFieldError('fullName'); as error) {
+                  <p
+                    id="register-full-name-error"
+                    aria-live="polite"
+                    class="text-sm font-medium text-(--status-danger-foreground)"
+                  >
+                    {{ error }}
+                  </p>
+                }
+              </div>
+
+              <div class="space-y-2 sm:min-w-0">
+                <label
+                  hlmLabel
+                  for="email"
+                  class="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-muted-foreground"
+                  >Email</label
+                >
+                <input
+                  id="email"
+                  name="email"
+                  hlmInput
+                  class="min-h-10 rounded-xl border border-border/80 px-3.5 text-[0.92rem] text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20"
+                  type="email"
+                  formControlName="email"
+                  autocomplete="email"
+                  autocapitalize="none"
+                  inputmode="email"
+                  spellcheck="false"
+                  [attr.aria-describedby]="
+                    registerFieldError('email') ? 'register-email-error' : null
+                  "
+                  [attr.aria-invalid]="registerFieldError('email') ? 'true' : null"
+                />
+                @if (registerFieldError('email'); as error) {
+                  <p
+                    id="register-email-error"
+                    aria-live="polite"
+                    class="text-sm font-medium text-(--status-danger-foreground)"
+                  >
+                    {{ error }}
+                  </p>
+                }
+              </div>
+
+              <div class="space-y-2 sm:col-span-2 sm:min-w-0">
+                <label
+                  hlmLabel
+                  for="registerUsername"
+                  class="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-muted-foreground"
+                  >Username</label
+                >
+                <input
+                  id="registerUsername"
+                  name="registerUsername"
+                  hlmInput
+                  class="min-h-10 rounded-xl border border-border/80 px-3.5 text-[0.92rem] text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20"
+                  type="text"
+                  formControlName="username"
+                  autocomplete="username"
+                  autocapitalize="none"
+                  spellcheck="false"
+                  [attr.aria-describedby]="
+                    registerFieldError('username') ? 'register-username-error' : null
+                  "
+                  [attr.aria-invalid]="registerFieldError('username') ? 'true' : null"
+                />
+                @if (registerFieldError('username'); as error) {
+                  <p
+                    id="register-username-error"
+                    aria-live="polite"
+                    class="text-sm font-medium text-(--status-danger-foreground)"
+                  >
+                    {{ error }}
+                  </p>
+                }
+              </div>
+
+              <div class="space-y-2 sm:min-w-0">
+                <label
+                  hlmLabel
+                  for="registerPassword"
+                  class="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-muted-foreground"
+                  >Password</label
+                >
+                <input
+                  id="registerPassword"
+                  name="registerPassword"
+                  hlmInput
+                  class="min-h-10 rounded-xl border border-border/80 px-3.5 text-[0.92rem] text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20"
+                  type="password"
+                  formControlName="password"
+                  autocomplete="new-password"
+                  [attr.aria-describedby]="
+                    registerFieldError('password') ? 'register-password-error' : null
+                  "
+                  [attr.aria-invalid]="registerFieldError('password') ? 'true' : null"
+                />
+                @if (registerFieldError('password'); as error) {
+                  <p
+                    id="register-password-error"
+                    aria-live="polite"
+                    class="text-sm font-medium text-(--status-danger-foreground)"
+                  >
+                    {{ error }}
+                  </p>
+                }
+              </div>
+
+              <div class="space-y-2 sm:min-w-0">
+                <label
+                  hlmLabel
+                  for="confirmPassword"
+                  class="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-muted-foreground"
+                  >Confirm Password</label
+                >
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  hlmInput
+                  class="min-h-10 rounded-xl border border-border/80 px-3.5 text-[0.92rem] text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20"
+                  type="password"
+                  formControlName="confirmPassword"
+                  autocomplete="new-password"
+                  [attr.aria-describedby]="
+                    registerFieldError('confirmPassword') ? 'register-confirm-password-error' : null
+                  "
+                  [attr.aria-invalid]="registerFieldError('confirmPassword') ? 'true' : null"
+                />
+                @if (registerFieldError('confirmPassword'); as error) {
+                  <p
+                    id="register-confirm-password-error"
+                    aria-live="polite"
+                    class="text-sm font-medium text-(--status-danger-foreground)"
+                  >
+                    {{ error }}
+                  </p>
+                }
+              </div>
+
+              @if (showPasswordMismatch()) {
+                <p
+                  aria-live="polite"
+                  class="rounded-xl border px-3.5 py-2.5 text-[0.88rem] font-medium sm:col-span-2 border-(--status-danger-border) [background:var(--status-danger-surface)] text-(--status-danger-foreground)"
+                >
+                  Passwords must match before you can create the account.
+                </p>
+              }
+
+              @if (registerErrorMessage()) {
+                <p
+                  aria-live="polite"
+                  class="rounded-xl border px-3.5 py-2.5 text-[0.88rem] font-medium sm:col-span-2 border-(--status-danger-border) [background:var(--status-danger-surface)] text-(--status-danger-foreground)"
+                >
+                  {{ registerErrorMessage() }}
+                </p>
+              }
+            </div>
+
+            <div hlmCardFooter class="flex flex-col gap-2.5 px-4 pb-4 pt-4 sm:px-5 sm:pb-5">
+              <button
+                hlmBtn
+                class="min-h-10 w-full rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/15 transition-[transform,background-color,box-shadow] hover:-translate-y-0.5"
+                type="submit"
+                size="lg"
+                [disabled]="registerLoading()"
+              >
+                {{ registerLoading() ? 'Creating Account…' : 'Create Account' }}
+              </button>
+              <button
+                hlmBtn
+                type="button"
+                variant="outline"
+                class="min-h-10 w-full rounded-xl"
+                (click)="switchPanel('login')"
+              >
+                Back to Sign In
+              </button>
+              <p class="text-center text-[0.88rem] leading-5 text-muted-foreground">
+                New accounts receive standard user access.
+              </p>
+            </div>
+          </form>
+        }
+      </section>
+    </div>
+  </section>
+</main>
