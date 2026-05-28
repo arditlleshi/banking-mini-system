@@ -16,28 +16,6 @@
     [style.max-width]="activePanel() === 'login' ? '22.75rem' : '37.5rem'"
   >
     <div class="w-full">
-      <div
-        class="mb-2.5 flex flex-col items-start gap-1.5 px-1 sm:flex-row sm:items-center sm:justify-between"
-      >
-        <div class="min-w-0">
-          <p class="text-[0.69rem] font-semibold uppercase tracking-[0.26em] text-muted-foreground">
-            Banking Mini System
-          </p>
-          <p class="mt-0.5 text-[0.9rem] leading-5 text-muted-foreground">
-            {{
-              activePanel() === 'login'
-                ? 'Secure access for daily operations.'
-                : 'Create a standard user account.'
-            }}
-          </p>
-        </div>
-        <span
-          class="inline-flex shrink-0 items-center rounded-full border border-border/70 bg-background/80 px-2.5 py-1 text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-foreground/80 backdrop-blur"
-        >
-          {{ activePanel() === 'login' ? 'Secure' : 'Standard' }}
-        </span>
-      </div>
-
       <section
         hlmCard
         class="login-card rounded-[1.35rem] border border-border/70 [background:color-mix(in_oklab,var(--card)_90%,transparent)]"
@@ -165,9 +143,6 @@
               >
                 Create Account
               </button>
-              <p class="text-center text-[0.88rem] leading-5 text-muted-foreground">
-                Need password help? Contact an administrator.
-              </p>
             </div>
           </form>
         } @else {
@@ -371,9 +346,6 @@
               >
                 Back to Sign In
               </button>
-              <p class="text-center text-[0.88rem] leading-5 text-muted-foreground">
-                New accounts receive standard user access.
-              </p>
             </div>
           </form>
         }
