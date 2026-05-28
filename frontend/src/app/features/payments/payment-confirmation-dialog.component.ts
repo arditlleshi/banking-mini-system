@@ -10,7 +10,7 @@ import {
   HlmDialogFooter,
   HlmDialogHeader,
   HlmDialogPortal,
-  HlmDialogTitle
+  HlmDialogTitle,
 } from '@spartan/dialog';
 
 export type PaymentConfirmation = {
@@ -41,11 +41,14 @@ export type PaymentConfirmation = {
     HlmDialogFooter,
     HlmDialogHeader,
     HlmDialogPortal,
-    HlmDialogTitle
+    HlmDialogTitle,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <hlm-dialog [state]="open() ? 'open' : 'closed'" (stateChanged)="handleDialogStateChanged($event)">
+    <hlm-dialog
+      [state]="open() ? 'open' : 'closed'"
+      (stateChanged)="handleDialogStateChanged($event)"
+    >
       <hlm-dialog-content
         *hlmDialogPortal="let ctx"
         class="w-[calc(100vw-1rem)] max-w-xl overflow-hidden border-border/70 p-0 shadow-[0_24px_60px_rgba(15,23,42,0.16)] [background:color-mix(in_oklab,var(--surface-panel-strong)_98%,var(--background)_2%)]"
@@ -69,12 +72,16 @@ export type PaymentConfirmation = {
             <section class="overflow-hidden rounded-2xl border border-border/70">
               <article class="grid gap-3 px-4 py-4 sm:px-5">
                 <div class="flex items-start justify-between gap-4">
-                  <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  From
+                  <p
+                    class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                  >
+                    From
                   </p>
                   <p class="text-lg font-semibold tracking-[-0.03em] text-foreground tabular-nums">
                     {{ model.amount | number: '1.2-2' }}
-                    <span class="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                    <span
+                      class="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground"
+                    >
                       {{ model.debitCurrency }}
                     </span>
                   </p>
@@ -83,7 +90,9 @@ export type PaymentConfirmation = {
                   <p class="truncate text-sm font-semibold text-foreground">
                     {{ model.debitAccountName }}
                   </p>
-                  <p class="mt-1 wrap-break-word font-mono text-xs tracking-[0.08em] text-muted-foreground">
+                  <p
+                    class="mt-1 wrap-break-word font-mono text-xs tracking-[0.08em] text-muted-foreground"
+                  >
                     {{ model.debitAccountNumber }}
                   </p>
                 </div>
@@ -93,8 +102,10 @@ export type PaymentConfirmation = {
 
               <article class="grid gap-3 px-4 py-4 sm:px-5">
                 <div class="flex items-start justify-between gap-4">
-                  <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  To
+                  <p
+                    class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                  >
+                    To
                   </p>
                   <p class="text-lg font-semibold tracking-[-0.03em] text-foreground tabular-nums">
                     @if (model.estimatedCreditAmount !== null) {
@@ -102,7 +113,9 @@ export type PaymentConfirmation = {
                     } @else {
                       —
                     }
-                    <span class="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                    <span
+                      class="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground"
+                    >
                       {{ model.creditCurrency }}
                     </span>
                   </p>
@@ -111,7 +124,9 @@ export type PaymentConfirmation = {
                   <p class="truncate text-sm font-semibold text-foreground">
                     {{ model.creditAccountName }}
                   </p>
-                  <p class="mt-1 wrap-break-word font-mono text-xs tracking-[0.08em] text-muted-foreground">
+                  <p
+                    class="mt-1 wrap-break-word font-mono text-xs tracking-[0.08em] text-muted-foreground"
+                  >
                     {{ model.creditAccountNumber }}
                   </p>
                 </div>
@@ -120,7 +135,9 @@ export type PaymentConfirmation = {
               <div class="mx-4 border-t border-dashed border-border/70 sm:mx-5"></div>
 
               <article class="flex items-center justify-between gap-4 px-4 py-4 sm:px-5">
-                <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                <p
+                  class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                >
                   Exchange Rate
                 </p>
                 @if (model.exchangeRate !== null) {
@@ -134,9 +151,7 @@ export type PaymentConfirmation = {
             </section>
 
             @if (submitting()) {
-              <p aria-live="polite" class="mt-3 text-sm text-muted-foreground">
-                Booking…
-              </p>
+              <p aria-live="polite" class="mt-3 text-sm text-muted-foreground">Booking…</p>
             }
           </div>
 
@@ -166,7 +181,7 @@ export type PaymentConfirmation = {
         }
       </hlm-dialog-content>
     </hlm-dialog>
-  `
+  `,
 })
 export class PaymentConfirmationDialogComponent {
   readonly open = input.required<boolean>();

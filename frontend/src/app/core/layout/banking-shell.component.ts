@@ -250,10 +250,7 @@ export class BankingShellComponent {
   }
 
   private buildUserInitials(value: string): string {
-    const parts = value
-      .trim()
-      .split(/\s+/)
-      .filter(Boolean);
+    const parts = value.trim().split(/\s+/).filter(Boolean);
 
     if (parts.length === 0) {
       return 'U';

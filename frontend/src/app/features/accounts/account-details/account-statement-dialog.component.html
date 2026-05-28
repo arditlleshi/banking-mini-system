@@ -5,7 +5,10 @@
   >
     <div class="flex min-h-0 flex-col">
       <div hlmDialogHeader class="gap-3 border-b border-border/70 px-6 py-6 sm:px-8">
-        <h2 hlmDialogTitle class="text-xl font-bold tracking-[-0.03em] text-balance leading-tight text-card-foreground sm:text-xl">
+        <h2
+          hlmDialogTitle
+          class="text-xl font-bold tracking-[-0.03em] text-balance leading-tight text-card-foreground sm:text-xl"
+        >
           Account statement
         </h2>
         <p hlmDialogDescription class="max-w-xl text-sm leading-6 text-muted-foreground">
@@ -13,7 +16,11 @@
         </p>
       </div>
 
-      <form [formGroup]="statementFiltersForm()" (submit)="$event.preventDefault()" class="flex min-h-0 flex-1 flex-col">
+      <form
+        [formGroup]="statementFiltersForm()"
+        (submit)="$event.preventDefault()"
+        class="flex min-h-0 flex-1 flex-col"
+      >
         <div class="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto px-6 py-6 sm:px-8">
           <div class="grid gap-5 md:grid-cols-2">
             <div class="flex flex-col gap-2">

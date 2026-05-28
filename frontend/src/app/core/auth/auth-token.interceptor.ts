@@ -24,9 +24,9 @@ export const authTokenInterceptor: HttpInterceptorFn = (req, next) => {
   const authReq = accessToken
     ? req.clone({
         setHeaders: {
-          Authorization: `Bearer ${accessToken}`
+          Authorization: `Bearer ${accessToken}`,
         },
-        withCredentials: true
+        withCredentials: true,
       })
     : req.clone({ withCredentials: true });
 
@@ -40,17 +40,17 @@ export const authTokenInterceptor: HttpInterceptorFn = (req, next) => {
         switchMap((tokens) => {
           const retryReq = req.clone({
             setHeaders: {
-              Authorization: `Bearer ${tokens.accessToken}`
+              Authorization: `Bearer ${tokens.accessToken}`,
             },
-            withCredentials: true
+            withCredentials: true,
           });
           return next(retryReq);
         }),
         catchError((refreshError) => {
           router.navigateByUrl('/login');
           return throwError(() => refreshError);
-        })
+        }),
       );
-    })
+    }),
   );
 };

@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, input, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  computed,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
 
 @Component({
   selector: 'app-copy-feedback',
@@ -6,7 +14,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, input
   exportAs: 'copyFeedback',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    class: 'relative inline-flex'
+    class: 'relative inline-flex',
   },
   template: `
     <ng-content />
@@ -20,7 +28,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, input
         {{ copiedText() }}
       </span>
     }
-  `
+  `,
 })
 export class CopyFeedbackComponent {
   private readonly destroyRef = inject(DestroyRef);
@@ -35,7 +43,7 @@ export class CopyFeedbackComponent {
   private fadeTimer: ReturnType<typeof setTimeout> | null = null;
 
   protected readonly messageMotionClass = computed(() =>
-    this.fadingOut() ? 'translate-y-1 opacity-0' : 'translate-y-0 opacity-100'
+    this.fadingOut() ? 'translate-y-1 opacity-0' : 'translate-y-0 opacity-100',
   );
 
   constructor() {

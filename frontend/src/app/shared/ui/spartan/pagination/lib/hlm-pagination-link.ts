@@ -21,15 +21,15 @@ import { classes } from '@spartan/utils';
         'preserveFragment',
         'skipLocationChange',
         'replaceUrl',
-        'routerLink: link'
-      ]
-    }
+        'routerLink: link',
+      ],
+    },
   ],
   host: {
     'data-slot': 'pagination-link',
     '[attr.data-active]': 'isActive() ? "true" : null',
-    '[attr.aria-current]': 'isActive() ? "page" : null'
-  }
+    '[attr.aria-current]': 'isActive() ? "page" : null',
+  },
 })
 export class HlmPaginationLink {
   /** Whether the link is active (i.e., the current page). */
@@ -44,9 +44,9 @@ export class HlmPaginationLink {
       'spartan-pagination-link',
       buttonVariants({
         variant: this.isActive() ? 'outline' : 'ghost',
-        size: this.size()
+        size: this.size(),
       }),
-      this.link() === undefined && 'cursor-pointer'
+      this.link() === undefined && 'cursor-pointer',
     ]);
   }
 }

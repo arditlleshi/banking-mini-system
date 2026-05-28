@@ -40,7 +40,9 @@ export class PaymentApiService {
   private readonly baseUrl = environment.apiBaseUrl;
 
   lookupBeneficiary(accountNumber: string): Observable<PaymentBeneficiaryResponse> {
-    return this.http.get<PaymentBeneficiaryResponse>(`${this.baseUrl}/payments/beneficiary/${encodeURIComponent(accountNumber)}`);
+    return this.http.get<PaymentBeneficiaryResponse>(
+      `${this.baseUrl}/payments/beneficiary/${encodeURIComponent(accountNumber)}`,
+    );
   }
 
   createPayment(payload: CreatePaymentRequest): Observable<PaymentResponse> {

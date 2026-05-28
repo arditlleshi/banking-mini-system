@@ -13,7 +13,7 @@ import { classes } from '@spartan/utils';
   host: {
     'data-slot': 'breadcrumb-separator',
     role: 'presentation',
-    'aria-hidden': 'true'
+    'aria-hidden': 'true',
   },
   template: `
     <span class="inline-flex h-4 w-4 shrink-0 items-center justify-center leading-none">
@@ -21,10 +21,13 @@ import { classes } from '@spartan/utils';
         <ng-icon hlm size="sm" name="lucideChevronRight" />
       </ng-content>
     </span>
-  `
+  `,
 })
 export class HlmBreadcrumbSeparator {
   constructor() {
-    classes(() => 'spartan-breadcrumb-separator inline-flex items-center justify-center text-muted-foreground');
+    classes(
+      () =>
+        'spartan-breadcrumb-separator inline-flex items-center justify-center text-muted-foreground',
+    );
   }
 }

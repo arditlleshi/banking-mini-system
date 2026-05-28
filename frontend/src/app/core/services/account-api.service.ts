@@ -96,7 +96,9 @@ export class AccountApiService {
   }
 
   getAccountCurrencyDistribution(): Observable<AccountCurrencyDistributionResponse[]> {
-    return this.http.get<AccountCurrencyDistributionResponse[]>(`${this.baseUrl}/accounts/currency-distribution`);
+    return this.http.get<AccountCurrencyDistributionResponse[]>(
+      `${this.baseUrl}/accounts/currency-distribution`,
+    );
   }
 
   createAccount(payload: CreateAccountRequest): Observable<AccountResponse> {
@@ -104,27 +106,39 @@ export class AccountApiService {
   }
 
   getAccountDetails(accountNumber: string, page = 1): Observable<AccountDetailsResponse> {
-    return this.http.get<AccountDetailsResponse>(`${this.baseUrl}/accounts/${accountNumber}/details`, {
-      params: new HttpParams().set('page', page.toString())
-    });
+    return this.http.get<AccountDetailsResponse>(
+      `${this.baseUrl}/accounts/${accountNumber}/details`,
+      {
+        params: new HttpParams().set('page', page.toString()),
+      },
+    );
   }
 
-  getAccountTransactions(accountId: number, filters: AccountStatementFilters = {}): Observable<AccountTransactionResponse[]> {
-    return this.http.get<AccountTransactionResponse[]>(`${this.baseUrl}/accounts/${accountId}/transactions`, {
-      params: this.buildStatementParams(filters)
-    });
+  getAccountTransactions(
+    accountId: number,
+    filters: AccountStatementFilters = {},
+  ): Observable<AccountTransactionResponse[]> {
+    return this.http.get<AccountTransactionResponse[]>(
+      `${this.baseUrl}/accounts/${accountId}/transactions`,
+      {
+        params: this.buildStatementParams(filters),
+      },
+    );
   }
 
-  downloadAccountStatement(accountId: number, filters: AccountStatementFilters = {}): Observable<Blob> {
+  downloadAccountStatement(
+    accountId: number,
+    filters: AccountStatementFilters = {},
+  ): Observable<Blob> {
     return this.http.get(`${this.baseUrl}/accounts/${accountId}/statement`, {
       params: this.buildStatementParams(filters),
-      responseType: 'blob'
+      responseType: 'blob',
     });
   }
 
   downloadPaymentDetails(accountId: number): Observable<Blob> {
     return this.http.get(`${this.baseUrl}/accounts/${accountId}/payment-details`, {
-      responseType: 'blob'
+      responseType: 'blob',
     });
   }
 

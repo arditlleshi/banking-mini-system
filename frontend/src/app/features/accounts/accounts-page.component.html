@@ -98,7 +98,9 @@
             }
           </div>
         } @else if (errorMessage()) {
-          <p class="rounded-lg px-4 py-3 text-sm font-medium [background:var(--status-danger-surface)] text-(--status-danger-foreground)">
+          <p
+            class="rounded-lg px-4 py-3 text-sm font-medium [background:var(--status-danger-surface)] text-(--status-danger-foreground)"
+          >
             {{ errorMessage() }}
           </p>
         } @else if (!accounts().length) {
@@ -124,10 +126,7 @@
             </button>
           </article>
         } @else {
-          <hlm-accordion
-            type="single"
-            class="grid gap-3"
-          >
+          <hlm-accordion type="single" class="grid gap-3">
             @for (account of accounts(); track trackByAccountId($index, account)) {
               <hlm-accordion-item
                 class="last:mb-0 overflow-hidden rounded-xl border border-border/45 px-2 transition-[background-color,border-color,box-shadow] [background:color-mix(in_oklab,var(--surface-panel)_78%,var(--background)_22%)] hover:border-border/70 hover:[background:color-mix(in_oklab,var(--surface-inset)_78%,var(--background)_22%)] data-[state=open]:border-border/80 data-[state=open]:[background:color-mix(in_oklab,var(--surface-inset-strong)_88%,var(--background)_12%)] data-[state=open]:[box-shadow:var(--surface-shadow-inline)]"
@@ -135,13 +134,15 @@
                 (openedChange)="handleAccountOpenChange(account.id, $event)"
               >
                 <hlm-accordion-trigger
-                  [triggerClass]="
-                    'items-center gap-4 rounded-xl border-0 px-4 py-4 focus-visible:ring-4 focus-visible:ring-ring/25 group-aria-expanded/accordion-trigger:[background:color-mix(in_oklab,var(--surface-control)_78%,var(--background)_22%)]'
-                  "
+                  [triggerClass]="'items-center gap-4 rounded-xl border-0 px-4 py-4 focus-visible:ring-4 focus-visible:ring-ring/25 group-aria-expanded/accordion-trigger:[background:color-mix(in_oklab,var(--surface-control)_78%,var(--background)_22%)]'"
                 >
-                  <div class="grid min-w-0 flex-1 gap-3 md:grid-cols-[minmax(0,1.4fr)_auto_auto] md:items-center md:gap-4">
+                  <div
+                    class="grid min-w-0 flex-1 gap-3 md:grid-cols-[minmax(0,1.4fr)_auto_auto] md:items-center md:gap-4"
+                  >
                     <div class="min-w-0 space-y-1">
-                      <p class="truncate text-base font-semibold tracking-[-0.02em] text-foreground">
+                      <p
+                        class="truncate text-base font-semibold tracking-[-0.02em] text-foreground"
+                      >
                         {{ account.name }}
                       </p>
                     </div>
@@ -153,7 +154,9 @@
                         {{ account.status }}
                       </span>
                     </div>
-                    <p class="min-w-0 truncate text-left text-base font-semibold text-foreground [font-variant-numeric:tabular-nums] md:text-right">
+                    <p
+                      class="min-w-0 truncate text-left text-base font-semibold text-foreground [font-variant-numeric:tabular-nums] md:text-right"
+                    >
                       {{ account.availableBalance | number: '1.2-2' }} {{ account.currency }}
                     </p>
                   </div>
@@ -171,47 +174,75 @@
 
                       <dl class="grid gap-5 sm:grid-cols-2">
                         <div class="space-y-1">
-                          <dt class="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                          <dt
+                            class="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                          >
                             Account number
                           </dt>
-                          <dd translate="no" class="font-mono text-sm text-foreground [font-variant-numeric:tabular-nums]">
+                          <dd
+                            translate="no"
+                            class="font-mono text-sm text-foreground [font-variant-numeric:tabular-nums]"
+                          >
                             {{ account.accountNumber }}
                           </dd>
                         </div>
                         <div class="space-y-1">
-                          <dt class="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                          <dt
+                            class="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                          >
                             IBAN
                           </dt>
-                          <dd translate="no" class="break-all font-mono text-sm text-foreground [font-variant-numeric:tabular-nums]">
+                          <dd
+                            translate="no"
+                            class="break-all font-mono text-sm text-foreground [font-variant-numeric:tabular-nums]"
+                          >
                             {{ account.iban ?? 'Pending' }}
                           </dd>
                         </div>
                         <div class="space-y-1">
-                          <dt class="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                          <dt
+                            class="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                          >
                             Status
                           </dt>
                           <dd class="text-sm font-medium text-foreground">{{ account.status }}</dd>
                         </div>
                         <div class="space-y-1">
-                          <dt class="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                          <dt
+                            class="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                          >
                             Opened
                           </dt>
-                          <dd class="text-sm font-medium text-foreground">{{ account.openedAt | date: 'dd MMM yyyy' }}</dd>
+                          <dd class="text-sm font-medium text-foreground">
+                            {{ account.openedAt | date: 'dd MMM yyyy' }}
+                          </dd>
                         </div>
                         <div class="space-y-1">
-                          <dt class="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                          <dt
+                            class="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                          >
                             Overdraft limit
                           </dt>
-                          <dd class="text-sm font-medium text-foreground [font-variant-numeric:tabular-nums]">
+                          <dd
+                            class="text-sm font-medium text-foreground [font-variant-numeric:tabular-nums]"
+                          >
                             {{ account.overdraftLimit | number: '1.2-2' }} {{ account.currency }}
                           </dd>
                         </div>
                         <div class="space-y-1">
-                          <dt class="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                          <dt
+                            class="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                          >
                             Interest rate
                           </dt>
-                          <dd class="text-sm font-medium text-foreground [font-variant-numeric:tabular-nums]">
-                            {{ account.annualInterestRate !== null ? (account.annualInterestRate | number: '1.2-2') + '%' : 'Not Set' }}
+                          <dd
+                            class="text-sm font-medium text-foreground [font-variant-numeric:tabular-nums]"
+                          >
+                            {{
+                              account.annualInterestRate !== null
+                                ? (account.annualInterestRate | number: '1.2-2') + '%'
+                                : 'Not Set'
+                            }}
                           </dd>
                         </div>
                       </dl>
@@ -249,23 +280,30 @@
 
                       <dl class="space-y-5">
                         <div class="space-y-1">
-                          <dt class="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                          <dt
+                            class="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                          >
                             Current balance
                           </dt>
-                          <dd class="text-3xl font-semibold tracking-[-0.03em] text-foreground [font-variant-numeric:tabular-nums]">
+                          <dd
+                            class="text-3xl font-semibold tracking-[-0.03em] text-foreground [font-variant-numeric:tabular-nums]"
+                          >
                             {{ account.currentBalance | number: '1.2-2' }} {{ account.currency }}
                           </dd>
                         </div>
                         <div class="space-y-1">
-                          <dt class="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                          <dt
+                            class="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                          >
                             Available balance
                           </dt>
-                          <dd class="text-xl font-semibold tracking-[-0.02em] text-foreground [font-variant-numeric:tabular-nums]">
+                          <dd
+                            class="text-xl font-semibold tracking-[-0.02em] text-foreground [font-variant-numeric:tabular-nums]"
+                          >
                             {{ account.availableBalance | number: '1.2-2' }} {{ account.currency }}
                           </dd>
                         </div>
                       </dl>
-
                     </aside>
                   </div>
                 </hlm-accordion-content>

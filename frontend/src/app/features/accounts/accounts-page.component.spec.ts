@@ -34,10 +34,10 @@ describe('AccountsPageComponent', () => {
           useValue: {
             getAccounts,
             createAccount,
-            downloadPaymentDetails
-          }
-        }
-      ]
+            downloadPaymentDetails,
+          },
+        },
+      ],
     }).compileComponents();
   });
 
@@ -100,8 +100,8 @@ describe('AccountsPageComponent', () => {
     downloadPaymentDetails.mockReturnValue(
       throwError(() => ({
         status: 409,
-        error: { message: 'Payment details are available only for active accounts' }
-      }))
+        error: { message: 'Payment details are available only for active accounts' },
+      })),
     );
 
     const fixture = TestBed.createComponent(AccountsPageComponent);
@@ -117,7 +117,9 @@ describe('AccountsPageComponent', () => {
     component.shareAccountDetails(createAccountResponse());
 
     expect(component.paymentDetailsDialogOpen()).toBe(true);
-    expect(component.paymentDetailsDialogErrorMessage()).toBe('Payment details are available only for active accounts');
+    expect(component.paymentDetailsDialogErrorMessage()).toBe(
+      'Payment details are available only for active accounts',
+    );
   });
 
   it('keeps the newly opened accordion item active when the previously open item closes afterward', async () => {
@@ -169,6 +171,6 @@ function createAccountResponse(): AccountResponse {
     overdraftLimit: 0,
     annualInterestRate: 0,
     openedAt: '2026-05-01T09:00:00Z',
-    closedAt: null
+    closedAt: null,
   };
 }

@@ -127,7 +127,11 @@ export function classes(computed: () => ClassValue[] | string, options: ClassesO
 function restoreTransitionSuppression(manager: ElementClassManager): void {
   const previousTransition = manager.previousTransition;
   if (previousTransition) {
-    manager.element.style.setProperty('transition', previousTransition, manager.previousTransitionPriority || undefined);
+    manager.element.style.setProperty(
+      'transition',
+      previousTransition,
+      manager.previousTransitionPriority || undefined,
+    );
   } else {
     manager.element.style.removeProperty('transition');
   }
@@ -201,7 +205,9 @@ function updateElement(manager: ElementClassManager): void {
     manager.hasInitialized = true;
   }
 
-  const sortedSources = Array.from(manager.sources.entries()).sort(([, a], [, b]) => a.order - b.order);
+  const sortedSources = Array.from(manager.sources.entries()).sort(
+    ([, a], [, b]) => a.order - b.order,
+  );
   const allSourceClasses: string[] = [];
 
   for (const [, source] of sortedSources) {

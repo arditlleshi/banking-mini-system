@@ -5,7 +5,7 @@ import { classes } from '@spartan/utils';
 @Directive({
   selector: '[hlmSelectValue],hlm-select-value',
   hostDirectives: [{ directive: BrnSelectValue, inputs: ['placeholder'] }],
-  host: { '[attr.data-slot]': '!_hidden() ? "select-value" : null' }
+  host: { '[attr.data-slot]': '!_hidden() ? "select-value" : null' },
 })
 export class HlmSelectValue {
   private readonly _brnSelectValue = inject(BrnSelectValue);

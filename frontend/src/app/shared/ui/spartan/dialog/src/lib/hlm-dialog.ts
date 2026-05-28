@@ -9,14 +9,14 @@ import { HlmDialogOverlay } from './hlm-dialog-overlay';
   providers: [
     {
       provide: BrnDialog,
-      useExisting: forwardRef(() => HlmDialog)
+      useExisting: forwardRef(() => HlmDialog),
     },
-    provideBrnDialogDefaultOptions({})
+    provideBrnDialogDefaultOptions({}),
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <hlm-dialog-overlay />
     <ng-content />
-  `
+  `,
 })
 export class HlmDialog extends BrnDialog {}

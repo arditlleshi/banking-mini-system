@@ -7,42 +7,59 @@ export const routes: Routes = [
   {
     path: 'login',
     canActivate: [guestGuard],
-    loadComponent: () => import('./features/login/login-page.component').then((module) => module.LoginPageComponent)
+    loadComponent: () =>
+      import('./features/login/login-page.component').then((module) => module.LoginPageComponent),
   },
   {
     path: '',
     canActivate: [authGuard],
-    loadComponent: () => import('./core/layout/banking-shell.component').then((module) => module.BankingShellComponent),
+    loadComponent: () =>
+      import('./core/layout/banking-shell.component').then(
+        (module) => module.BankingShellComponent,
+      ),
     children: [
       {
         path: 'home',
-        loadComponent: () => import('./features/home/home-page.component').then((module) => module.HomePageComponent)
+        loadComponent: () =>
+          import('./features/home/home-page.component').then((module) => module.HomePageComponent),
       },
       {
         path: 'accounts',
         pathMatch: 'full',
-        loadComponent: () => import('./features/accounts/accounts-page.component').then((module) => module.AccountsPageComponent)
+        loadComponent: () =>
+          import('./features/accounts/accounts-page.component').then(
+            (module) => module.AccountsPageComponent,
+          ),
       },
       {
         path: 'accounts/:accountNumber',
         loadComponent: () =>
           import('./features/accounts/account-details/account-details-page.component').then(
-            (module) => module.AccountDetailsPageComponent
-          )
+            (module) => module.AccountDetailsPageComponent,
+          ),
       },
       {
         path: 'customers',
-        loadComponent: () => import('./features/customers/customers-page.component').then((module) => module.CustomersPageComponent)
+        loadComponent: () =>
+          import('./features/customers/customers-page.component').then(
+            (module) => module.CustomersPageComponent,
+          ),
       },
       {
         path: 'payments',
-        loadComponent: () => import('./features/payments/payments-page.component').then((module) => module.PaymentsPageComponent)
+        loadComponent: () =>
+          import('./features/payments/payments-page.component').then(
+            (module) => module.PaymentsPageComponent,
+          ),
       },
       {
         path: 'settings',
-        loadComponent: () => import('./features/settings/settings-page.component').then((module) => module.SettingsPageComponent)
-      }
-    ]
+        loadComponent: () =>
+          import('./features/settings/settings-page.component').then(
+            (module) => module.SettingsPageComponent,
+          ),
+      },
+    ],
   },
-  { path: '**', redirectTo: 'home' }
+  { path: '**', redirectTo: 'home' },
 ];

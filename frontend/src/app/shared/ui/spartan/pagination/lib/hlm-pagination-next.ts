@@ -1,5 +1,11 @@
 import type { BooleanInput } from '@angular/cdk/coercion';
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import {
+  booleanAttribute,
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+} from '@angular/core';
 import type { RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideChevronRight } from '@ng-icons/lucide';
@@ -28,7 +34,7 @@ import { HlmPaginationLink } from './hlm-pagination-link';
       <span [class]="_labelClass()">{{ text() }}</span>
       <ng-icon name="lucideChevronRight" class="rtl:rotate-180 spartan-rtl-flip" />
     </a>
-  `
+  `,
 })
 export class HlmPaginationNext {
   readonly userClass = input<ClassValue>('', { alias: 'class' });
@@ -45,14 +51,18 @@ export class HlmPaginationNext {
   readonly text = input<string>('Next');
   /** Whether the button should only display the icon. */
   readonly iconOnly = input<boolean, BooleanInput>(false, {
-    transform: booleanAttribute
+    transform: booleanAttribute,
   });
 
-  protected readonly _labelClass = computed(() => (this.iconOnly() ? 'sr-only' : 'hidden sm:block'));
+  protected readonly _labelClass = computed(() =>
+    this.iconOnly() ? 'sr-only' : 'hidden sm:block',
+  );
 
-  protected readonly _size = computed<ButtonVariants['size']>(() => (this.iconOnly() ? 'icon' : 'default'));
+  protected readonly _size = computed<ButtonVariants['size']>(() =>
+    this.iconOnly() ? 'icon' : 'default',
+  );
 
   protected readonly _computedClass = computed(() =>
-    hlm(!this.iconOnly() && 'spartan-pagination-next', this.userClass())
+    hlm(!this.iconOnly() && 'spartan-pagination-next', this.userClass()),
   );
 }

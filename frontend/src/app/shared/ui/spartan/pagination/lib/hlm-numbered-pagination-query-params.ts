@@ -7,7 +7,7 @@ import {
   input,
   model,
   numberAttribute,
-  untracked
+  untracked,
 } from '@angular/core';
 
 import { createPageArray, outOfBoundCorrection } from './hlm-numbered-pagination';
@@ -28,7 +28,7 @@ import { HlmPaginationPrevious } from './hlm-pagination-previous';
     HlmPaginationPrevious,
     HlmPaginationNext,
     HlmPaginationLink,
-    HlmPaginationEllipsis
+    HlmPaginationEllipsis,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -73,7 +73,7 @@ import { HlmPaginationPrevious } from './hlm-pagination-previous';
         }
       </ul>
     </nav>
-  `
+  `,
 })
 export class HlmNumberedPaginationQueryParams {
   /**
@@ -90,7 +90,7 @@ export class HlmNumberedPaginationQueryParams {
    * The total number of items in the collection.
    */
   readonly totalItems = input.required<number, NumberInput>({
-    transform: numberAttribute
+    transform: numberAttribute,
   });
 
   /**
@@ -103,18 +103,20 @@ export class HlmNumberedPaginationQueryParams {
    * The number of page links to show.
    */
   readonly maxSize = input<number, NumberInput>(7, {
-    transform: numberAttribute
+    transform: numberAttribute,
   });
 
   /**
    * Show the first and last page buttons.
    */
   readonly showEdges = input<boolean, BooleanInput>(true, {
-    transform: booleanAttribute
+    transform: booleanAttribute,
   });
 
   protected readonly _isFirstPageActive = computed(() => this.currentPage() === 1);
-  protected readonly _isLastPageActive = computed(() => this.currentPage() === this._lastPageNumber());
+  protected readonly _isLastPageActive = computed(
+    () => this.currentPage() === this._lastPageNumber(),
+  );
 
   protected readonly _lastPageNumber = computed(() => {
     if (this.totalItems() < 1) {
@@ -124,12 +126,21 @@ export class HlmNumberedPaginationQueryParams {
   });
 
   protected readonly _pages = computed(() => {
-    const correctedCurrentPage = outOfBoundCorrection(this.totalItems(), this.itemsPerPage(), this.currentPage());
+    const correctedCurrentPage = outOfBoundCorrection(
+      this.totalItems(),
+      this.itemsPerPage(),
+      this.currentPage(),
+    );
 
     if (correctedCurrentPage !== this.currentPage()) {
       untracked(() => this.currentPage.set(correctedCurrentPage));
     }
 
-    return createPageArray(correctedCurrentPage, this.itemsPerPage(), this.totalItems(), this.maxSize());
+    return createPageArray(
+      correctedCurrentPage,
+      this.itemsPerPage(),
+      this.totalItems(),
+      this.maxSize(),
+    );
   });
 }

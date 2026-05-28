@@ -17,7 +17,10 @@
     </header>
     <section class="grid gap-4 md:grid-cols-3">
       @for (highlight of content().highlights; track highlight) {
-        <section hlmCard class="rounded-lg border border-border/70 [background:var(--surface-hero)]">
+        <section
+          hlmCard
+          class="rounded-lg border border-border/70 [background:var(--surface-hero)]"
+        >
           <div hlmCardHeader class="gap-3 p-6">
             <p
               class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
@@ -38,7 +41,10 @@
         </section>
       }
     </section>
-    <section hlmCard class="rounded-lg border border-border/70 [background:var(--surface-panel-strong)]">
+    <section
+      hlmCard
+      class="rounded-lg border border-border/70 [background:var(--surface-panel-strong)]"
+    >
       <div hlmCardHeader class="gap-3 p-6 sm:p-8">
         <p class="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
           Operational readiness
@@ -55,7 +61,9 @@
         </p>
       </div>
       <div hlmCardContent class="grid gap-4 px-6 pb-6 sm:grid-cols-2 sm:px-8 sm:pb-8">
-        <article class="rounded-lg border border-border/70 p-5 [background:var(--surface-inset)] [box-shadow:var(--surface-shadow-inline)]">
+        <article
+          class="rounded-lg border border-border/70 p-5 [background:var(--surface-inset)] [box-shadow:var(--surface-shadow-inline)]"
+        >
           <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             Surface direction
           </p>
@@ -64,7 +72,9 @@
             real forms, lists, and approvals.
           </p>
         </article>
-        <article class="rounded-lg border border-border/70 p-5 [background:var(--surface-inset)] [box-shadow:var(--surface-shadow-inline)]">
+        <article
+          class="rounded-lg border border-border/70 p-5 [background:var(--surface-inset)] [box-shadow:var(--surface-shadow-inline)]"
+        >
           <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             Next build step
           </p>

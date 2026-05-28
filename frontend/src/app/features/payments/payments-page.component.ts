@@ -2,30 +2,65 @@ import { DecimalPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toSignal, takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { provideIcons } from '@ng-icons/core';
-import { lucideBuilding2, lucideCreditCard, lucideLandmark, lucideSmartphone, lucideZap } from '@ng-icons/lucide';
+import {
+  lucideBuilding2,
+  lucideCreditCard,
+  lucideLandmark,
+  lucideSmartphone,
+  lucideZap,
+} from '@ng-icons/lucide';
 import { HlmIconImports } from '@spartan/icon';
 import { toast } from '@spartan-ng/brain/sonner';
 import { startWith } from 'rxjs';
 
-import { AccountApiService, type AccountCurrency, type AccountResponse } from '../../core/services/account-api.service';
-import { ExchangeRateApiService, type ExchangeRateResponse } from '../../core/services/exchange-rate-api.service';
+import {
+  AccountApiService,
+  type AccountCurrency,
+  type AccountResponse,
+} from '../../core/services/account-api.service';
+import {
+  ExchangeRateApiService,
+  type ExchangeRateResponse,
+} from '../../core/services/exchange-rate-api.service';
 import {
   PaymentApiService,
   type PaymentBeneficiaryResponse,
-  type PaymentResponse
+  type PaymentResponse,
 } from '../../core/services/payment-api.service';
-import { TransferApiService, type TransferResponse } from '../../core/services/transfer-api.service';
+import {
+  TransferApiService,
+  type TransferResponse,
+} from '../../core/services/transfer-api.service';
 import { HlmButton } from '../../shared/ui/spartan/button';
-import { HlmCard, HlmCardContent, HlmCardDescription, HlmCardHeader, HlmCardTitle } from '../../shared/ui/spartan/card';
+import {
+  HlmCard,
+  HlmCardContent,
+  HlmCardDescription,
+  HlmCardHeader,
+  HlmCardTitle,
+} from '../../shared/ui/spartan/card';
 import { HlmInput } from '../../shared/ui/spartan/input';
 import { HlmLabel } from '../../shared/ui/spartan/label';
-import { HlmSelect, HlmSelectContent, HlmSelectItem, HlmSelectPortal, HlmSelectTrigger, HlmSelectValue } from '../../shared/ui/spartan/select';
+import {
+  HlmSelect,
+  HlmSelectContent,
+  HlmSelectItem,
+  HlmSelectPortal,
+  HlmSelectTrigger,
+  HlmSelectValue,
+} from '../../shared/ui/spartan/select';
 import {
   PaymentConfirmationDialogComponent,
-  type PaymentConfirmation
+  type PaymentConfirmation,
 } from './payment-confirmation-dialog.component';
 
 type AccountOption = {
@@ -33,7 +68,12 @@ type AccountOption = {
   readonly label: string;
 };
 
-type PaymentActionId = 'own-accounts' | 'bank-account' | 'utilities' | 'mobile-top-up' | 'credit-card';
+type PaymentActionId =
+  | 'own-accounts'
+  | 'bank-account'
+  | 'utilities'
+  | 'mobile-top-up'
+  | 'credit-card';
 
 type PaymentAction = {
   readonly id: PaymentActionId;
@@ -86,7 +126,7 @@ type PendingConfirmation = PendingTransferConfirmation | PendingBankPaymentConfi
     HlmSelectItem,
     HlmSelectPortal,
     HlmSelectTrigger,
-    HlmSelectValue
+    HlmSelectValue,
   ],
   providers: [
     provideIcons({
@@ -94,11 +134,11 @@ type PendingConfirmation = PendingTransferConfirmation | PendingBankPaymentConfi
       lucideCreditCard,
       lucideLandmark,
       lucideSmartphone,
-      lucideZap
-    })
+      lucideZap,
+    }),
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './payments-page.component.html'
+  templateUrl: './payments-page.component.html',
 })
 export class PaymentsPageComponent {
   private static readonly descriptionPattern = /^[A-Za-z0-9][A-Za-z0-9 .,'()\/\-]*$/;
@@ -137,36 +177,36 @@ export class PaymentsPageComponent {
       label: 'Own Accounts',
       description: 'Move money between your eligible bank accounts.',
       icon: 'lucideLandmark',
-      available: true
+      available: true,
     },
     {
       id: 'bank-account',
       label: 'Another Account',
       description: 'Send money to another customer account after verification.',
       icon: 'lucideBuilding2',
-      available: true
+      available: true,
     },
     {
       id: 'utilities',
       label: 'Utilities',
       description: 'Pay household bills from approved providers.',
       icon: 'lucideZap',
-      available: false
+      available: false,
     },
     {
       id: 'mobile-top-up',
       label: 'Mobile Top-Up',
       description: 'Reload a phone number from your account balance.',
       icon: 'lucideSmartphone',
-      available: false
+      available: false,
     },
     {
       id: 'credit-card',
       label: 'Credit Card',
       description: 'Pay your card balance or a selected statement.',
       icon: 'lucideCreditCard',
-      available: false
-    }
+      available: false,
+    },
   ];
 
   protected readonly ownTransferForm = this.fb.nonNullable.group(
@@ -180,18 +220,22 @@ export class PaymentsPageComponent {
           Validators.required,
           Validators.minLength(5),
           Validators.maxLength(280),
-          Validators.pattern(PaymentsPageComponent.descriptionPattern)
-        ]
-      ]
+          Validators.pattern(PaymentsPageComponent.descriptionPattern),
+        ],
+      ],
     },
-    { validators: [PaymentsPageComponent.differentAccountsValidator] }
+    { validators: [PaymentsPageComponent.differentAccountsValidator] },
   );
 
   protected readonly paymentForm = this.fb.nonNullable.group({
     sourceAccountId: [0, [Validators.required, Validators.min(1)]],
     beneficiaryAccountNumber: [
       '',
-      [Validators.required, Validators.maxLength(34), Validators.pattern(PaymentsPageComponent.accountNumberPattern)]
+      [
+        Validators.required,
+        Validators.maxLength(34),
+        Validators.pattern(PaymentsPageComponent.accountNumberPattern),
+      ],
     ],
     amount: [0, [Validators.required, Validators.min(0.01), Validators.max(1_000_000)]],
     description: [
@@ -200,54 +244,69 @@ export class PaymentsPageComponent {
         Validators.required,
         Validators.minLength(5),
         Validators.maxLength(280),
-        Validators.pattern(PaymentsPageComponent.descriptionPattern)
-      ]
-    ]
+        Validators.pattern(PaymentsPageComponent.descriptionPattern),
+      ],
+    ],
   });
 
   private readonly ownSourceAccountIdValue = toSignal(
-    this.ownTransferForm.controls.sourceAccountId.valueChanges.pipe(startWith(this.ownTransferForm.controls.sourceAccountId.value)),
-    { initialValue: this.ownTransferForm.controls.sourceAccountId.value }
+    this.ownTransferForm.controls.sourceAccountId.valueChanges.pipe(
+      startWith(this.ownTransferForm.controls.sourceAccountId.value),
+    ),
+    { initialValue: this.ownTransferForm.controls.sourceAccountId.value },
   );
   private readonly ownTargetAccountIdValue = toSignal(
-    this.ownTransferForm.controls.targetAccountId.valueChanges.pipe(startWith(this.ownTransferForm.controls.targetAccountId.value)),
-    { initialValue: this.ownTransferForm.controls.targetAccountId.value }
+    this.ownTransferForm.controls.targetAccountId.valueChanges.pipe(
+      startWith(this.ownTransferForm.controls.targetAccountId.value),
+    ),
+    { initialValue: this.ownTransferForm.controls.targetAccountId.value },
   );
   private readonly ownAmountValue = toSignal(
-    this.ownTransferForm.controls.amount.valueChanges.pipe(startWith(this.ownTransferForm.controls.amount.value)),
-    { initialValue: this.ownTransferForm.controls.amount.value }
+    this.ownTransferForm.controls.amount.valueChanges.pipe(
+      startWith(this.ownTransferForm.controls.amount.value),
+    ),
+    { initialValue: this.ownTransferForm.controls.amount.value },
   );
   private readonly paymentSourceAccountIdValue = toSignal(
-    this.paymentForm.controls.sourceAccountId.valueChanges.pipe(startWith(this.paymentForm.controls.sourceAccountId.value)),
-    { initialValue: this.paymentForm.controls.sourceAccountId.value }
+    this.paymentForm.controls.sourceAccountId.valueChanges.pipe(
+      startWith(this.paymentForm.controls.sourceAccountId.value),
+    ),
+    { initialValue: this.paymentForm.controls.sourceAccountId.value },
   );
   private readonly paymentAmountValue = toSignal(
-    this.paymentForm.controls.amount.valueChanges.pipe(startWith(this.paymentForm.controls.amount.value)),
-    { initialValue: this.paymentForm.controls.amount.value }
+    this.paymentForm.controls.amount.valueChanges.pipe(
+      startWith(this.paymentForm.controls.amount.value),
+    ),
+    { initialValue: this.paymentForm.controls.amount.value },
   );
 
-  protected readonly sourceAccount = computed(() =>
-    this.accounts().find((account) => account.id === this.ownSourceAccountIdValue()) ?? null
+  protected readonly sourceAccount = computed(
+    () => this.accounts().find((account) => account.id === this.ownSourceAccountIdValue()) ?? null,
   );
-  protected readonly targetAccount = computed(() =>
-    this.accounts().find((account) => account.id === this.ownTargetAccountIdValue()) ?? null
+  protected readonly targetAccount = computed(
+    () => this.accounts().find((account) => account.id === this.ownTargetAccountIdValue()) ?? null,
   );
-  protected readonly paymentSourceAccount = computed(() =>
-    this.accounts().find((account) => account.id === this.paymentSourceAccountIdValue()) ?? null
+  protected readonly paymentSourceAccount = computed(
+    () =>
+      this.accounts().find((account) => account.id === this.paymentSourceAccountIdValue()) ?? null,
   );
   protected readonly ownFxPreview = computed(() =>
-    this.buildFxPreview(this.sourceAccount()?.currency ?? null, this.targetAccount()?.currency ?? null, this.ownAmountValue() || 0)
+    this.buildFxPreview(
+      this.sourceAccount()?.currency ?? null,
+      this.targetAccount()?.currency ?? null,
+      this.ownAmountValue() || 0,
+    ),
   );
   protected readonly beneficiaryFxPreview = computed(() => {
     const beneficiaryCurrency = this.beneficiary()?.currency ?? null;
     return this.buildFxPreview(
       this.paymentSourceAccount()?.currency ?? null,
       beneficiaryCurrency as AccountCurrency | null,
-      this.paymentAmountValue() || 0
+      this.paymentAmountValue() || 0,
     );
   });
   protected readonly accountOptions = computed<readonly AccountOption[]>(() =>
-    this.accounts().map((account) => ({ value: account.id, label: this.accountLabel(account) }))
+    this.accounts().map((account) => ({ value: account.id, label: this.accountLabel(account) })),
   );
   protected readonly targetAccountOptions = computed<readonly AccountOption[]>(() => {
     const sourceAccountId = this.ownSourceAccountIdValue();
@@ -279,12 +338,16 @@ export class PaymentsPageComponent {
     this.loadData();
   }
 
-  protected ownControlHasError(controlName: 'sourceAccountId' | 'targetAccountId' | 'amount' | 'description'): boolean {
+  protected ownControlHasError(
+    controlName: 'sourceAccountId' | 'targetAccountId' | 'amount' | 'description',
+  ): boolean {
     const control = this.ownTransferForm.controls[controlName];
     return control.invalid && control.touched;
   }
 
-  protected paymentControlHasError(controlName: 'sourceAccountId' | 'beneficiaryAccountNumber' | 'amount' | 'description'): boolean {
+  protected paymentControlHasError(
+    controlName: 'sourceAccountId' | 'beneficiaryAccountNumber' | 'amount' | 'description',
+  ): boolean {
     const control = this.paymentForm.controls[controlName];
     return control.invalid && control.touched;
   }
@@ -313,7 +376,8 @@ export class PaymentsPageComponent {
     if (control.hasError('required')) return 'Description is required.';
     if (control.hasError('minlength')) return 'Description must be at least 5 characters.';
     if (control.hasError('maxlength')) return 'Description cannot exceed 280 characters.';
-    if (control.hasError('pattern')) return 'Description must start with a letter or number and use valid characters only.';
+    if (control.hasError('pattern'))
+      return 'Description must start with a letter or number and use valid characters only.';
     return 'Enter a valid description.';
   }
 
@@ -323,7 +387,8 @@ export class PaymentsPageComponent {
     if (control.hasError('required')) return 'Description is required.';
     if (control.hasError('minlength')) return 'Description must be at least 5 characters.';
     if (control.hasError('maxlength')) return 'Description cannot exceed 280 characters.';
-    if (control.hasError('pattern')) return 'Description must start with a letter or number and use valid characters only.';
+    if (control.hasError('pattern'))
+      return 'Description must start with a letter or number and use valid characters only.';
     return 'Enter a valid description.';
   }
 
@@ -331,8 +396,10 @@ export class PaymentsPageComponent {
     const control = this.paymentForm.controls.beneficiaryAccountNumber;
     if (!this.paymentControlHasError('beneficiaryAccountNumber')) return null;
     if (control.hasError('required')) return 'Beneficiary account number is required.';
-    if (control.hasError('maxlength')) return 'Beneficiary account number cannot exceed 34 characters.';
-    if (control.hasError('pattern')) return 'Use letters and numbers only in the beneficiary account number.';
+    if (control.hasError('maxlength'))
+      return 'Beneficiary account number cannot exceed 34 characters.';
+    if (control.hasError('pattern'))
+      return 'Use letters and numbers only in the beneficiary account number.';
     return 'Enter a valid beneficiary account number.';
   }
 
@@ -388,14 +455,16 @@ export class PaymentsPageComponent {
         this.resolvedBeneficiaryAccountNumber.set(null);
         this.beneficiaryLookupLoading.set(false);
         this.beneficiaryLookupError.set(
-          this.extractApiError(error, 'Beneficiary account could not be verified right now.')
+          this.extractApiError(error, 'Beneficiary account could not be verified right now.'),
         );
-      }
+      },
     });
   }
 
   protected handleBeneficiaryAccountBlur(): void {
-    const normalized = this.normalizeAccountNumber(this.paymentForm.controls.beneficiaryAccountNumber.getRawValue());
+    const normalized = this.normalizeAccountNumber(
+      this.paymentForm.controls.beneficiaryAccountNumber.getRawValue(),
+    );
     if (!normalized || normalized === this.resolvedBeneficiaryAccountNumber()) {
       return;
     }
@@ -473,7 +542,7 @@ export class PaymentsPageComponent {
     void this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { mode: action.id },
-      queryParamsHandling: 'merge'
+      queryParamsHandling: 'merge',
     });
   }
 
@@ -496,7 +565,7 @@ export class PaymentsPageComponent {
   protected accountConfirmationData(account: AccountResponse): { name: string; number: string } {
     return {
       name: account.name,
-      number: account.accountNumber
+      number: account.accountNumber,
     };
   }
 
@@ -506,7 +575,9 @@ export class PaymentsPageComponent {
       return;
     }
 
-    const matchedAction = this.paymentActions.find((action) => action.id === requestedMode && action.available);
+    const matchedAction = this.paymentActions.find(
+      (action) => action.id === requestedMode && action.available,
+    );
     if (matchedAction) {
       this.activePaymentAction.set(matchedAction.id);
     }
@@ -530,7 +601,7 @@ export class PaymentsPageComponent {
   private buildFxPreview(
     sourceCurrency: AccountCurrency | null,
     targetCurrency: AccountCurrency | null,
-    amount: number
+    amount: number,
   ): FxPreview | null {
     if (!sourceCurrency || !targetCurrency) {
       return null;
@@ -539,7 +610,7 @@ export class PaymentsPageComponent {
       return {
         rate: 1,
         targetAmount: amount,
-        note: 'Same currency transfer'
+        note: 'Same currency transfer',
       };
     }
 
@@ -551,7 +622,7 @@ export class PaymentsPageComponent {
     return {
       rate,
       targetAmount: Number((amount * rate).toFixed(2)),
-      note: 'Estimated credit amount'
+      note: 'Estimated credit amount',
     };
   }
 
@@ -570,15 +641,19 @@ export class PaymentsPageComponent {
       error: (error: HttpErrorResponse) => {
         this.ratesLoading.set(false);
         if (error.status === 403) {
-          this.exchangeRateLoadWarning.set('Live exchange rate preview is not available for your current role.');
+          this.exchangeRateLoadWarning.set(
+            'Live exchange rate preview is not available for your current role.',
+          );
           return;
         }
         if (error.status === 0) {
-          this.exchangeRateLoadWarning.set('Exchange rates are currently unavailable because backend is unreachable.');
+          this.exchangeRateLoadWarning.set(
+            'Exchange rates are currently unavailable because backend is unreachable.',
+          );
           return;
         }
         this.exchangeRateLoadWarning.set('Exchange rate preview is currently unavailable.');
-      }
+      },
     });
   }
 
@@ -599,14 +674,20 @@ export class PaymentsPageComponent {
       },
       error: (error: HttpErrorResponse) => {
         this.accountsLoading.set(false);
-        this.accountsLoadError.set(this.extractApiError(error, 'Accounts could not be loaded at the moment.'));
-      }
+        this.accountsLoadError.set(
+          this.extractApiError(error, 'Accounts could not be loaded at the moment.'),
+        );
+      },
     });
   }
 
   private ensureOwnTransferDefaults(accounts: AccountResponse[]): void {
-    const sourceSelected = accounts.some((account) => account.id === this.ownTransferForm.controls.sourceAccountId.value);
-    const targetSelected = accounts.some((account) => account.id === this.ownTransferForm.controls.targetAccountId.value);
+    const sourceSelected = accounts.some(
+      (account) => account.id === this.ownTransferForm.controls.sourceAccountId.value,
+    );
+    const targetSelected = accounts.some(
+      (account) => account.id === this.ownTransferForm.controls.targetAccountId.value,
+    );
 
     if (!sourceSelected) {
       this.ownTransferForm.controls.sourceAccountId.setValue(accounts[0].id);
@@ -615,7 +696,11 @@ export class PaymentsPageComponent {
       const fallback = accounts.length > 1 ? accounts[1].id : accounts[0].id;
       this.ownTransferForm.controls.targetAccountId.setValue(fallback);
     }
-    if (this.ownTransferForm.controls.sourceAccountId.value === this.ownTransferForm.controls.targetAccountId.value && accounts.length > 1) {
+    if (
+      this.ownTransferForm.controls.sourceAccountId.value ===
+        this.ownTransferForm.controls.targetAccountId.value &&
+      accounts.length > 1
+    ) {
       const currentSource = this.ownTransferForm.controls.sourceAccountId.value;
       const fallbackTarget = accounts.find((account) => account.id !== currentSource);
       if (fallbackTarget) {
@@ -625,7 +710,9 @@ export class PaymentsPageComponent {
   }
 
   private ensurePaymentDefaults(accounts: AccountResponse[]): void {
-    const sourceSelected = accounts.some((account) => account.id === this.paymentForm.controls.sourceAccountId.value);
+    const sourceSelected = accounts.some(
+      (account) => account.id === this.paymentForm.controls.sourceAccountId.value,
+    );
     if (!sourceSelected) {
       this.paymentForm.controls.sourceAccountId.setValue(accounts[0].id);
     }
@@ -636,7 +723,7 @@ export class PaymentsPageComponent {
       sourceAccountId: this.ownTransferForm.controls.sourceAccountId.value,
       targetAccountId: this.ownTransferForm.controls.targetAccountId.value,
       amount: 0,
-      description: ''
+      description: '',
     });
   }
 
@@ -645,11 +732,14 @@ export class PaymentsPageComponent {
       sourceAccountId: this.paymentForm.controls.sourceAccountId.value,
       beneficiaryAccountNumber: this.paymentForm.controls.beneficiaryAccountNumber.value,
       amount: 0,
-      description: ''
+      description: '',
     });
   }
 
-  private resolveExchangeRate(sourceCurrency: AccountCurrency, targetCurrency: AccountCurrency): number | null {
+  private resolveExchangeRate(
+    sourceCurrency: AccountCurrency,
+    targetCurrency: AccountCurrency,
+  ): number | null {
     if (sourceCurrency === targetCurrency) {
       return 1;
     }
@@ -678,7 +768,10 @@ export class PaymentsPageComponent {
     return Number((sourceToAll.buyRate / targetToAll.sellRate).toFixed(8));
   }
 
-  private findLatestRate(baseCurrency: AccountCurrency, quoteCurrency: AccountCurrency): ExchangeRateResponse | null {
+  private findLatestRate(
+    baseCurrency: AccountCurrency,
+    quoteCurrency: AccountCurrency,
+  ): ExchangeRateResponse | null {
     const candidates = this.exchangeRates()
       .filter((rate) => rate.baseCurrency === baseCurrency && rate.quoteCurrency === quoteCurrency)
       .sort((left, right) => right.validFrom.localeCompare(left.validFrom));
@@ -698,7 +791,9 @@ export class PaymentsPageComponent {
     const source = this.sourceAccount();
     const target = this.targetAccount();
     if (!source || !target) {
-      this.transferError.set('Choose both debit and credit accounts before reviewing the transfer.');
+      this.transferError.set(
+        'Choose both debit and credit accounts before reviewing the transfer.',
+      );
       return null;
     }
     if (this.ownTransferForm.hasError('sameAccount') || source.id === target.id) {
@@ -709,7 +804,9 @@ export class PaymentsPageComponent {
     const raw = this.ownTransferForm.getRawValue();
     const amount = Number(raw.amount);
     if (amount > source.availableBalance) {
-      this.transferError.set('Transfer amount cannot be greater than the available balance of the debit account.');
+      this.transferError.set(
+        'Transfer amount cannot be greater than the available balance of the debit account.',
+      );
       return null;
     }
 
@@ -732,7 +829,7 @@ export class PaymentsPageComponent {
       creditAccountNumber: creditAccount.number,
       sourceAccountId: raw.sourceAccountId,
       targetAccountId: raw.targetAccountId,
-      bookingDescription: raw.description.trim()
+      bookingDescription: raw.description.trim(),
     };
   }
 
@@ -756,7 +853,9 @@ export class PaymentsPageComponent {
     const raw = this.paymentForm.getRawValue();
     const amount = Number(raw.amount);
     if (amount > source.availableBalance) {
-      this.paymentError.set('Payment amount cannot be greater than the available balance of the debit account.');
+      this.paymentError.set(
+        'Payment amount cannot be greater than the available balance of the debit account.',
+      );
       return null;
     }
 
@@ -779,7 +878,7 @@ export class PaymentsPageComponent {
       sourceAccountId: raw.sourceAccountId,
       counterpartyName: beneficiary.beneficiaryName,
       counterpartyAccount: beneficiary.accountNumber,
-      bookingDescription: raw.description.trim()
+      bookingDescription: raw.description.trim(),
     };
   }
 
@@ -793,7 +892,7 @@ export class PaymentsPageComponent {
         sourceAccountId: confirmation.sourceAccountId,
         targetAccountId: confirmation.targetAccountId,
         amount: confirmation.amount,
-        description: confirmation.bookingDescription
+        description: confirmation.bookingDescription,
       })
       .subscribe({
         next: () => {
@@ -808,8 +907,13 @@ export class PaymentsPageComponent {
           this.submitting.set(false);
           this.confirmationOpen.set(false);
           this.pendingConfirmation.set(null);
-          this.transferError.set(this.extractApiError(error, 'Transfer failed. Please review your inputs and try again.'));
-        }
+          this.transferError.set(
+            this.extractApiError(
+              error,
+              'Transfer failed. Please review your inputs and try again.',
+            ),
+          );
+        },
       });
   }
 
@@ -824,7 +928,7 @@ export class PaymentsPageComponent {
         amount: confirmation.amount,
         description: confirmation.bookingDescription,
         counterpartyName: confirmation.counterpartyName,
-        counterpartyAccount: confirmation.counterpartyAccount
+        counterpartyAccount: confirmation.counterpartyAccount,
       })
       .subscribe({
         next: () => {
@@ -839,8 +943,10 @@ export class PaymentsPageComponent {
           this.submitting.set(false);
           this.confirmationOpen.set(false);
           this.pendingConfirmation.set(null);
-          this.paymentError.set(this.extractApiError(error, 'Payment failed. Please review your inputs and try again.'));
-        }
+          this.paymentError.set(
+            this.extractApiError(error, 'Payment failed. Please review your inputs and try again.'),
+          );
+        },
       });
   }
 

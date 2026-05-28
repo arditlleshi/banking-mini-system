@@ -10,7 +10,7 @@ export class AuthSessionService {
 
   constructor(
     private readonly authApi: AuthApiService,
-    private readonly authState: AuthStateService
+    private readonly authState: AuthStateService,
   ) {}
 
   refreshTokens(): Observable<AuthTokens> {
@@ -29,7 +29,7 @@ export class AuthSessionService {
       finalize(() => {
         this.refreshInFlight$ = null;
       }),
-      shareReplay({ bufferSize: 1, refCount: false })
+      shareReplay({ bufferSize: 1, refCount: false }),
     );
 
     return this.refreshInFlight$;
@@ -38,7 +38,7 @@ export class AuthSessionService {
   logoutAndClear(): Observable<void> {
     return this.authApi.logout().pipe(
       catchError(() => of(void 0)),
-      finalize(() => this.authState.clear())
+      finalize(() => this.authState.clear()),
     );
   }
 }

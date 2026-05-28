@@ -30,5 +30,5 @@ export const HlmDialogImports = [
   HlmDialogOverlay,
   HlmDialogPortal,
   HlmDialogTitle,
-  HlmDialogTrigger
+  HlmDialogTrigger,
 ] as const;

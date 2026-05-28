@@ -4,8 +4,8 @@ import { classes } from '@spartan/utils';
 @Directive({
   selector: '[hlmBreadcrumbList]',
   host: {
-    'data-slot': 'breadcrumb-list'
-  }
+    'data-slot': 'breadcrumb-list',
+  },
 })
 export class HlmBreadcrumbList {
   constructor() {

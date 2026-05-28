@@ -43,8 +43,11 @@ export class DashboardApiService {
   }
 
   getDashboardMonthlyCashFlow(months = 6): Observable<DashboardMonthlyCashFlowResponse> {
-    return this.http.get<DashboardMonthlyCashFlowResponse>(`${this.baseUrl}/dashboard/monthly-cash-flow`, {
-      params: { months }
-    });
+    return this.http.get<DashboardMonthlyCashFlowResponse>(
+      `${this.baseUrl}/dashboard/monthly-cash-flow`,
+      {
+        params: { months },
+      },
+    );
   }
 }

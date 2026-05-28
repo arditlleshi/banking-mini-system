@@ -25,7 +25,12 @@ describe('PaymentsPageComponent', () => {
     createPayment.mockReset();
     navigate.mockReset();
 
-    getAccounts.mockReturnValue(of([createAccount(1, 'Source Account', '111111CUR01'), createAccount(2, 'Savings', '222222CUR01')]));
+    getAccounts.mockReturnValue(
+      of([
+        createAccount(1, 'Source Account', '111111CUR01'),
+        createAccount(2, 'Savings', '222222CUR01'),
+      ]),
+    );
     getExchangeRates.mockReturnValue(of([]));
     createTransfer.mockReturnValue(
       of({
@@ -37,8 +42,8 @@ describe('PaymentsPageComponent', () => {
         sourceAmount: 150,
         targetAmount: 150,
         description: 'Monthly savings transfer',
-        bookedAt: '2026-05-19T09:05:00Z'
-      })
+        bookedAt: '2026-05-19T09:05:00Z',
+      }),
     );
     lookupBeneficiary.mockReturnValue(
       of({
@@ -47,8 +52,8 @@ describe('PaymentsPageComponent', () => {
         iban: 'AL4733333300000000000001',
         beneficiaryName: 'Beneficiary User',
         accountName: 'Beneficiary Main',
-        currency: 'EUR'
-      })
+        currency: 'EUR',
+      }),
     );
     createPayment.mockReturnValue(
       of({
@@ -60,8 +65,8 @@ describe('PaymentsPageComponent', () => {
         counterpartyName: 'Beneficiary User',
         counterpartyAccount: '333333CUR01',
         balanceAfter: 925,
-        bookedAt: '2026-05-19T09:00:00Z'
-      })
+        bookedAt: '2026-05-19T09:00:00Z',
+      }),
     );
 
     await TestBed.configureTestingModule({
@@ -69,29 +74,29 @@ describe('PaymentsPageComponent', () => {
       providers: [
         {
           provide: AccountApiService,
-          useValue: { getAccounts }
+          useValue: { getAccounts },
         },
         {
           provide: ExchangeRateApiService,
-          useValue: { getExchangeRates }
+          useValue: { getExchangeRates },
         },
         {
           provide: TransferApiService,
-          useValue: { createTransfer }
+          useValue: { createTransfer },
         },
         {
           provide: PaymentApiService,
-          useValue: { lookupBeneficiary, createPayment }
+          useValue: { lookupBeneficiary, createPayment },
         },
         {
           provide: ActivatedRoute,
-          useValue: { snapshot: { queryParamMap: convertToParamMap({ mode: 'bank-account' }) } }
+          useValue: { snapshot: { queryParamMap: convertToParamMap({ mode: 'bank-account' }) } },
         },
         {
           provide: Router,
-          useValue: { navigate }
-        }
-      ]
+          useValue: { navigate },
+        },
+      ],
     }).compileComponents();
   });
 
@@ -132,7 +137,7 @@ describe('PaymentsPageComponent', () => {
       sourceAccountId: 1,
       beneficiaryAccountNumber: '333333CUR01',
       amount: 75,
-      description: 'Rent contribution'
+      description: 'Rent contribution',
     });
 
     component.lookupBeneficiary();
@@ -151,7 +156,7 @@ describe('PaymentsPageComponent', () => {
       amount: 75,
       description: 'Rent contribution',
       counterpartyName: 'Beneficiary User',
-      counterpartyAccount: '333333CUR01'
+      counterpartyAccount: '333333CUR01',
     });
     expect(component.successPayment()?.paymentReference).toBe('payment-ref-1');
   });
@@ -180,7 +185,7 @@ describe('PaymentsPageComponent', () => {
       sourceAccountId: 1,
       targetAccountId: 2,
       amount: 150,
-      description: 'Monthly savings transfer'
+      description: 'Monthly savings transfer',
     });
 
     component.submitTransfer();
@@ -195,7 +200,7 @@ describe('PaymentsPageComponent', () => {
       sourceAccountId: 1,
       targetAccountId: 2,
       amount: 150,
-      description: 'Monthly savings transfer'
+      description: 'Monthly savings transfer',
     });
     expect(component.successTransfer()?.transferReference).toBe('transfer-ref-1');
   });
@@ -215,6 +220,6 @@ function createAccount(id: number, name: string, accountNumber: string) {
     overdraftLimit: 0,
     annualInterestRate: 0,
     openedAt: '2026-05-01T09:00:00Z',
-    closedAt: null
+    closedAt: null,
   };
 }

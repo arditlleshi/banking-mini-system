@@ -27,5 +27,5 @@ export const HlmPaginationImports = [
   HlmPaginationNext,
   HlmPaginationEllipsis,
   HlmNumberedPagination,
-  HlmNumberedPaginationQueryParams
+  HlmNumberedPaginationQueryParams,
 ] as const;

@@ -18,13 +18,13 @@ import { classes } from '@spartan/utils';
         'preserveFragment',
         'skipLocationChange',
         'replaceUrl',
-        'routerLink: link'
-      ]
-    }
+        'routerLink: link',
+      ],
+    },
   ],
   host: {
-    'data-slot': 'breadcrumb-link'
-  }
+    'data-slot': 'breadcrumb-link',
+  },
 })
 export class HlmBreadcrumbLink {
   /** The link to navigate to the page. */

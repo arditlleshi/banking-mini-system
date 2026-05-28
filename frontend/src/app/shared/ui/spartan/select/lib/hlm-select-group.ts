@@ -7,8 +7,8 @@ import { classes } from '@spartan/utils';
   selector: '[hlmSelectGroup],hlm-select-group',
   hostDirectives: [{ directive: BrnSelectGroup }],
   host: {
-    'data-slot': 'select-group'
-  }
+    'data-slot': 'select-group',
+  },
 })
 export class HlmSelectGroup {
   constructor() {

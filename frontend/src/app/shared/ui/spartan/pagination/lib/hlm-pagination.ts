@@ -7,8 +7,8 @@ import { classes } from '@spartan/utils';
   host: {
     'data-slot': 'pagination',
     role: 'navigation',
-    '[attr.aria-label]': 'ariaLabel()'
-  }
+    '[attr.aria-label]': 'ariaLabel()',
+  },
 })
 export class HlmPagination {
   /** The aria-label for the pagination component. */

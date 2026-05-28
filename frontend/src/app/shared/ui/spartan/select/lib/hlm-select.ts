@@ -9,27 +9,36 @@ import { classes } from '@spartan/utils';
   providers: [
     provideBrnPopoverConfig({
       align: 'start',
-      sideOffset: 6
+      sideOffset: 6,
     }),
     provideBrnDialogDefaultOptions({
-      autoFocus: 'first-heading'
-    })
+      autoFocus: 'first-heading',
+    }),
   ],
   hostDirectives: [
     {
       directive: BrnSelect,
       inputs: ['disabled', 'value', 'isItemEqualToValue', 'itemToString'],
-      outputs: ['valueChange']
+      outputs: ['valueChange'],
     },
     {
       directive: BrnPopover,
-      inputs: ['align', 'autoFocus', 'closeDelay', 'closeOnOutsidePointerEvents', 'sideOffset', 'state', 'offsetX', 'restoreFocus'],
-      outputs: ['stateChanged', 'closed']
-    }
+      inputs: [
+        'align',
+        'autoFocus',
+        'closeDelay',
+        'closeOnOutsidePointerEvents',
+        'sideOffset',
+        'state',
+        'offsetX',
+        'restoreFocus',
+      ],
+      outputs: ['stateChanged', 'closed'],
+    },
   ],
   host: {
-    'data-slot': 'select'
-  }
+    'data-slot': 'select',
+  },
 })
 export class HlmSelect {
   constructor() {

@@ -14,7 +14,7 @@ import {
   HlmDialogFooter,
   HlmDialogHeader,
   HlmDialogPortal,
-  HlmDialogTitle
+  HlmDialogTitle,
 } from '@spartan/dialog';
 
 @Component({
@@ -29,19 +29,27 @@ import {
     HlmDialogFooter,
     HlmDialogHeader,
     HlmDialogPortal,
-    HlmDialogTitle
+    HlmDialogTitle,
   ],
   providers: [provideIcons({ lucideCopy, lucideDownload, lucideShare2 })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <hlm-dialog [state]="open() ? 'open' : 'closed'" (stateChanged)="handleDialogStateChanged($event)">
+    <hlm-dialog
+      [state]="open() ? 'open' : 'closed'"
+      (stateChanged)="handleDialogStateChanged($event)"
+    >
       <hlm-dialog-content
         *hlmDialogPortal="let ctx"
         class="flex max-h-[min(92vh,56rem)] w-[calc(100vw-1rem)] max-w-6xl flex-col overflow-hidden border-border/70 p-0 backdrop-blur-xl [background:color-mix(in_oklab,var(--surface-panel-strong)_94%,var(--background)_6%)]"
       >
-        <div class="flex items-start justify-between gap-4 border-b border-border/70 px-4 py-4 sm:px-5">
+        <div
+          class="flex items-start justify-between gap-4 border-b border-border/70 px-4 py-4 sm:px-5"
+        >
           <div hlmDialogHeader class="min-w-0 gap-1 p-0 text-left">
-            <h2 hlmDialogTitle class="truncate text-base font-semibold tracking-[-0.02em] text-foreground">
+            <h2
+              hlmDialogTitle
+              class="truncate text-base font-semibold tracking-[-0.02em] text-foreground"
+            >
               Payment Details
             </h2>
             <p hlmDialogDescription class="max-w-2xl text-sm leading-5 text-muted-foreground">
@@ -50,10 +58,14 @@ import {
           </div>
         </div>
 
-        <section class="flex min-h-0 flex-1 [background:color-mix(in_oklab,var(--surface-inset-strong)_82%,var(--background)_18%)]">
+        <section
+          class="flex min-h-0 flex-1 [background:color-mix(in_oklab,var(--surface-inset-strong)_82%,var(--background)_18%)]"
+        >
           @if (loading()) {
             <div class="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
-              <div class="h-12 w-12 animate-spin rounded-full border-2 border-border/80 border-t-primary/70"></div>
+              <div
+                class="h-12 w-12 animate-spin rounded-full border-2 border-border/80 border-t-primary/70"
+              ></div>
               <div class="space-y-1">
                 <p class="text-sm font-semibold text-foreground">Preparing PDF...</p>
                 <p class="max-w-sm text-xs leading-5 text-muted-foreground">
@@ -72,7 +84,9 @@ import {
             </div>
           } @else if (previewUrl()) {
             <div class="flex flex-1 overflow-auto p-4 sm:p-5">
-              <div class="mx-auto flex min-h-full w-full max-w-4xl overflow-hidden rounded-(--radius-surface) bg-white shadow-[0_28px_56px_rgba(0,0,0,0.22)]">
+              <div
+                class="mx-auto flex min-h-full w-full max-w-4xl overflow-hidden rounded-(--radius-surface) bg-white shadow-[0_28px_56px_rgba(0,0,0,0.22)]"
+              >
                 <object
                   aria-label="Payment details PDF preview"
                   class="block min-h-128 w-full flex-1 bg-white"
@@ -81,7 +95,9 @@ import {
                 >
                   <div class="flex min-h-128 w-full items-center justify-center p-6 text-center">
                     <div class="space-y-3">
-                      <p class="text-sm font-semibold text-foreground">Preview is unavailable here.</p>
+                      <p class="text-sm font-semibold text-foreground">
+                        Preview is unavailable here.
+                      </p>
                       <p class="max-w-sm text-xs leading-5 text-muted-foreground">
                         Use the download action below to open the payment details PDF.
                       </p>
@@ -176,7 +192,7 @@ import {
         </div>
       </hlm-dialog-content>
     </hlm-dialog>
-  `
+  `,
 })
 export class PaymentDetailsDialogComponent {
   readonly open = input.required<boolean>();
@@ -205,7 +221,10 @@ function formatIban(iban: string | null): string {
     return '';
   }
 
-  return iban.replace(/\s+/g, '').replace(/(.{4})/g, '$1 ').trim();
+  return iban
+    .replace(/\s+/g, '')
+    .replace(/(.{4})/g, '$1 ')
+    .trim();
 }
 
 function buildPaymentDetailsText(account: AccountResponse | null): string {
@@ -218,6 +237,6 @@ function buildPaymentDetailsText(account: AccountResponse | null): string {
     `Account Name: ${account.name}`,
     `Account Number: ${account.accountNumber}`,
     `IBAN: ${account.iban ? formatIban(account.iban) : 'Pending'}`,
-    `Currency: ${account.currency}`
+    `Currency: ${account.currency}`,
   ].join('\n');
 }

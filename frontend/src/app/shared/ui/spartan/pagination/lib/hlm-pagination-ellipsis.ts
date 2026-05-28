@@ -13,7 +13,7 @@ import { classes } from '@spartan/utils';
   template: `
     <ng-icon name="lucideEllipsis" />
     <span class="sr-only">{{ srOnlyText() }}</span>
-  `
+  `,
 })
 export class HlmPaginationEllipsis {
   /** Screen reader only text for the ellipsis */

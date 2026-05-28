@@ -7,6 +7,6 @@ import { HlmToasterImports } from '@spartan/sonner';
   imports: [RouterOutlet, HlmToasterImports],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrl: './app.css',
 })
 export class App {}

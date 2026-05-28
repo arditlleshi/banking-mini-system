@@ -55,7 +55,10 @@
       </div>
     </section>
 
-    <section hlmCard class="rounded-lg border border-border/70 [background:var(--surface-panel-strong)]">
+    <section
+      hlmCard
+      class="rounded-lg border border-border/70 [background:var(--surface-panel-strong)]"
+    >
       <div hlmCardHeader class="gap-3 border-b border-border/70 p-6 sm:p-8">
         <h2
           hlmCardTitle
@@ -126,16 +129,23 @@
                     [itemToString]="accountValueToLabel"
                     (valueChange)="handlePaymentSourceAccountChange($any($event))"
                   >
-                    <hlm-select-trigger buttonId="payment-source-account" [class]="compactControlClass">
+                    <hlm-select-trigger
+                      buttonId="payment-source-account"
+                      [class]="compactControlClass"
+                    >
                       <span hlmSelectValue placeholder="Choose debit account"></span>
                     </hlm-select-trigger>
                     <hlm-select-content *hlmSelectPortal>
                       @for (option of accountOptions(); track option.value) {
-                        <hlm-select-item [value]="option.value"> {{ option.label }} </hlm-select-item>
+                        <hlm-select-item [value]="option.value">
+                          {{ option.label }}
+                        </hlm-select-item>
                       }
                     </hlm-select-content>
                   </div>
-                  <div class="rounded-lg border border-border/60 px-3 py-2 [background:var(--surface-inset)]">
+                  <div
+                    class="rounded-lg border border-border/60 px-3 py-2 [background:var(--surface-inset)]"
+                  >
                     <p
                       class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
                     >
@@ -192,7 +202,9 @@
                       class="grid gap-4 rounded-xl border border-border/70 p-4 [background:var(--surface-inset)] sm:grid-cols-3"
                     >
                       <div class="min-w-0">
-                        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                        <p
+                          class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                        >
                           Beneficiary
                         </p>
                         <p class="mt-2 font-semibold text-foreground text-pretty">
@@ -203,7 +215,9 @@
                         </p>
                       </div>
                       <div class="min-w-0">
-                        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                        <p
+                          class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                        >
                           Destination
                         </p>
                         <p class="mt-2 font-semibold text-foreground wrap-break-word">
@@ -214,7 +228,9 @@
                         </p>
                       </div>
                       <div class="min-w-0">
-                        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                        <p
+                          class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                        >
                           Credit Currency
                         </p>
                         <p class="mt-2 text-lg font-semibold text-foreground">
@@ -288,40 +304,60 @@
               </div>
 
               <section class="grid gap-4 md:grid-cols-3" aria-label="Payment preview">
-                <article class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]">
-                  <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                <article
+                  class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]"
+                >
+                  <p
+                    class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                  >
                     Debit Currency
                   </p>
                   <p class="mt-3 text-lg font-semibold text-foreground">
                     {{ paymentSourceAccount()?.currency ?? '-' }}
                   </p>
                 </article>
-                <article class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]">
-                  <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                <article
+                  class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]"
+                >
+                  <p
+                    class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                  >
                     Credit Currency
                   </p>
                   <p class="mt-3 text-lg font-semibold text-foreground">
                     {{ beneficiary()?.currency ?? '-' }}
                   </p>
                 </article>
-                <article class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]">
-                  <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                <article
+                  class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]"
+                >
+                  <p
+                    class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                  >
                     Exchange Rate
                   </p>
                   @if (beneficiaryFxPreview()) {
                     <p class="mt-3 text-lg font-semibold text-foreground">
                       {{ beneficiaryFxPreview()!.rate | number: '1.4-8' }}
                     </p>
-                    <p class="mt-2 text-xs text-muted-foreground">{{ beneficiaryFxPreview()!.note }}</p>
+                    <p class="mt-2 text-xs text-muted-foreground">
+                      {{ beneficiaryFxPreview()!.note }}
+                    </p>
                   } @else {
-                    <p class="mt-3 text-sm font-medium text-(--status-warning-foreground)">Not Available</p>
+                    <p class="mt-3 text-sm font-medium text-(--status-warning-foreground)">
+                      Not Available
+                    </p>
                   }
                 </article>
               </section>
 
               @if (beneficiaryFxPreview()) {
-                <article class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]">
-                  <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                <article
+                  class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]"
+                >
+                  <p
+                    class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                  >
                     Estimated Credit Amount
                   </p>
                   <p class="mt-2 text-base font-semibold text-foreground">
@@ -368,7 +404,12 @@
                   hlmBtn
                   type="submit"
                   class="h-10 rounded-lg px-5 text-sm"
-                  [disabled]="submitting() || paymentForm.invalid || paymentInsufficientFunds() || !beneficiary()"
+                  [disabled]="
+                    submitting() ||
+                    paymentForm.invalid ||
+                    paymentInsufficientFunds() ||
+                    !beneficiary()
+                  "
                 >
                   {{ submitting() ? 'Submitting…' : 'Review Payment' }}
                 </button>
@@ -395,11 +436,15 @@
                     </hlm-select-trigger>
                     <hlm-select-content *hlmSelectPortal>
                       @for (option of accountOptions(); track option.value) {
-                        <hlm-select-item [value]="option.value"> {{ option.label }} </hlm-select-item>
+                        <hlm-select-item [value]="option.value">
+                          {{ option.label }}
+                        </hlm-select-item>
                       }
                     </hlm-select-content>
                   </div>
-                  <div class="rounded-lg border border-border/60 px-3 py-2 [background:var(--surface-inset)]">
+                  <div
+                    class="rounded-lg border border-border/60 px-3 py-2 [background:var(--surface-inset)]"
+                  >
                     <p
                       class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
                     >
@@ -429,11 +474,15 @@
                     </hlm-select-trigger>
                     <hlm-select-content *hlmSelectPortal>
                       @for (option of targetAccountOptions(); track option.value) {
-                        <hlm-select-item [value]="option.value"> {{ option.label }} </hlm-select-item>
+                        <hlm-select-item [value]="option.value">
+                          {{ option.label }}
+                        </hlm-select-item>
                       }
                     </hlm-select-content>
                   </div>
-                  <div class="rounded-lg border border-border/60 px-3 py-2 [background:var(--surface-inset)]">
+                  <div
+                    class="rounded-lg border border-border/60 px-3 py-2 [background:var(--surface-inset)]"
+                  >
                     <p
                       class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
                     >
@@ -473,7 +522,9 @@
                     class="h-10 rounded-lg border border-border/80 px-4 text-sm text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20 disabled:[background:var(--surface-control-disabled)]"
                   />
                   @if (ownAmountErrorMessage()) {
-                    <p class="text-sm font-medium text-(--status-danger-foreground)">{{ ownAmountErrorMessage() }}</p>
+                    <p class="text-sm font-medium text-(--status-danger-foreground)">
+                      {{ ownAmountErrorMessage() }}
+                    </p>
                   }
                 </div>
                 <div class="flex flex-col gap-2">
@@ -495,30 +546,44 @@
                     placeholder="Monthly savings transfer…"
                   />
                   @if (ownDescriptionErrorMessage()) {
-                    <p class="text-sm font-medium text-(--status-danger-foreground)">{{ ownDescriptionErrorMessage() }}</p>
+                    <p class="text-sm font-medium text-(--status-danger-foreground)">
+                      {{ ownDescriptionErrorMessage() }}
+                    </p>
                   }
                 </div>
               </div>
 
               <section class="grid gap-4 md:grid-cols-3" aria-label="Payment preview">
-                <article class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]">
-                  <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                <article
+                  class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]"
+                >
+                  <p
+                    class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                  >
                     Debit Currency
                   </p>
                   <p class="mt-3 text-lg font-semibold text-foreground">
                     {{ sourceAccount()?.currency ?? '-' }}
                   </p>
                 </article>
-                <article class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]">
-                  <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                <article
+                  class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]"
+                >
+                  <p
+                    class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                  >
                     Credit Currency
                   </p>
                   <p class="mt-3 text-lg font-semibold text-foreground">
                     {{ targetAccount()?.currency ?? '-' }}
                   </p>
                 </article>
-                <article class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]">
-                  <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                <article
+                  class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]"
+                >
+                  <p
+                    class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                  >
                     Exchange Rate
                   </p>
                   @if (ownFxPreview()) {
@@ -535,8 +600,12 @@
               </section>
 
               @if (ownFxPreview()) {
-                <article class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]">
-                  <p class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                <article
+                  class="rounded-lg border border-border/70 p-4 [background:var(--surface-inset)]"
+                >
+                  <p
+                    class="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                  >
                     Estimated Credit Amount
                   </p>
                   <p class="mt-2 text-base font-semibold text-foreground">

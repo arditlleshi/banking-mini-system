@@ -7,14 +7,15 @@ import { WorkspaceSectionShellComponent } from '../workspace/workspace-section-s
   selector: 'app-settings-page',
   imports: [WorkspaceSectionShellComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: '<app-workspace-section-shell [content]="content" />'
+  template: '<app-workspace-section-shell [content]="content" />',
 })
 export class SettingsPageComponent {
   protected readonly content: WorkspacePageContent = {
     section: 'Settings',
     eyebrow: 'Platform governance',
     headline: 'Operational preferences, access control, and system policies in one workspace.',
-    summary: 'Reserve this area for permissions, environment controls, audit settings, and product configuration.',
-    highlights: ['Role policies', 'Session governance', 'Operational defaults']
+    summary:
+      'Reserve this area for permissions, environment controls, audit settings, and product configuration.',
+    highlights: ['Role policies', 'Session governance', 'Operational defaults'],
   };
 }

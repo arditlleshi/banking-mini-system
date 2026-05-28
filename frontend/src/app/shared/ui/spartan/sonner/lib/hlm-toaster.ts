@@ -5,7 +5,7 @@ import {
   booleanAttribute,
   computed,
   input,
-  numberAttribute
+  numberAttribute,
 } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
@@ -13,7 +13,7 @@ import {
   lucideInfo,
   lucideLoader2,
   lucideOctagonX,
-  lucideTriangleAlert
+  lucideTriangleAlert,
 } from '@ng-icons/lucide';
 import { BrnSonnerImports, type ToasterProps } from '@spartan-ng/brain/sonner';
 import type { ClassValue } from 'clsx';
@@ -23,7 +23,15 @@ import { hlm } from '../../utils';
 @Component({
   selector: 'hlm-toaster',
   imports: [BrnSonnerImports, NgIcon],
-  providers: [provideIcons({ lucideCircleCheck, lucideInfo, lucideTriangleAlert, lucideOctagonX, lucideLoader2 })],
+  providers: [
+    provideIcons({
+      lucideCircleCheck,
+      lucideInfo,
+      lucideTriangleAlert,
+      lucideOctagonX,
+      lucideLoader2,
+    }),
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <brn-sonner-toaster
@@ -42,7 +50,10 @@ import { hlm } from '../../utils';
       [style]="userStyle()"
     >
       <ng-template #loadingIcon>
-        <ng-icon name="lucideLoader2" class="overflow-visible! text-base [&>svg]:motion-safe:animate-spin" />
+        <ng-icon
+          name="lucideLoader2"
+          class="overflow-visible! text-base [&>svg]:motion-safe:animate-spin"
+        />
       </ng-template>
       <ng-template #successIcon>
         <ng-icon name="lucideCircleCheck" class="overflow-visible! text-base" />
@@ -57,29 +68,29 @@ import { hlm } from '../../utils';
         <ng-icon name="lucideTriangleAlert" class="overflow-visible! text-base" />
       </ng-template>
     </brn-sonner-toaster>
-  `
+  `,
 })
 export class HlmToaster {
   public readonly invert = input<ToasterProps['invert'], BooleanInput>(false, {
-    transform: booleanAttribute
+    transform: booleanAttribute,
   });
   public readonly theme = input<ToasterProps['theme']>('light');
   public readonly position = input<ToasterProps['position']>('bottom-right');
   public readonly hotKey = input<ToasterProps['hotkey']>(['altKey', 'KeyT']);
   public readonly richColors = input<ToasterProps['richColors'], BooleanInput>(false, {
-    transform: booleanAttribute
+    transform: booleanAttribute,
   });
   public readonly expand = input<ToasterProps['expand'], BooleanInput>(false, {
-    transform: booleanAttribute
+    transform: booleanAttribute,
   });
   public readonly duration = input<ToasterProps['duration'], NumberInput>(4000, {
-    transform: numberAttribute
+    transform: numberAttribute,
   });
   public readonly visibleToasts = input<ToasterProps['visibleToasts'], NumberInput>(3, {
-    transform: numberAttribute
+    transform: numberAttribute,
   });
   public readonly closeButton = input<ToasterProps['closeButton'], BooleanInput>(false, {
-    transform: booleanAttribute
+    transform: booleanAttribute,
   });
   public readonly toastOptions = input<ToasterProps['toastOptions']>({});
   public readonly offset = input<ToasterProps['offset']>(null);
@@ -89,9 +100,9 @@ export class HlmToaster {
       '--normal-bg': 'var(--popover)',
       '--normal-text': 'var(--popover-foreground)',
       '--normal-border': 'var(--border)',
-      '--border-radius': 'var(--radius)'
+      '--border-radius': 'var(--radius)',
     },
-    { alias: 'style' }
+    { alias: 'style' },
   );
 
   protected readonly _computedClass = computed(() => hlm('toaster group', this.userClass()));

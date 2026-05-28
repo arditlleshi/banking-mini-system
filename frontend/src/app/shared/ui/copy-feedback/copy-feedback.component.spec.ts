@@ -7,7 +7,7 @@ import { CopyFeedbackComponent } from './copy-feedback.component';
 describe('CopyFeedbackComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TestHostComponent]
+      imports: [TestHostComponent],
     }).compileComponents();
   });
 
@@ -16,14 +16,15 @@ describe('CopyFeedbackComponent', () => {
     const clipboardWriteText = vi.fn().mockResolvedValue(undefined);
     Object.defineProperty(navigator, 'clipboard', {
       configurable: true,
-      value: { writeText: clipboardWriteText }
+      value: { writeText: clipboardWriteText },
     });
 
     const fixture = TestBed.createComponent(TestHostComponent);
     fixture.detectChanges();
     await fixture.whenStable();
 
-    const copyFeedback = fixture.debugElement.children[0].componentInstance as CopyFeedbackComponent & {
+    const copyFeedback = fixture.debugElement.children[0]
+      .componentInstance as CopyFeedbackComponent & {
       copy: () => Promise<void>;
     };
 
@@ -53,6 +54,6 @@ describe('CopyFeedbackComponent', () => {
     >
       <button type="button">Copy</button>
     </app-copy-feedback>
-  `
+  `,
 })
 class TestHostComponent {}

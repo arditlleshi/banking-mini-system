@@ -41,14 +41,14 @@ export class AuthApiService {
   login(payload: LoginRequest): Observable<AuthTokens> {
     return this.http.post<AuthTokens>(`${this.baseUrl}/auth/login`, payload, {
       context: this.skipAuthContext,
-      withCredentials: true
+      withCredentials: true,
     });
   }
 
   register(payload: RegisterRequest): Observable<RegisteredUser> {
     return this.http.post<RegisteredUser>(`${this.baseUrl}/auth/register`, payload, {
       context: this.skipAuthContext,
-      withCredentials: true
+      withCredentials: true,
     });
   }
 
@@ -56,7 +56,7 @@ export class AuthApiService {
     return this.http.post<AuthTokens>(
       `${this.baseUrl}/auth/refresh`,
       {},
-      { context: this.skipAuthContext, withCredentials: true }
+      { context: this.skipAuthContext, withCredentials: true },
     );
   }
 
@@ -64,13 +64,13 @@ export class AuthApiService {
     return this.http.post<void>(
       `${this.baseUrl}/auth/logout`,
       {},
-      { context: this.skipAuthContext, withCredentials: true }
+      { context: this.skipAuthContext, withCredentials: true },
     );
   }
 
   getCurrentUser(): Observable<AuthenticatedUser> {
     return this.http.get<AuthenticatedUser>(`${this.baseUrl}/users/me`, {
-      withCredentials: true
+      withCredentials: true,
     });
   }
 }

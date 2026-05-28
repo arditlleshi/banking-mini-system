@@ -7,8 +7,8 @@ import { classes } from '@spartan/utils';
     'data-slot': 'breadcrumb-page',
     role: 'link',
     'aria-disabled': 'true',
-    'aria-current': 'page'
-  }
+    'aria-current': 'page',
+  },
 })
 export class HlmBreadcrumbPage {
   constructor() {

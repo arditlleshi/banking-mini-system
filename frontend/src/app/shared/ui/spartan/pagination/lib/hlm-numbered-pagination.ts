@@ -7,7 +7,7 @@ import {
   input,
   model,
   numberAttribute,
-  untracked
+  untracked,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
@@ -32,7 +32,7 @@ import { HlmPaginationPrevious } from './hlm-pagination-previous';
     HlmPaginationNext,
     HlmPaginationLink,
     HlmPaginationEllipsis,
-    HlmSelectImports
+    HlmSelectImports,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -57,7 +57,11 @@ import { HlmPaginationPrevious } from './hlm-pagination-previous';
               @if (page === '...') {
                 <hlm-pagination-ellipsis />
               } @else {
-                <a hlmPaginationLink [isActive]="currentPage() === page" (click)="currentPage.set(page)">
+                <a
+                  hlmPaginationLink
+                  [isActive]="currentPage() === page"
+                  (click)="currentPage.set(page)"
+                >
                   {{ page }}
                 </a>
               }
@@ -87,7 +91,7 @@ import { HlmPaginationPrevious } from './hlm-pagination-previous';
         </hlm-select>
       }
     </div>
-  `
+  `,
 })
 export class HlmNumberedPagination {
   /**
@@ -106,21 +110,21 @@ export class HlmNumberedPagination {
    * to a single page returned by the server API.
    */
   readonly totalItems = input.required<number, NumberInput>({
-    transform: numberAttribute
+    transform: numberAttribute,
   });
 
   /**
    * The number of page links to show.
    */
   readonly maxSize = input<number, NumberInput>(7, {
-    transform: numberAttribute
+    transform: numberAttribute,
   });
 
   /**
    * Show the first and last page buttons.
    */
   readonly showEdges = input<boolean, BooleanInput>(true, {
-    transform: booleanAttribute
+    transform: booleanAttribute,
   });
 
   /**
@@ -129,7 +133,7 @@ export class HlmNumberedPagination {
    */
   readonly pageSizes = input<number[]>([10, 20, 50, 100]);
   readonly showPageSizeSelector = input<boolean>(true, {
-    transform: booleanAttribute
+    transform: booleanAttribute,
   });
 
   protected readonly _pageSizesWithCurrent = computed(() => {
@@ -140,7 +144,9 @@ export class HlmNumberedPagination {
   });
 
   protected readonly _isFirstPageActive = computed(() => this.currentPage() === 1);
-  protected readonly _isLastPageActive = computed(() => this.currentPage() === this._lastPageNumber());
+  protected readonly _isLastPageActive = computed(
+    () => this.currentPage() === this._lastPageNumber(),
+  );
 
   protected readonly _lastPageNumber = computed(() => {
     if (this.totalItems() < 1) {
@@ -150,13 +156,22 @@ export class HlmNumberedPagination {
   });
 
   protected readonly _pages = computed(() => {
-    const correctedCurrentPage = outOfBoundCorrection(this.totalItems(), this.itemsPerPage(), this.currentPage());
+    const correctedCurrentPage = outOfBoundCorrection(
+      this.totalItems(),
+      this.itemsPerPage(),
+      this.currentPage(),
+    );
 
     if (correctedCurrentPage !== this.currentPage()) {
       untracked(() => this.currentPage.set(correctedCurrentPage));
     }
 
-    return createPageArray(correctedCurrentPage, this.itemsPerPage(), this.totalItems(), this.maxSize());
+    return createPageArray(
+      correctedCurrentPage,
+      this.itemsPerPage(),
+      this.totalItems(),
+      this.maxSize(),
+    );
   });
 
   protected goToPrevious(): void {
@@ -184,7 +199,11 @@ type Page = number | '...';
  *
  * Copied from 'ngx-pagination' package.
  */
-export function outOfBoundCorrection(totalItems: number, itemsPerPage: number, currentPage: number): number {
+export function outOfBoundCorrection(
+  totalItems: number,
+  itemsPerPage: number,
+  currentPage: number,
+): number {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   if (totalPages < currentPage && 0 < totalPages) {
     return totalPages;
@@ -206,7 +225,7 @@ export function createPageArray(
   currentPage: number,
   itemsPerPage: number,
   totalItems: number,
-  paginationRange: number
+  paginationRange: number,
 ): Page[] {
   paginationRange = +paginationRange;
   const pages: Page[] = [];
@@ -244,7 +263,12 @@ export function createPageArray(
  *
  * Copied from 'ngx-pagination' package.
  */
-function calculatePageNumber(i: number, currentPage: number, paginationRange: number, totalPages: number): number {
+function calculatePageNumber(
+  i: number,
+  currentPage: number,
+  paginationRange: number,
+  totalPages: number,
+): number {
   const halfWay = Math.ceil(paginationRange / 2);
   if (i === paginationRange) {
     return totalPages;

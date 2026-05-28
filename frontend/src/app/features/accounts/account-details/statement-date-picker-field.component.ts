@@ -83,13 +83,17 @@ function buildCalendarWeeks(anchorDate: Date): Date[][] {
         type="button"
         variant="outline"
         class="w-full justify-between gap-4 rounded-lg px-4 py-2.5 text-left font-normal shadow-sm"
-        [brnPopoverTriggerFor]="popover"
+        [hlmPopoverTriggerFor]="popover"
         [id]="buttonId()"
         [attr.aria-label]="label()"
         (click)="prepareForOpen()"
       >
         <span class="min-w-0">
-          <span class="block text-sm leading-5" [class.text-foreground]="value()" [class.text-muted-foreground]="!value()">
+          <span
+            class="block text-sm leading-5"
+            [class.text-foreground]="value()"
+            [class.text-muted-foreground]="!value()"
+          >
             {{ displayValue() }}
           </span>
         </span>
@@ -140,7 +144,9 @@ function buildCalendarWeeks(anchorDate: Date): Date[][] {
             </div>
 
             <div brnCalendarGrid class="space-y-2">
-              <div class="grid grid-cols-7 gap-1 text-center text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              <div
+                class="grid grid-cols-7 gap-1 text-center text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground"
+              >
                 @for (weekday of weekdayLabels; track weekday) {
                   <span>{{ weekday }}</span>
                 }
@@ -168,7 +174,7 @@ function buildCalendarWeeks(anchorDate: Date): Date[][] {
         </div>
       </ng-template>
     </div>
-  `
+  `,
 })
 export class StatementDatePickerFieldComponent {
   readonly label = input.required<string>();
@@ -186,15 +192,17 @@ export class StatementDatePickerFieldComponent {
   private readonly selectedDateFormatter = new Intl.DateTimeFormat(undefined, {
     day: '2-digit',
     month: 'short',
-    year: 'numeric'
+    year: 'numeric',
   });
   private readonly monthYearFormatter = new Intl.DateTimeFormat(undefined, {
     month: 'long',
-    year: 'numeric'
+    year: 'numeric',
   });
 
   protected readonly weeks = computed(() => buildCalendarWeeks(this.visibleDate()));
-  protected readonly monthYearLabel = computed(() => this.monthYearFormatter.format(this.visibleDate()));
+  protected readonly monthYearLabel = computed(() =>
+    this.monthYearFormatter.format(this.visibleDate()),
+  );
 
   protected displayValue(): string {
     return this.value() ? this.selectedDateFormatter.format(this.value()!) : 'Select date';

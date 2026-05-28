@@ -21,5 +21,5 @@ export const HlmSelectImports = [
   HlmSelectContent,
   HlmSelectGroup,
   HlmSelectItem,
-  HlmSelectPortal
+  HlmSelectPortal,
 ] as const;

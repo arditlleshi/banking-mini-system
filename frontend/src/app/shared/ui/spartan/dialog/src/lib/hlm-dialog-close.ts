@@ -5,7 +5,7 @@ import { BrnDialogClose } from '@spartan-ng/brain/dialog';
   selector: 'button[hlmDialogClose]',
   hostDirectives: [{ directive: BrnDialogClose, inputs: ['delay'] }],
   host: {
-    'data-slot': 'dialog-close'
-  }
+    'data-slot': 'dialog-close',
+  },
 })
 export class HlmDialogClose {}

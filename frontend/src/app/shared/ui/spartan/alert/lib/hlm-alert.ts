@@ -8,15 +8,16 @@ export const alertVariants = cva(
   {
     variants: {
       variant: {
-        default: 'border-(--status-success-border) [background:var(--status-success-surface)] text-(--status-success-foreground)',
+        default:
+          'border-(--status-success-border) [background:var(--status-success-surface)] text-(--status-success-foreground)',
         destructive:
-          'border-(--status-danger-border) [background:var(--status-danger-surface)] text-(--status-danger-foreground)'
-      }
+          'border-(--status-danger-border) [background:var(--status-danger-surface)] text-(--status-danger-foreground)',
+      },
     },
     defaultVariants: {
-      variant: 'default'
-    }
-  }
+      variant: 'default',
+    },
+  },
 );
 
 export type AlertVariants = VariantProps<typeof alertVariants>;
@@ -24,8 +25,8 @@ export type AlertVariants = VariantProps<typeof alertVariants>;
 @Directive({
   selector: '[hlmAlert],hlm-alert',
   host: {
-    'data-slot': 'alert'
-  }
+    'data-slot': 'alert',
+  },
 })
 export class HlmAlert {
   readonly variant = input<AlertVariants['variant']>('default');

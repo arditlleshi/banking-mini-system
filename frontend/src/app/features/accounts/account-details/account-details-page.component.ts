@@ -98,7 +98,9 @@ export class AccountDetailsPageComponent {
   private readonly loadedAccountNumber = signal<string | null>(null);
   protected readonly statementFiltersForm: StatementFiltersForm = this.fb.group({
     period: this.fb.nonNullable.control<StatementPeriodOption>(DEFAULT_STATEMENT_PERIOD),
-    direction: this.fb.nonNullable.control<StatementTransactionDirectionOption>(DEFAULT_STATEMENT_DIRECTION),
+    direction: this.fb.nonNullable.control<StatementTransactionDirectionOption>(
+      DEFAULT_STATEMENT_DIRECTION,
+    ),
     fromDate: this.fb.control<Date | null>(null),
     toDate: this.fb.control<Date | null>(null),
   });
@@ -130,11 +132,12 @@ export class AccountDetailsPageComponent {
   );
 
   protected readonly customPeriodSelected = computed(() => this.periodValue() === 'CUSTOM');
-  protected readonly canResetStatementFilters = computed(() =>
-    this.periodValue() !== DEFAULT_STATEMENT_PERIOD ||
-    this.directionValue() !== DEFAULT_STATEMENT_DIRECTION ||
-    this.fromDateValue() !== null ||
-    this.toDateValue() !== null,
+  protected readonly canResetStatementFilters = computed(
+    () =>
+      this.periodValue() !== DEFAULT_STATEMENT_PERIOD ||
+      this.directionValue() !== DEFAULT_STATEMENT_DIRECTION ||
+      this.fromDateValue() !== null ||
+      this.toDateValue() !== null,
   );
   protected readonly statementRangeError = computed(() => {
     if (this.periodValue() !== 'CUSTOM') {
@@ -181,12 +184,10 @@ export class AccountDetailsPageComponent {
           return;
         }
 
-        this.statementFiltersForm.patchValue(
-          {
-            fromDate: null,
-            toDate: null,
-          }
-        );
+        this.statementFiltersForm.patchValue({
+          fromDate: null,
+          toDate: null,
+        });
       });
 
     combineLatest([this.route.paramMap, this.route.queryParamMap])
@@ -411,7 +412,11 @@ export class AccountDetailsPageComponent {
 
   private currentStatementFilters(): AccountStatementFilters {
     const rawValue = this.statementFiltersForm.getRawValue();
-    const dateRange = this.resolveStatementDateRange(rawValue.period, rawValue.fromDate, rawValue.toDate);
+    const dateRange = this.resolveStatementDateRange(
+      rawValue.period,
+      rawValue.fromDate,
+      rawValue.toDate,
+    );
 
     return {
       fromDate: this.formatStatementDate(dateRange.fromDate),

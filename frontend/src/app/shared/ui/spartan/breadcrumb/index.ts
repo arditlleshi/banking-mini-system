@@ -21,7 +21,7 @@ export const HlmBreadcrumbImports = [
   HlmBreadcrumbItem,
   HlmBreadcrumbLink,
   HlmBreadcrumbPage,
-  HlmBreadcrumbList
+  HlmBreadcrumbList,
 ] as const;
 
 /**

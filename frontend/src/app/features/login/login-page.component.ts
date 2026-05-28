@@ -1,12 +1,25 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { AuthApiService } from '../../core/auth/auth-api.service';
 import { AuthStateService } from '../../core/auth/auth-state.service';
 import { HlmButton } from '../../shared/ui/spartan/button';
-import { HlmCard, HlmCardContent, HlmCardDescription, HlmCardFooter, HlmCardHeader, HlmCardTitle } from '../../shared/ui/spartan/card';
+import {
+  HlmCard,
+  HlmCardContent,
+  HlmCardDescription,
+  HlmCardFooter,
+  HlmCardHeader,
+  HlmCardTitle,
+} from '../../shared/ui/spartan/card';
 import { HlmInput } from '../../shared/ui/spartan/input';
 import { HlmLabel } from '../../shared/ui/spartan/label';
 import { HlmSeparator } from '../../shared/ui/spartan/separator';
@@ -26,11 +39,11 @@ import { ThemeToggleComponent } from '../../shared/theme/theme-toggle.component'
     HlmInput,
     HlmLabel,
     HlmSeparator,
-    ThemeToggleComponent
+    ThemeToggleComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './login-page.component.html',
-  styleUrl: './login-page.component.css'
+  styleUrl: './login-page.component.css',
 })
 export class LoginPageComponent {
   private readonly fb = inject(FormBuilder);
@@ -47,7 +60,7 @@ export class LoginPageComponent {
 
   protected readonly loginForm = this.fb.nonNullable.group({
     username: ['admin', [Validators.required]],
-    password: ['123456', [Validators.required]]
+    password: ['123456', [Validators.required]],
   });
 
   protected readonly registerForm = this.fb.nonNullable.group(
@@ -56,9 +69,9 @@ export class LoginPageComponent {
       email: ['', [Validators.required, Validators.email, Validators.maxLength(255)]],
       username: ['', [Validators.required, Validators.maxLength(50)]],
       password: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(72)]],
-      confirmPassword: ['', [Validators.required]]
+      confirmPassword: ['', [Validators.required]],
     },
-    { validators: passwordMatchValidator }
+    { validators: passwordMatchValidator },
   );
 
   protected switchPanel(panel: 'login' | 'register'): void {
@@ -97,7 +110,7 @@ export class LoginPageComponent {
           return;
         }
         this.loginErrorMessage.set(extractErrorMessage(error, 'Login failed. Please try again.'));
-      }
+      },
     });
   }
 
@@ -121,7 +134,7 @@ export class LoginPageComponent {
           email: '',
           username: '',
           password: '',
-          confirmPassword: ''
+          confirmPassword: '',
         });
         this.loginForm.patchValue({ username, password: '' });
         this.registrationSuccessMessage.set('Account created. You can sign in now.');
@@ -134,15 +147,21 @@ export class LoginPageComponent {
           return;
         }
         this.registerErrorMessage.set(
-          extractErrorMessage(error, 'Account creation failed. Please review your details and try again.')
+          extractErrorMessage(
+            error,
+            'Account creation failed. Please review your details and try again.',
+          ),
         );
-      }
+      },
     });
   }
 
   protected showPasswordMismatch(): boolean {
-    return !!this.registerForm.errors?.['passwordMismatch'] &&
-      (this.registerForm.controls.confirmPassword.touched || this.registerForm.controls.confirmPassword.dirty);
+    return (
+      !!this.registerForm.errors?.['passwordMismatch'] &&
+      (this.registerForm.controls.confirmPassword.touched ||
+        this.registerForm.controls.confirmPassword.dirty)
+    );
   }
 }
 
@@ -165,9 +184,12 @@ function extractErrorMessage(error: HttpErrorResponse, fallbackMessage: string):
   }
 
   if (payload && typeof payload === 'object') {
-    const detail = 'detail' in payload && typeof payload.detail === 'string' ? payload.detail : null;
-    const message = 'message' in payload && typeof payload.message === 'string' ? payload.message : null;
-    const errorMessage = 'error' in payload && typeof payload.error === 'string' ? payload.error : null;
+    const detail =
+      'detail' in payload && typeof payload.detail === 'string' ? payload.detail : null;
+    const message =
+      'message' in payload && typeof payload.message === 'string' ? payload.message : null;
+    const errorMessage =
+      'error' in payload && typeof payload.error === 'string' ? payload.error : null;
 
     return detail ?? message ?? errorMessage ?? fallbackMessage;
   }

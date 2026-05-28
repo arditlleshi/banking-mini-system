@@ -6,8 +6,8 @@ import { classes } from '@spartan/utils';
   selector: '[hlmDialogDescription]',
   hostDirectives: [BrnDialogDescription],
   host: {
-    'data-slot': 'dialog-description'
-  }
+    'data-slot': 'dialog-description',
+  },
 })
 export class HlmDialogDescription {
   constructor() {

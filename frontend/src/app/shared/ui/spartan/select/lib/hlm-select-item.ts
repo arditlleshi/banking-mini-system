@@ -11,14 +11,18 @@ import { classes } from '@spartan/utils';
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [{ directive: BrnSelectItem, inputs: ['id', 'disabled', 'value'] }],
   host: {
-    'data-slot': 'select-item'
+    'data-slot': 'select-item',
   },
   template: `
     <ng-content />
     @if (_active()) {
-      <ng-icon name="lucideCheck" class="absolute right-2 flex items-center justify-center" aria-hidden="true" />
+      <ng-icon
+        name="lucideCheck"
+        class="absolute right-2 flex items-center justify-center"
+        aria-hidden="true"
+      />
     }
-  `
+  `,
 })
 export class HlmSelectItem {
   private readonly _brnSelectItem = inject(BrnSelectItem);
@@ -27,7 +31,7 @@ export class HlmSelectItem {
   constructor() {
     classes(
       () =>
-        'data-highlighted:bg-accent data-highlighted:text-accent-foreground relative flex w-full cursor-default items-center gap-2 rounded-sm py-1.5 pl-2 pr-8 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50'
+        'data-highlighted:bg-accent data-highlighted:text-accent-foreground relative flex w-full cursor-default items-center gap-2 rounded-sm py-1.5 pl-2 pr-8 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50',
     );
   }
 }

@@ -10,7 +10,7 @@ import {
   HlmDialogFooter,
   HlmDialogHeader,
   HlmDialogPortal,
-  HlmDialogTitle
+  HlmDialogTitle,
 } from '@spartan/dialog';
 import { HlmIconImports } from '@spartan/icon';
 
@@ -21,7 +21,7 @@ import {
   HlmSelectItem,
   HlmSelectPortal,
   HlmSelectTrigger,
-  HlmSelectValue
+  HlmSelectValue,
 } from '../../../shared/ui/spartan/select';
 import { StatementDatePickerFieldComponent } from './statement-date-picker-field.component';
 
@@ -59,11 +59,11 @@ type StatementFilterOption<T extends string> = {
     HlmSelectPortal,
     HlmSelectTrigger,
     HlmSelectValue,
-    StatementDatePickerFieldComponent
+    StatementDatePickerFieldComponent,
   ],
   providers: [provideIcons({ lucideDownload, lucideRotateCcw })],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './account-statement-dialog.component.html'
+  templateUrl: './account-statement-dialog.component.html',
 })
 export class AccountStatementDialogComponent {
   readonly open = input.required<boolean>();
@@ -83,13 +83,14 @@ export class AccountStatementDialogComponent {
   protected readonly periodOptions: readonly StatementFilterOption<StatementPeriodOption>[] = [
     { value: 'LAST_MONTH', label: 'Last Month' },
     { value: 'ALL', label: 'All Transactions' },
-    { value: 'CUSTOM', label: 'Specify Period' }
+    { value: 'CUSTOM', label: 'Specify Period' },
   ];
-  protected readonly directionOptions: readonly StatementFilterOption<StatementTransactionDirectionOption>[] = [
-    { value: 'BOTH', label: 'Incoming and Outgoing' },
-    { value: 'CREDIT', label: 'Incoming / Credit' },
-    { value: 'DEBIT', label: 'Outgoing / Debit' }
-  ];
+  protected readonly directionOptions: readonly StatementFilterOption<StatementTransactionDirectionOption>[] =
+    [
+      { value: 'BOTH', label: 'Incoming and Outgoing' },
+      { value: 'CREDIT', label: 'Incoming / Credit' },
+      { value: 'DEBIT', label: 'Outgoing / Debit' },
+    ];
 
   protected handleDialogStateChanged(state: string): void {
     this.openChange.emit(state === 'open');
@@ -112,7 +113,9 @@ export class AccountStatementDialogComponent {
     return this.periodOptions.find((option) => option.value === value)?.label ?? value;
   };
 
-  protected readonly directionValueToLabel = (value: StatementTransactionDirectionOption | null): string => {
+  protected readonly directionValueToLabel = (
+    value: StatementTransactionDirectionOption | null,
+  ): string => {
     if (!value) {
       return '';
     }

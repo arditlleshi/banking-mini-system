@@ -15,5 +15,5 @@ export const HlmAlertImports = [
   HlmAlertAction,
   HlmAlertDescription,
   HlmAlertIcon,
-  HlmAlertTitle
+  HlmAlertTitle,
 ] as const;

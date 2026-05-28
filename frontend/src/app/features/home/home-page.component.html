@@ -54,14 +54,19 @@
       </section>
     </section>
     @if (summaryError(); as errorMessage) {
-      <section class="rounded-lg border border-[var(--status-danger-border)] px-6 py-4 [background:var(--status-danger-surface)]">
+      <section
+        class="rounded-lg border border-[var(--status-danger-border)] px-6 py-4 [background:var(--status-danger-surface)]"
+      >
         <p class="text-sm leading-6 [color:var(--status-danger-foreground)]">
           {{ errorMessage }}
         </p>
       </section>
     }
     <section class="grid gap-6 lg:grid-cols-[0.88fr_1.12fr]">
-      <section hlmCard class="rounded-lg border border-border/70 [background:var(--surface-panel-strong)]">
+      <section
+        hlmCard
+        class="rounded-lg border border-border/70 [background:var(--surface-panel-strong)]"
+      >
         <div hlmCardHeader class="gap-3 p-6 sm:p-8">
           <p class="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
             Portfolio exposure
@@ -78,9 +83,7 @@
         </div>
         <div hlmCardContent class="px-6 pb-6 sm:px-8 sm:pb-8">
           @if (currencyDistributionLoading()) {
-            <p class="text-sm leading-6 text-muted-foreground">
-              Loading currency distribution...
-            </p>
+            <p class="text-sm leading-6 text-muted-foreground">Loading currency distribution...</p>
           } @else if (currencyDistributionError(); as errorMessage) {
             <p class="text-sm leading-6 [color:var(--status-danger-foreground)]">
               {{ errorMessage }}
@@ -101,7 +104,10 @@
           }
         </div>
       </section>
-      <section hlmCard class="rounded-lg border border-border/70 [background:var(--surface-panel-strong)]">
+      <section
+        hlmCard
+        class="rounded-lg border border-border/70 [background:var(--surface-panel-strong)]"
+      >
         <div hlmCardHeader class="gap-3 p-6 sm:p-8">
           <p class="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
             External cash flow
@@ -119,9 +125,7 @@
         </div>
         <div hlmCardContent class="px-6 pb-6 sm:px-8 sm:pb-8">
           @if (monthlyCashFlowLoading()) {
-            <p class="text-sm leading-6 text-muted-foreground">
-              Loading monthly cash flow…
-            </p>
+            <p class="text-sm leading-6 text-muted-foreground">Loading monthly cash flow…</p>
           } @else if (monthlyCashFlowError(); as errorMessage) {
             <p class="text-sm leading-6 [color:var(--status-danger-foreground)]">
               {{ errorMessage }}

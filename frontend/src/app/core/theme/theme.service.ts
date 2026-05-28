@@ -21,12 +21,14 @@ export class ThemeService {
 
     const storedMode = window.localStorage.getItem(STORAGE_KEY);
     const prefersDarkMode =
-      typeof window.matchMedia === 'function' && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const initialMode = storedMode === 'dark' || storedMode === 'light'
-      ? storedMode
-      : prefersDarkMode
-        ? 'dark'
-        : 'light';
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const initialMode =
+      storedMode === 'dark' || storedMode === 'light'
+        ? storedMode
+        : prefersDarkMode
+          ? 'dark'
+          : 'light';
 
     this.setMode(initialMode, false);
   }

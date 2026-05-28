@@ -4,8 +4,8 @@ import { classes } from '@spartan/utils';
 @Directive({
   selector: '[hlmDialogHeader],hlm-dialog-header',
   host: {
-    'data-slot': 'dialog-header'
-  }
+    'data-slot': 'dialog-header',
+  },
 })
 export class HlmDialogHeader {
   constructor() {

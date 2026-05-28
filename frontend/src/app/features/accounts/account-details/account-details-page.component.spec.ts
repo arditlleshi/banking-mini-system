@@ -6,7 +6,7 @@ import { vi } from 'vitest';
 import {
   AccountApiService,
   type AccountDetailsResponse,
-  type AccountHistoryTransactionResponse
+  type AccountHistoryTransactionResponse,
 } from '../../../core/services/account-api.service';
 import { AccountDetailsPageComponent } from './account-details-page.component';
 
@@ -28,8 +28,8 @@ describe('AccountDetailsPageComponent', () => {
           provide: AccountApiService,
           useValue: {
             getAccountDetails,
-            downloadAccountStatement
-          }
+            downloadAccountStatement,
+          },
         },
         {
           provide: ActivatedRoute,
@@ -37,11 +37,11 @@ describe('AccountDetailsPageComponent', () => {
             paramMap: of(convertToParamMap({ accountNumber: 'AL123456789' })),
             queryParamMap: of(convertToParamMap({ page: '1' })),
             snapshot: {
-              queryParamMap: convertToParamMap({})
-            } as ActivatedRoute['snapshot']
-          } satisfies Partial<ActivatedRoute>
-        }
-      ]
+              queryParamMap: convertToParamMap({}),
+            } as ActivatedRoute['snapshot'],
+          } satisfies Partial<ActivatedRoute>,
+        },
+      ],
     }).compileComponents();
   });
 
@@ -86,7 +86,7 @@ describe('AccountDetailsPageComponent', () => {
       period: 'CUSTOM',
       direction: 'DEBIT',
       fromDate: new Date('2026-05-15T00:00:00Z'),
-      toDate: new Date('2026-05-20T00:00:00Z')
+      toDate: new Date('2026-05-20T00:00:00Z'),
     });
     component.resetStatementFilters();
 
@@ -94,7 +94,7 @@ describe('AccountDetailsPageComponent', () => {
       period: 'LAST_MONTH',
       direction: 'BOTH',
       fromDate: null,
-      toDate: null
+      toDate: null,
     });
   });
 
@@ -124,7 +124,7 @@ describe('AccountDetailsPageComponent', () => {
       period: 'LAST_MONTH',
       direction: 'CREDIT',
       fromDate: null,
-      toDate: null
+      toDate: null,
     });
 
     vi.useFakeTimers();
@@ -135,7 +135,7 @@ describe('AccountDetailsPageComponent', () => {
     expect(downloadAccountStatement).toHaveBeenCalledWith(7, {
       fromDate: '2026-04-01',
       toDate: '2026-04-30',
-      direction: 'CREDIT'
+      direction: 'CREDIT',
     });
 
     vi.useRealTimers();
@@ -160,7 +160,7 @@ function createAccountDetailsResponse(): AccountDetailsResponse {
       overdraftLimit: 0,
       annualInterestRate: 0,
       openedAt: '2026-05-01T09:00:00Z',
-      closedAt: null
+      closedAt: null,
     },
     transactionCount: 2,
     transactionPage: 1,
@@ -170,15 +170,15 @@ function createAccountDetailsResponse(): AccountDetailsResponse {
     netMovement: 120,
     transactions: [
       createTransactionResponse('full-ref-1', 'CREDIT', 200),
-      createTransactionResponse('full-ref-2', 'DEBIT', 80)
-    ]
+      createTransactionResponse('full-ref-2', 'DEBIT', 80),
+    ],
   };
 }
 
 function createTransactionResponse(
   transactionReference: string,
   direction: AccountHistoryTransactionResponse['direction'],
-  amount: number
+  amount: number,
 ): AccountHistoryTransactionResponse {
   return {
     id: direction === 'CREDIT' ? 1 : 2,
@@ -190,6 +190,6 @@ function createTransactionResponse(
     description: 'Statement test transaction',
     counterpartyName: 'Counterparty',
     counterpartyAccount: 'AL000000000000000000001',
-    bookingTimestamp: '2026-05-10T09:30:00Z'
+    bookingTimestamp: '2026-05-10T09:30:00Z',
   };
 }

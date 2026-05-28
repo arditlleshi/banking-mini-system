@@ -2,35 +2,51 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { BaseChartDirective } from 'ng2-charts';
 import type { ChartData, ChartOptions } from 'chart.js';
-import { AccountApiService, type AccountCurrencyDistributionResponse } from '../../core/services/account-api.service';
+import {
+  AccountApiService,
+  type AccountCurrencyDistributionResponse,
+} from '../../core/services/account-api.service';
 import {
   DashboardApiService,
   type DashboardMonthlyCashFlowResponse,
-  type DashboardSummaryResponse
+  type DashboardSummaryResponse,
 } from '../../core/services/dashboard-api.service';
-import { HlmCard, HlmCardContent, HlmCardDescription, HlmCardHeader, HlmCardTitle } from '../../shared/ui/spartan/card';
+import {
+  HlmCard,
+  HlmCardContent,
+  HlmCardDescription,
+  HlmCardHeader,
+  HlmCardTitle,
+} from '../../shared/ui/spartan/card';
 
 @Component({
   selector: 'app-home-page',
-  imports: [BaseChartDirective, HlmCard, HlmCardContent, HlmCardDescription, HlmCardHeader, HlmCardTitle],
+  imports: [
+    BaseChartDirective,
+    HlmCard,
+    HlmCardContent,
+    HlmCardDescription,
+    HlmCardHeader,
+    HlmCardTitle,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './home-page.component.html',
-  styleUrl: './home-page.component.css'
+  styleUrl: './home-page.component.css',
 })
 export class HomePageComponent {
   private readonly accountApi = inject(AccountApiService);
   private readonly dashboardApi = inject(DashboardApiService);
   private readonly moneyFormatter = new Intl.NumberFormat(undefined, {
     minimumFractionDigits: 2,
-    maximumFractionDigits: 2
+    maximumFractionDigits: 2,
   });
   private readonly shortDateFormatter = new Intl.DateTimeFormat(undefined, {
     month: 'short',
     day: 'numeric',
-    year: 'numeric'
+    year: 'numeric',
   });
   private readonly monthFormatter = new Intl.DateTimeFormat(undefined, {
-    month: 'short'
+    month: 'short',
   });
   private readonly currencyOrder: readonly string[] = ['EUR', 'USD', 'GBP', 'ALL'];
   private readonly currencyColors: readonly string[] = ['#0B8B87', '#2563EB', '#F59E0B', '#475569'];
@@ -52,10 +68,10 @@ export class HomePageComponent {
     return periodEnd ? this.shortDateFormatter.format(new Date(periodEnd)) : null;
   });
   protected readonly hasCurrencyData = computed(() =>
-    this.currencyDistribution().some((item) => item.accountCount > 0)
+    this.currencyDistribution().some((item) => item.accountCount > 0),
   );
   protected readonly hasMonthlyCashFlowData = computed(() =>
-    (this.monthlyCashFlow()?.months ?? []).some((month) => month.income > 0 || month.expenses > 0)
+    (this.monthlyCashFlow()?.months ?? []).some((month) => month.income > 0 || month.expenses > 0),
   );
   protected readonly currencyChartData = computed<ChartData<'doughnut'>>(() => ({
     labels: [...this.currencyOrder],
@@ -64,9 +80,9 @@ export class HomePageComponent {
         data: this.currencyOrder.map((currency) => this.resolveCurrencyCount(currency)),
         backgroundColor: [...this.currencyColors],
         hoverBackgroundColor: [...this.currencyColors],
-        borderWidth: 0
-      }
-    ]
+        borderWidth: 0,
+      },
+    ],
   }));
   protected readonly monthlyCashFlowChartData = computed<ChartData<'bar'>>(() => {
     const months = this.monthlyCashFlow()?.months ?? [];
@@ -80,7 +96,7 @@ export class HomePageComponent {
           backgroundColor: this.cashFlowIncomeColor,
           borderRadius: 10,
           borderSkipped: false,
-          maxBarThickness: 24
+          maxBarThickness: 24,
         },
         {
           label: 'Expenses',
@@ -88,9 +104,9 @@ export class HomePageComponent {
           backgroundColor: this.cashFlowExpenseColor,
           borderRadius: 10,
           borderSkipped: false,
-          maxBarThickness: 24
-        }
-      ]
+          maxBarThickness: 24,
+        },
+      ],
     };
   });
   protected readonly currencyChartOptions: ChartOptions<'doughnut'> = {
@@ -103,8 +119,8 @@ export class HomePageComponent {
           boxWidth: 10,
           boxHeight: 10,
           useBorderRadius: true,
-          borderRadius: 5
-        }
+          borderRadius: 5,
+        },
       },
       tooltip: {
         callbacks: {
@@ -113,17 +129,17 @@ export class HomePageComponent {
             const value = context.parsed ?? 0;
             const suffix = value === 1 ? 'account' : 'accounts';
             return `${label}: ${value} ${suffix}`;
-          }
-        }
-      }
-    }
+          },
+        },
+      },
+    },
   };
   protected readonly monthlyCashFlowChartOptions: ChartOptions<'bar'> = {
     responsive: true,
     maintainAspectRatio: false,
     interaction: {
       mode: 'index',
-      intersect: false
+      intersect: false,
     },
     plugins: {
       legend: {
@@ -132,38 +148,40 @@ export class HomePageComponent {
           boxWidth: 10,
           boxHeight: 10,
           useBorderRadius: true,
-          borderRadius: 5
-        }
+          borderRadius: 5,
+        },
       },
       tooltip: {
         callbacks: {
-          label: (context) => `${context.dataset.label}: ${this.formatSummaryMoney(context.parsed.y ?? 0)}`
-        }
-      }
+          label: (context) =>
+            `${context.dataset.label}: ${this.formatSummaryMoney(context.parsed.y ?? 0)}`,
+        },
+      },
     },
     scales: {
       x: {
         grid: {
-          display: false
+          display: false,
         },
         ticks: {
-          color: '#64748B'
-        }
+          color: '#64748B',
+        },
       },
       y: {
         beginAtZero: true,
         border: {
-          display: false
+          display: false,
         },
         grid: {
-          color: 'rgba(100, 116, 139, 0.16)'
+          color: 'rgba(100, 116, 139, 0.16)',
         },
         ticks: {
           color: '#64748B',
-          callback: (value) => `${this.moneyFormatter.format(Number(value))} ${this.summaryBaseCurrency()}`
-        }
-      }
-    }
+          callback: (value) =>
+            `${this.moneyFormatter.format(Number(value))} ${this.summaryBaseCurrency()}`,
+        },
+      },
+    },
   };
   constructor() {
     this.loadDashboardSummary();
@@ -200,11 +218,13 @@ export class HomePageComponent {
       error: (error: HttpErrorResponse) => {
         this.monthlyCashFlowLoading.set(false);
         if (error.status === 0) {
-          this.monthlyCashFlowError.set('Backend is not reachable. Start backend and refresh the page.');
+          this.monthlyCashFlowError.set(
+            'Backend is not reachable. Start backend and refresh the page.',
+          );
           return;
         }
         this.monthlyCashFlowError.set('Monthly cash flow is not available right now.');
-      }
+      },
     });
   }
 
@@ -224,7 +244,7 @@ export class HomePageComponent {
           return;
         }
         this.summaryError.set('Dashboard summary is not available right now.');
-      }
+      },
     });
   }
 
@@ -240,15 +260,21 @@ export class HomePageComponent {
       error: (error: HttpErrorResponse) => {
         this.currencyDistributionLoading.set(false);
         if (error.status === 0) {
-          this.currencyDistributionError.set('Backend is not reachable. Start backend and refresh the page.');
+          this.currencyDistributionError.set(
+            'Backend is not reachable. Start backend and refresh the page.',
+          );
           return;
         }
-        this.currencyDistributionError.set('Account currency distribution is not available right now.');
-      }
+        this.currencyDistributionError.set(
+          'Account currency distribution is not available right now.',
+        );
+      },
     });
   }
 
   private resolveCurrencyCount(currency: string): number {
-    return this.currencyDistribution().find((item) => item.currency === currency)?.accountCount ?? 0;
+    return (
+      this.currencyDistribution().find((item) => item.currency === currency)?.accountCount ?? 0
+    );
   }
 }

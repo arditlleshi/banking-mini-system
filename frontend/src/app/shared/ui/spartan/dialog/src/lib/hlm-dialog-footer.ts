@@ -4,8 +4,8 @@ import { classes } from '@spartan/utils';
 @Directive({
   selector: '[hlmDialogFooter],hlm-dialog-footer',
   host: {
-    'data-slot': 'dialog-footer'
-  }
+    'data-slot': 'dialog-footer',
+  },
 })
 export class HlmDialogFooter {
   constructor() {

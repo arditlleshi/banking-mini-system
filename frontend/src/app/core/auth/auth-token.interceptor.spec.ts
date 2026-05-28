@@ -15,21 +15,21 @@ describe('authTokenInterceptor', () => {
 
   beforeEach(() => {
     authState = {
-      getAccessToken: () => 'expired-access-token'
+      getAccessToken: () => 'expired-access-token',
     };
     authSession = {
-      refreshTokens: () => of({ accessToken: 'refreshed-access-token' })
+      refreshTokens: () => of({ accessToken: 'refreshed-access-token' }),
     };
     router = {
-      navigateByUrl: () => Promise.resolve(true)
+      navigateByUrl: () => Promise.resolve(true),
     };
 
     TestBed.configureTestingModule({
       providers: [
         { provide: AuthStateService, useValue: authState },
         { provide: AuthSessionService, useValue: authSession },
-        { provide: Router, useValue: router }
-      ]
+        { provide: Router, useValue: router },
+      ],
     });
   });
 
@@ -46,7 +46,7 @@ describe('authTokenInterceptor', () => {
     };
 
     const response = await TestBed.runInInjectionContext(() =>
-      firstValueFrom(authTokenInterceptor(new HttpRequest('GET', '/api/accounts'), next))
+      firstValueFrom(authTokenInterceptor(new HttpRequest('GET', '/api/accounts'), next)),
     );
 
     expect((response as HttpResponse<{ ok: boolean }>).body).toEqual({ ok: true });
@@ -60,12 +60,15 @@ describe('authTokenInterceptor', () => {
     const refreshSpy = vi.fn();
     authSession.refreshTokens = refreshSpy;
 
-    const next: HttpHandlerFn = () => throwError(() => new HttpErrorResponse({ status: 403, statusText: 'Forbidden' }));
+    const next: HttpHandlerFn = () =>
+      throwError(() => new HttpErrorResponse({ status: 403, statusText: 'Forbidden' }));
 
     await expect(
       TestBed.runInInjectionContext(() =>
-        firstValueFrom(authTokenInterceptor(new HttpRequest<any>('POST' as any, '/api/auth/login'), next))
-      )
+        firstValueFrom(
+          authTokenInterceptor(new HttpRequest<any>('POST' as any, '/api/auth/login'), next),
+        ),
+      ),
     ).rejects.toMatchObject({ status: 403 });
 
     expect(refreshSpy).not.toHaveBeenCalled();

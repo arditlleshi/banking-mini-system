@@ -4,8 +4,8 @@ import { classes } from '@spartan/utils';
 @Directive({
   selector: '[hlmAlertAction]',
   host: {
-    'data-slot': 'alert-action'
-  }
+    'data-slot': 'alert-action',
+  },
 })
 export class HlmAlertAction {
   constructor() {

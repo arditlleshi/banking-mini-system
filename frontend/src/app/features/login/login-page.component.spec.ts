@@ -26,8 +26,8 @@ describe('LoginPageComponent', () => {
         email: 'jane.doe@example.com',
         active: true,
         role: 'USER',
-        createdAt: '2026-05-19T08:00:00Z'
-      })
+        createdAt: '2026-05-19T08:00:00Z',
+      }),
     );
 
     await TestBed.configureTestingModule({
@@ -38,16 +38,16 @@ describe('LoginPageComponent', () => {
           provide: AuthApiService,
           useValue: {
             login,
-            register
-          }
+            register,
+          },
         },
         {
           provide: AuthStateService,
           useValue: {
-            setTokens
-          }
-        }
-      ]
+            setTokens,
+          },
+        },
+      ],
     }).compileComponents();
   });
 
@@ -80,7 +80,7 @@ describe('LoginPageComponent', () => {
       email: 'jane.doe@example.com',
       username: 'jane.doe',
       password: 'secretpass123',
-      confirmPassword: 'secretpass123'
+      confirmPassword: 'secretpass123',
     });
 
     component.submitRegistration();
@@ -89,7 +89,7 @@ describe('LoginPageComponent', () => {
       fullName: 'Jane Doe',
       email: 'jane.doe@example.com',
       username: 'jane.doe',
-      password: 'secretpass123'
+      password: 'secretpass123',
     });
     expect(component.activePanel()).toBe('login');
     expect(component.registrationSuccessMessage()).toBe('Account created. You can sign in now.');
@@ -100,8 +100,8 @@ describe('LoginPageComponent', () => {
     register.mockReturnValue(
       throwError(() => ({
         status: 409,
-        error: { detail: 'Username is already in use' }
-      }))
+        error: { detail: 'Username is already in use' },
+      })),
     );
 
     const fixture = TestBed.createComponent(LoginPageComponent);
@@ -128,7 +128,7 @@ describe('LoginPageComponent', () => {
       email: 'jane.doe@example.com',
       username: 'jane.doe',
       password: 'secretpass123',
-      confirmPassword: 'secretpass123'
+      confirmPassword: 'secretpass123',
     });
 
     component.submitRegistration();
