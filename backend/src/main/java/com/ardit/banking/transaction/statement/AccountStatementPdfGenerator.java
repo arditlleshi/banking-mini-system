@@ -22,6 +22,7 @@ import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.springframework.stereotype.Component;
 
 import com.ardit.banking.common.document.InstitutionDocumentProperties;
+import com.ardit.banking.transaction.domain.TransactionDirection;
 
 @Component
 public class AccountStatementPdfGenerator {
@@ -70,7 +71,10 @@ public class AccountStatementPdfGenerator {
     public String buildFilename(AccountStatement statement) {
         String fromDate = statement.fromDate() == null ? "all" : statement.fromDate().toString();
         String toDate = statement.toDate() == null ? "latest" : statement.toDate().toString();
-        return "statement-" + statement.accountNumber() + "-" + fromDate + "-to-" + toDate + ".pdf";
+        String directionSuffix = statement.directionFilter() == null
+            ? ""
+            : "-" + statement.directionFilter().name().toLowerCase(Locale.ROOT);
+        return "statement-" + statement.accountNumber() + "-" + fromDate + "-to-" + toDate + directionSuffix + ".pdf";
     }
 
     private void drawHeader(PageWriter writer, AccountStatement statement) throws IOException {
@@ -101,6 +105,7 @@ public class AccountStatementPdfGenerator {
         writer.writeLabelValue("Statement period", formatPeriod(statement), PAGE_MARGIN, 674f, 120f);
         writer.writeLabelValue("Customer name", statement.customerName(), PAGE_MARGIN, 660f, 120f);
         writer.writeLabelValue("Username", statement.username(), PAGE_MARGIN, 646f, 120f);
+        writer.writeLabelValue("Transaction type", formatDirectionFilter(statement.directionFilter()), PAGE_MARGIN, 632f, 120f);
 
         writer.writeLabelValue("Account name", statement.accountName(), 320f, 688f, 100f);
         writer.writeLabelValue("Account number", statement.accountNumber(), 320f, 674f, 100f);
@@ -114,7 +119,7 @@ public class AccountStatementPdfGenerator {
             100f
         );
 
-        writer.moveCursorTo(610f);
+        writer.moveCursorTo(596f);
     }
 
     private void drawStatementSummary(PageWriter writer, AccountStatement statement) throws IOException {
@@ -126,7 +131,7 @@ public class AccountStatementPdfGenerator {
     private void drawTransactions(PageWriter writer, AccountStatement statement) throws IOException {
         writer.sectionTitle("Transactions");
         if (statement.transactions().isEmpty()) {
-            writer.detailRow("Status", "No booked transactions were found for the selected period.");
+            writer.detailRow("Status", "No booked transactions were found for the selected filters.");
             return;
         }
 
@@ -173,6 +178,16 @@ public class AccountStatementPdfGenerator {
         String from = statement.fromDate() == null ? formatDate(statement.accountOpenedAt()) : formatDate(statement.fromDate().atStartOfDay(ZoneId.systemDefault()).toInstant());
         String to = statement.toDate() == null ? formatDate(statement.generatedAt()) : formatDate(statement.toDate().atStartOfDay(ZoneId.systemDefault()).toInstant());
         return from + " to " + to;
+    }
+
+    private static String formatDirectionFilter(TransactionDirection directionFilter) {
+        if (directionFilter == null) {
+            return "All transactions";
+        }
+
+        return directionFilter == TransactionDirection.CREDIT
+            ? "Incoming (credit)"
+            : "Outgoing (debit)";
     }
 
     private static String formatTimestamp(java.time.Instant timestamp) {

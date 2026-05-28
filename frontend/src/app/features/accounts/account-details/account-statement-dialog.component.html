@@ -9,28 +9,78 @@
           Account statement
         </h2>
         <p hlmDialogDescription class="max-w-xl text-sm leading-6 text-muted-foreground">
-          Add a date range to focus the booked history and export a PDF from the selected period.
+          Choose the statement period and transaction type before exporting the PDF.
         </p>
       </div>
 
       <form [formGroup]="statementFiltersForm()" (submit)="$event.preventDefault()" class="flex min-h-0 flex-1 flex-col">
         <div class="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto px-6 py-6 sm:px-8">
           <div class="grid gap-5 md:grid-cols-2">
-            <app-statement-date-picker-field
-              label="Date From"
-              buttonId="statement-from-date"
-              [value]="statementFiltersForm().controls.fromDate.value"
-              [max]="statementFiltersForm().controls.toDate.value"
-              (valueChange)="statementFiltersForm().controls.fromDate.setValue($event)"
-            />
-            <app-statement-date-picker-field
-              label="Date To"
-              buttonId="statement-to-date"
-              [value]="statementFiltersForm().controls.toDate.value"
-              [min]="statementFiltersForm().controls.fromDate.value"
-              (valueChange)="statementFiltersForm().controls.toDate.setValue($event)"
-            />
+            <div class="flex flex-col gap-2">
+              <p class="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                Period
+              </p>
+              <div
+                hlmSelect
+                [value]="statementFiltersForm().controls.period.value"
+                [itemToString]="periodValueToLabel"
+                (valueChange)="statementFiltersForm().controls.period.setValue($any($event))"
+              >
+                <hlm-select-trigger buttonId="statement-period" [class]="compactControlClass">
+                  <span hlmSelectValue placeholder="Choose period"></span>
+                </hlm-select-trigger>
+                <hlm-select-content *hlmSelectPortal>
+                  @for (option of periodOptions; track option.value) {
+                    <hlm-select-item [value]="option.value">
+                      {{ option.label }}
+                    </hlm-select-item>
+                  }
+                </hlm-select-content>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <p class="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                Transactions
+              </p>
+              <div
+                hlmSelect
+                [value]="statementFiltersForm().controls.direction.value"
+                [itemToString]="directionValueToLabel"
+                (valueChange)="statementFiltersForm().controls.direction.setValue($any($event))"
+              >
+                <hlm-select-trigger buttonId="statement-direction" [class]="compactControlClass">
+                  <span hlmSelectValue placeholder="Choose transaction type"></span>
+                </hlm-select-trigger>
+                <hlm-select-content *hlmSelectPortal>
+                  @for (option of directionOptions; track option.value) {
+                    <hlm-select-item [value]="option.value">
+                      {{ option.label }}
+                    </hlm-select-item>
+                  }
+                </hlm-select-content>
+              </div>
+            </div>
           </div>
+
+          @if (customPeriodSelected()) {
+            <div class="grid gap-5 md:grid-cols-2">
+              <app-statement-date-picker-field
+                label="Date From"
+                buttonId="statement-from-date"
+                [value]="statementFiltersForm().controls.fromDate.value"
+                [max]="statementFiltersForm().controls.toDate.value"
+                (valueChange)="statementFiltersForm().controls.fromDate.setValue($event)"
+              />
+              <app-statement-date-picker-field
+                label="Date To"
+                buttonId="statement-to-date"
+                [value]="statementFiltersForm().controls.toDate.value"
+                [min]="statementFiltersForm().controls.fromDate.value"
+                (valueChange)="statementFiltersForm().controls.toDate.setValue($event)"
+              />
+            </div>
+          }
         </div>
 
         <div class="border-t border-border/70 px-6 py-5 sm:px-8">
@@ -52,33 +102,26 @@
             </p>
           }
 
-          @if (statementSuccessMessage()) {
-            <p
-              aria-live="polite"
-              class="mb-4 rounded-lg border px-4 py-3 text-sm font-medium border-(--status-success-border) [background:var(--status-success-surface)] text-(--status-success-foreground)"
-            >
-              {{ statementSuccessMessage() }}
-            </p>
-          }
-
           <div hlmDialogFooter class="justify-end gap-3">
             <button
               hlmBtn
               type="button"
               variant="outline"
-              class="h-10 rounded-lg px-5 text-sm"
-              [disabled]="downloadingStatement() || !hasDateFilters()"
+              class="h-10 gap-2 rounded-lg px-5 text-sm"
+              [disabled]="downloadingStatement() || !canResetFilters()"
               (click)="resetStatementFilters()"
             >
+              <ng-icon name="lucideRotateCcw" size="14" aria-hidden="true" />
               Reset
             </button>
             <button
               hlmBtn
               type="button"
-              class="h-10 rounded-lg px-5 text-sm"
+              class="h-10 gap-2 rounded-lg px-5 text-sm"
               [disabled]="downloadingStatement()"
               (click)="downloadStatement()"
             >
+              <ng-icon name="lucideDownload" size="14" aria-hidden="true" />
               {{ downloadingStatement() ? 'Preparing PDF...' : 'Download PDF' }}
             </button>
           </div>

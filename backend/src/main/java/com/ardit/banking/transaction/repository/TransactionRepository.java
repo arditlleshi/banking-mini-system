@@ -26,12 +26,14 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
         where transaction.account.id = :accountId
           and transaction.valueDate >= coalesce(:fromDate, transaction.valueDate)
           and transaction.valueDate <= coalesce(:toDate, transaction.valueDate)
+          and (:direction is null or transaction.direction = :direction)
         order by transaction.bookingTimestamp desc, transaction.id desc
         """)
     Page<TransactionEntity> findStatementEntries(
         @Param("accountId") Long accountId,
         @Param("fromDate") LocalDate fromDate,
         @Param("toDate") LocalDate toDate,
+        @Param("direction") TransactionDirection direction,
         Pageable pageable
     );
 
@@ -41,12 +43,14 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
         where transaction.account.id = :accountId
           and transaction.valueDate >= coalesce(:fromDate, transaction.valueDate)
           and transaction.valueDate <= coalesce(:toDate, transaction.valueDate)
+          and (:direction is null or transaction.direction = :direction)
         order by transaction.bookingTimestamp desc, transaction.id desc
         """)
     List<TransactionEntity> findStatementEntries(
         @Param("accountId") Long accountId,
         @Param("fromDate") LocalDate fromDate,
-        @Param("toDate") LocalDate toDate
+        @Param("toDate") LocalDate toDate,
+        @Param("direction") TransactionDirection direction
     );
 
     @Query("""

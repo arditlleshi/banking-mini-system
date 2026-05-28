@@ -77,7 +77,7 @@ class AccountServiceTests {
         );
 
         when(ownedAccountAccessService.getOwnedAccountByNumber("details-user", "123456STD01")).thenReturn(account);
-        when(accountStatementService.getPagedStatementForUsernameAndAccount("details-user", 7L, null, null, 1, 5))
+        when(accountStatementService.getPagedStatementForUsernameAndAccount("details-user", 7L, null, null, null, 1, 5))
             .thenReturn(new AccountStatementPage(
                 1,
                 5,

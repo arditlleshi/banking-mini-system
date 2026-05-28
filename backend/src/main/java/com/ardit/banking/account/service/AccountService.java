@@ -130,6 +130,7 @@ public class AccountService {
             account.getId(),
             null,
             null,
+            null,
             page,
             BOOKED_TRANSACTION_PAGE_SIZE
         );

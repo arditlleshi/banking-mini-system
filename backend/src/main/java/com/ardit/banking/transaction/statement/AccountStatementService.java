@@ -36,25 +36,28 @@ public class AccountStatementService {
 
     @Transactional(readOnly = true)
     public AccountStatement getStatementForUsernameAndAccount(String username, Long accountId,
-                                                              LocalDate fromDate, LocalDate toDate) {
+                                                              LocalDate fromDate, LocalDate toDate,
+                                                              TransactionDirection directionFilter) {
         StatementDateRange dateRange = StatementDateRange.of(fromDate, toDate);
         AccountEntity account = ownedAccountAccessService.getOwnedAccountById(username, accountId);
-        return buildStatement(account, username, dateRange);
+        return buildStatement(account, username, dateRange, directionFilter);
     }
 
     @Transactional(readOnly = true)
     public AccountStatement getStatementForAccount(AccountEntity account, String username,
-                                                   LocalDate fromDate, LocalDate toDate) {
+                                                   LocalDate fromDate, LocalDate toDate,
+                                                   TransactionDirection directionFilter) {
         StatementDateRange dateRange = StatementDateRange.of(fromDate, toDate);
-        return buildStatement(account, username, dateRange);
+        return buildStatement(account, username, dateRange, directionFilter);
     }
 
     @Transactional(readOnly = true)
     public AccountStatement getStatementForUsernameAndAccountNumber(String username, String accountNumber,
-                                                                    LocalDate fromDate, LocalDate toDate) {
+                                                                    LocalDate fromDate, LocalDate toDate,
+                                                                    TransactionDirection directionFilter) {
         StatementDateRange dateRange = StatementDateRange.of(fromDate, toDate);
         AccountEntity account = ownedAccountAccessService.getOwnedAccountByNumber(username, accountNumber);
-        return buildStatement(account, username, dateRange);
+        return buildStatement(account, username, dateRange, directionFilter);
     }
 
     @Transactional(readOnly = true)
@@ -63,19 +66,24 @@ public class AccountStatementService {
         Long accountId,
         LocalDate fromDate,
         LocalDate toDate,
+        TransactionDirection directionFilter,
         int pageNumber,
         int pageSize
     ) {
         StatementDateRange dateRange = StatementDateRange.of(fromDate, toDate);
         AccountEntity account = ownedAccountAccessService.getOwnedAccountById(username, accountId);
-        return buildPagedStatement(account, dateRange, pageNumber, pageSize);
+        return buildPagedStatement(account, dateRange, directionFilter, pageNumber, pageSize);
     }
 
-    private AccountStatement buildStatement(AccountEntity account, String username, StatementDateRange dateRange) {
+    private AccountStatement buildStatement(AccountEntity account,
+                                            String username,
+                                            StatementDateRange dateRange,
+                                            TransactionDirection directionFilter) {
         List<TransactionEntity> statementEntries = transactionRepository.findStatementEntries(
             account.getId(),
             dateRange.fromDate(),
-            dateRange.toDate()
+            dateRange.toDate(),
+            directionFilter
         );
 
         List<AccountStatementTransaction> transactions = statementEntries.stream()
@@ -99,6 +107,7 @@ public class AccountStatementService {
             account.getOwner().getFullName(),
             username,
             account.getOpenedAt(),
+            directionFilter,
             dateRange.fromDate(),
             dateRange.toDate(),
             Instant.now(),
@@ -113,6 +122,7 @@ public class AccountStatementService {
     private AccountStatementPage buildPagedStatement(
         AccountEntity account,
         StatementDateRange dateRange,
+        TransactionDirection directionFilter,
         int pageNumber,
         int pageSize
     ) {
@@ -128,6 +138,7 @@ public class AccountStatementService {
             account.getId(),
             dateRange.fromDate(),
             dateRange.toDate(),
+            directionFilter,
             pageable
         );
 
@@ -141,6 +152,7 @@ public class AccountStatementService {
                 account.getId(),
                 dateRange.fromDate(),
                 dateRange.toDate(),
+                directionFilter,
                 pageable
             );
             normalizedPageNumber = statementPage.getTotalPages();

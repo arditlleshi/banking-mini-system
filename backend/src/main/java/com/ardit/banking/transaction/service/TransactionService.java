@@ -100,7 +100,7 @@ public class TransactionService {
                                                                           LocalDate fromDate, LocalDate toDate) {
         StatementDateRange.of(fromDate, toDate);
         AccountEntity account = getOwnedAccount(username, accountId);
-        return transactionRepository.findStatementEntries(account.getId(), fromDate, toDate).stream()
+        return transactionRepository.findStatementEntries(account.getId(), fromDate, toDate, null).stream()
             .map(TransactionService::toResponse)
             .toList();
     }

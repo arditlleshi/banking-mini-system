@@ -62,12 +62,44 @@ class TransactionRepositoryTests {
             account.getId(),
             null,
             null,
+            null,
             PageRequest.of(0, 2)
         );
 
         assertThat(transactions.getTotalElements()).isEqualTo(3);
         assertThat(transactions.getContent()).extracting(TransactionEntity::getId)
             .containsExactly(sameTimestampButLaterId.getId(), newer.getId());
+    }
+
+    @Test
+    void findStatementEntriesCanFilterByDirection() {
+        UserEntity owner = persistUser("direction-user");
+        AccountEntity account = persistAccount(owner, "123456STAT02");
+
+        TransactionEntity credit = persistTransaction(
+            account,
+            1L,
+            Instant.parse("2026-05-10T08:00:00Z"),
+            TransactionDirection.CREDIT
+        );
+        persistTransaction(
+            account,
+            2L,
+            Instant.parse("2026-05-12T08:00:00Z"),
+            TransactionDirection.DEBIT
+        );
+
+        entityManager.flush();
+        entityManager.clear();
+
+        List<TransactionEntity> transactions = transactionRepository.findStatementEntries(
+            account.getId(),
+            null,
+            null,
+            TransactionDirection.CREDIT
+        );
+
+        assertThat(transactions).extracting(TransactionEntity::getId).containsExactly(credit.getId());
     }
 
     private UserEntity persistUser(String username) {
@@ -103,13 +135,20 @@ class TransactionRepositoryTests {
     }
 
     private TransactionEntity persistTransaction(AccountEntity account, Long referenceSuffix, Instant bookingTimestamp) {
+        return persistTransaction(account, referenceSuffix, bookingTimestamp, TransactionDirection.CREDIT);
+    }
+
+    private TransactionEntity persistTransaction(AccountEntity account,
+                                                 Long referenceSuffix,
+                                                 Instant bookingTimestamp,
+                                                 TransactionDirection direction) {
         TransactionEntity transaction = TransactionEntity.book(
             account,
             "ref-" + referenceSuffix,
             null,
-            TransactionType.ADJUSTMENT,
+            direction == TransactionDirection.CREDIT ? TransactionType.DEPOSIT : TransactionType.PAYMENT,
             TransactionStatus.BOOKED,
-            TransactionDirection.CREDIT,
+            direction,
             AccountCurrency.EUR,
             new BigDecimal("10.00"),
             "Ordering test transaction",

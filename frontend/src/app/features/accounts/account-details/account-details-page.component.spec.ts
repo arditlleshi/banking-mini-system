@@ -35,18 +35,9 @@ describe('AccountDetailsPageComponent', () => {
           provide: ActivatedRoute,
           useValue: {
             paramMap: of(convertToParamMap({ accountNumber: 'AL123456789' })),
-            queryParamMap: of(
-              convertToParamMap({
-                page: '1',
-                fromDate: '2026-05-01',
-                toDate: '2026-05-31'
-              })
-            ),
+            queryParamMap: of(convertToParamMap({ page: '1' })),
             snapshot: {
-              queryParamMap: convertToParamMap({
-                fromDate: '2026-05-01',
-                toDate: '2026-05-31'
-              })
+              queryParamMap: convertToParamMap({})
             } as ActivatedRoute['snapshot']
           } satisfies Partial<ActivatedRoute>
         }
@@ -75,22 +66,82 @@ describe('AccountDetailsPageComponent', () => {
 
     const component = fixture.componentInstance as unknown as {
       statementFiltersForm: {
-        setValue: (value: { fromDate: Date | null; toDate: Date | null }) => void;
-        getRawValue: () => { fromDate: Date | null; toDate: Date | null };
+        setValue: (value: {
+          period: 'LAST_MONTH' | 'ALL' | 'CUSTOM';
+          direction: 'BOTH' | 'CREDIT' | 'DEBIT';
+          fromDate: Date | null;
+          toDate: Date | null;
+        }) => void;
+        getRawValue: () => {
+          period: 'LAST_MONTH' | 'ALL' | 'CUSTOM';
+          direction: 'BOTH' | 'CREDIT' | 'DEBIT';
+          fromDate: Date | null;
+          toDate: Date | null;
+        };
       };
       resetStatementFilters: () => void;
     };
 
     component.statementFiltersForm.setValue({
+      period: 'CUSTOM',
+      direction: 'DEBIT',
       fromDate: new Date('2026-05-15T00:00:00Z'),
       toDate: new Date('2026-05-20T00:00:00Z')
     });
     component.resetStatementFilters();
 
     expect(component.statementFiltersForm.getRawValue()).toEqual({
+      period: 'LAST_MONTH',
+      direction: 'BOTH',
       fromDate: null,
       toDate: null
     });
+  });
+
+  it('downloads last month statements with the selected direction filter', async () => {
+    const fixture = TestBed.createComponent(AccountDetailsPageComponent);
+    await fixture.whenStable();
+
+    const component = fixture.componentInstance as unknown as {
+      statementFiltersForm: {
+        setValue: (value: {
+          period: 'LAST_MONTH' | 'ALL' | 'CUSTOM';
+          direction: 'BOTH' | 'CREDIT' | 'DEBIT';
+          fromDate: Date | null;
+          toDate: Date | null;
+        }) => void;
+      };
+      downloadStatement: () => void;
+    };
+
+    const createObjectUrl = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:test');
+    const revokeObjectUrl = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => undefined);
+    const clickSpy = vi
+      .spyOn(HTMLAnchorElement.prototype, 'click')
+      .mockImplementation(() => undefined);
+
+    component.statementFiltersForm.setValue({
+      period: 'LAST_MONTH',
+      direction: 'CREDIT',
+      fromDate: null,
+      toDate: null
+    });
+
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-05-28T12:00:00Z'));
+
+    component.downloadStatement();
+
+    expect(downloadAccountStatement).toHaveBeenCalledWith(7, {
+      fromDate: '2026-04-01',
+      toDate: '2026-04-30',
+      direction: 'CREDIT'
+    });
+
+    vi.useRealTimers();
+    createObjectUrl.mockRestore();
+    revokeObjectUrl.mockRestore();
+    clickSpy.mockRestore();
   });
 });
 

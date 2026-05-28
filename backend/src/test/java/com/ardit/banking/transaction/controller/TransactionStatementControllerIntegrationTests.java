@@ -119,6 +119,54 @@ class TransactionStatementControllerIntegrationTests {
             .andExpect(status().isBadRequest());
     }
 
+    @Test
+    void downloadsStatementPdfFilteredByTransactionDirection() throws Exception {
+        UserEntity owner = persistUser("statement-user");
+        AccountEntity account = persistAccount(owner, "123456STD01");
+        persistTransaction(
+            account,
+            "credit-ref-1",
+            TransactionDirection.CREDIT,
+            new BigDecimal("210.00"),
+            new BigDecimal("1210.00"),
+            LocalDate.of(2026, 5, 2),
+            Instant.parse("2026-05-02T09:00:00Z")
+        );
+        persistTransaction(
+            account,
+            "debit-ref-1",
+            TransactionDirection.DEBIT,
+            new BigDecimal("65.00"),
+            new BigDecimal("1145.00"),
+            LocalDate.of(2026, 5, 6),
+            Instant.parse("2026-05-06T09:00:00Z")
+        );
+
+        entityManager.flush();
+        entityManager.clear();
+
+        byte[] responseBody = mockMvc.perform(
+                get("/api/accounts/{accountId}/statement", account.getId())
+                    .with(user("statement-user"))
+                    .param("fromDate", "2026-05-01")
+                    .param("toDate", "2026-05-31")
+                    .param("direction", "CREDIT")
+            )
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsByteArray();
+
+        try (PDDocument document = Loader.loadPDF(responseBody)) {
+            String text = new PDFTextStripper().getText(document);
+            assertThat(text).contains("Incoming (credit)");
+            assertThat(text).contains("02 May 2026 09:00:00");
+            assertThat(text).doesNotContain("06 May 2026 09:00:00");
+            assertThat(text).contains("210.00");
+            assertThat(text).contains("(0)");
+        }
+    }
+
     private UserEntity persistUser(String username) {
         UserEntity user = new UserEntity();
         ReflectionTestUtils.setField(user, "username", username);

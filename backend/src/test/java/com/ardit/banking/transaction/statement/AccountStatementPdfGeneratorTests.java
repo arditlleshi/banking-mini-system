@@ -44,6 +44,7 @@ class AccountStatementPdfGeneratorTests {
             "Statement User",
             "statement-user",
             Instant.parse("2026-05-01T09:00:00Z"),
+            null,
             LocalDate.of(2026, 5, 1),
             LocalDate.of(2026, 5, 31),
             Instant.parse("2026-05-13T10:15:00Z"),
@@ -83,6 +84,8 @@ class AccountStatementPdfGeneratorTests {
             assertThat(text).contains("Transaction Statement");
             assertThat(text).contains("Statement date");
             assertThat(text).contains("Statement period");
+            assertThat(text).contains("Transaction type");
+            assertThat(text).contains("All transactions");
             assertThat(text).contains("Statement User");
             assertThat(text).contains("123456STD01");
             assertThat(text).contains("10 May 2026");

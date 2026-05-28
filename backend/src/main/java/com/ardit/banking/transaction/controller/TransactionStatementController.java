@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ardit.banking.transaction.statement.AccountStatement;
 import com.ardit.banking.transaction.statement.AccountStatementPdfGenerator;
 import com.ardit.banking.transaction.statement.AccountStatementService;
+import com.ardit.banking.transaction.domain.TransactionDirection;
 
 @RestController
 @RequestMapping("/api/accounts/{accountId}/statement")
@@ -37,13 +38,15 @@ public class TransactionStatementController {
         @AuthenticationPrincipal UserDetails user,
         @PathVariable Long accountId,
         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate
+        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+        @RequestParam(required = false) TransactionDirection direction
     ) {
         AccountStatement statement = accountStatementService.getStatementForUsernameAndAccount(
             user.getUsername(),
             accountId,
             fromDate,
-            toDate
+            toDate,
+            direction
         );
         byte[] pdf = accountStatementPdfGenerator.generate(statement);
         String filename = accountStatementPdfGenerator.buildFilename(statement);

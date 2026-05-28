@@ -5,6 +5,8 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.ardit.banking.transaction.domain.TransactionDirection;
+
 public record AccountStatement(
     Long accountId,
     String accountNumber,
@@ -18,6 +20,7 @@ public record AccountStatement(
     String customerName,
     String username,
     Instant accountOpenedAt,
+    TransactionDirection directionFilter,
     LocalDate fromDate,
     LocalDate toDate,
     Instant generatedAt,

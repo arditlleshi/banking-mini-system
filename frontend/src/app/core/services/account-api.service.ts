@@ -78,6 +78,7 @@ export type AccountDetailsResponse = {
 export type AccountStatementFilters = {
   readonly fromDate?: string | null;
   readonly toDate?: string | null;
+  readonly direction?: 'CREDIT' | 'DEBIT' | null;
 };
 
 export type AccountCurrencyDistributionResponse = {
@@ -135,6 +136,9 @@ export class AccountApiService {
     }
     if (filters.toDate) {
       params = params.set('toDate', filters.toDate);
+    }
+    if (filters.direction) {
+      params = params.set('direction', filters.direction);
     }
 
     return params;

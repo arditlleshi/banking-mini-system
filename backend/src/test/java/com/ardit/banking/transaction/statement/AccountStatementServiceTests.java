@@ -76,14 +76,15 @@ class AccountStatementServiceTests {
         );
 
         when(ownedAccountAccessService.getOwnedAccountById("statement-user", 7L)).thenReturn(account);
-        when(transactionRepository.findStatementEntries(7L, fromDate, toDate))
+        when(transactionRepository.findStatementEntries(7L, fromDate, toDate, null))
             .thenReturn(List.of(latestInRange, oldestInRange));
 
         AccountStatement statement = accountStatementService.getStatementForUsernameAndAccount(
             "statement-user",
             7L,
             fromDate,
-            toDate
+            toDate,
+            null
         );
 
         assertThat(statement.transactionCount()).isEqualTo(2);
@@ -123,7 +124,7 @@ class AccountStatementServiceTests {
         );
 
         when(ownedAccountAccessService.getOwnedAccountById("statement-user", 7L)).thenReturn(account);
-        when(transactionRepository.findStatementEntries(eq(7L), eq(fromDate), eq(toDate), any(Pageable.class)))
+        when(transactionRepository.findStatementEntries(eq(7L), eq(fromDate), eq(toDate), eq(null), any(Pageable.class)))
             .thenReturn(new PageImpl<>(List.of(latestInRange, oldestInRange), PageRequest.of(0, 5), 2));
         when(transactionRepository.sumStatementAmountByDirection(7L, fromDate, toDate, TransactionDirection.CREDIT))
             .thenReturn(new BigDecimal("200.00"));
@@ -135,12 +136,13 @@ class AccountStatementServiceTests {
             7L,
             fromDate,
             toDate,
+            null,
             1,
             5
         );
 
         ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
-        verify(transactionRepository).findStatementEntries(eq(7L), eq(fromDate), eq(toDate), pageableCaptor.capture());
+        verify(transactionRepository).findStatementEntries(eq(7L), eq(fromDate), eq(toDate), eq(null), pageableCaptor.capture());
 
         assertThat(pageableCaptor.getValue()).isEqualTo(PageRequest.of(0, 5, Sort.by(Sort.Order.desc("bookingTimestamp"), Sort.Order.desc("id"))));
         assertThat(statement.pageNumber()).isEqualTo(1);
@@ -151,6 +153,44 @@ class AccountStatementServiceTests {
         assertThat(statement.netMovement()).isEqualByComparingTo("150.00");
         assertThat(statement.transactions()).extracting(AccountStatementTransaction::transactionReference)
             .containsExactly("ref-debit", "ref-credit");
+    }
+
+    @Test
+    void buildsStatementWithOnlyRequestedDirection() {
+        UserEntity user = createUser(11L, "statement-user", "Statement User");
+        AccountEntity account = createAccount(7L, user, "123456STD01", new BigDecimal("1150.00"));
+        LocalDate fromDate = LocalDate.of(2026, 5, 3);
+        LocalDate toDate = LocalDate.of(2026, 5, 4);
+
+        TransactionEntity creditOnly = createTransaction(
+            2L,
+            account,
+            "ref-credit",
+            TransactionDirection.CREDIT,
+            new BigDecimal("200.00"),
+            new BigDecimal("1200.00"),
+            LocalDate.of(2026, 5, 3),
+            Instant.parse("2026-05-03T09:00:00Z")
+        );
+
+        when(ownedAccountAccessService.getOwnedAccountById("statement-user", 7L)).thenReturn(account);
+        when(transactionRepository.findStatementEntries(7L, fromDate, toDate, TransactionDirection.CREDIT))
+            .thenReturn(List.of(creditOnly));
+
+        AccountStatement statement = accountStatementService.getStatementForUsernameAndAccount(
+            "statement-user",
+            7L,
+            fromDate,
+            toDate,
+            TransactionDirection.CREDIT
+        );
+
+        assertThat(statement.directionFilter()).isEqualTo(TransactionDirection.CREDIT);
+        assertThat(statement.transactionCount()).isEqualTo(1);
+        assertThat(statement.totalCredits()).isEqualByComparingTo("200.00");
+        assertThat(statement.totalDebits()).isEqualByComparingTo("0.00");
+        assertThat(statement.transactions()).extracting(AccountStatementTransaction::transactionReference)
+            .containsExactly("ref-credit");
     }
 
     private static UserEntity createUser(Long id, String username, String fullName) {

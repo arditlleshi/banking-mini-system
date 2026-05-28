@@ -30,7 +30,11 @@ import {
   HlmCardTitle,
 } from '../../../shared/ui/spartan/card';
 import { HlmNumberedPaginationQueryParams } from '../../../shared/ui/spartan/pagination';
-import { AccountStatementDialogComponent } from './account-statement-dialog.component';
+import {
+  AccountStatementDialogComponent,
+  type StatementPeriodOption,
+  type StatementTransactionDirectionOption,
+} from './account-statement-dialog.component';
 
 type StatementSummary = {
   readonly transactionCount: number;
@@ -40,9 +44,14 @@ type StatementSummary = {
 };
 
 type StatementFiltersForm = FormGroup<{
+  period: FormControl<StatementPeriodOption>;
+  direction: FormControl<StatementTransactionDirectionOption>;
   fromDate: FormControl<Date | null>;
   toDate: FormControl<Date | null>;
 }>;
+
+const DEFAULT_STATEMENT_PERIOD: StatementPeriodOption = 'LAST_MONTH';
+const DEFAULT_STATEMENT_DIRECTION: StatementTransactionDirectionOption = 'BOTH';
 
 @Component({
   selector: 'app-account-details-page',
@@ -81,7 +90,6 @@ export class AccountDetailsPageComponent {
   protected readonly statementLoading = signal(true);
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly statementErrorMessage = signal<string | null>(null);
-  protected readonly statementSuccessMessage = signal<string | null>(null);
   protected readonly details = signal<AccountDetailsResponse | null>(null);
   protected readonly statementTransactions = signal<AccountHistoryTransactionResponse[]>([]);
   protected readonly transactionPage = signal(1);
@@ -89,9 +97,24 @@ export class AccountDetailsPageComponent {
   protected readonly statementDialogOpen = signal(false);
   private readonly loadedAccountNumber = signal<string | null>(null);
   protected readonly statementFiltersForm: StatementFiltersForm = this.fb.group({
+    period: this.fb.nonNullable.control<StatementPeriodOption>(DEFAULT_STATEMENT_PERIOD),
+    direction: this.fb.nonNullable.control<StatementTransactionDirectionOption>(DEFAULT_STATEMENT_DIRECTION),
     fromDate: this.fb.control<Date | null>(null),
     toDate: this.fb.control<Date | null>(null),
   });
+
+  private readonly periodValue = toSignal(
+    this.statementFiltersForm.controls.period.valueChanges.pipe(
+      startWith(this.statementFiltersForm.controls.period.value),
+    ),
+    { initialValue: this.statementFiltersForm.controls.period.value },
+  );
+  private readonly directionValue = toSignal(
+    this.statementFiltersForm.controls.direction.valueChanges.pipe(
+      startWith(this.statementFiltersForm.controls.direction.value),
+    ),
+    { initialValue: this.statementFiltersForm.controls.direction.value },
+  );
 
   private readonly fromDateValue = toSignal(
     this.statementFiltersForm.controls.fromDate.valueChanges.pipe(
@@ -106,12 +129,24 @@ export class AccountDetailsPageComponent {
     { initialValue: this.statementFiltersForm.controls.toDate.value },
   );
 
-  protected readonly hasDateFilters = computed(() =>
-    Boolean(this.fromDateValue() || this.toDateValue()),
+  protected readonly customPeriodSelected = computed(() => this.periodValue() === 'CUSTOM');
+  protected readonly canResetStatementFilters = computed(() =>
+    this.periodValue() !== DEFAULT_STATEMENT_PERIOD ||
+    this.directionValue() !== DEFAULT_STATEMENT_DIRECTION ||
+    this.fromDateValue() !== null ||
+    this.toDateValue() !== null,
   );
   protected readonly statementRangeError = computed(() => {
+    if (this.periodValue() !== 'CUSTOM') {
+      return null;
+    }
+
     const fromDate = this.fromDateValue();
     const toDate = this.toDateValue();
+
+    if (!fromDate || !toDate) {
+      return 'Select both dates for a custom statement period.';
+    }
 
     if (fromDate && toDate && fromDate.getTime() > toDate.getTime()) {
       return 'The start date must be before or equal to the end date.';
@@ -139,6 +174,21 @@ export class AccountDetailsPageComponent {
   });
 
   constructor() {
+    this.statementFiltersForm.controls.period.valueChanges
+      .pipe(distinctUntilChanged(), takeUntilDestroyed())
+      .subscribe((period) => {
+        if (period === 'CUSTOM') {
+          return;
+        }
+
+        this.statementFiltersForm.patchValue(
+          {
+            fromDate: null,
+            toDate: null,
+          }
+        );
+      });
+
     combineLatest([this.route.paramMap, this.route.queryParamMap])
       .pipe(
         map(([params, queryParams]) => ({
@@ -154,7 +204,6 @@ export class AccountDetailsPageComponent {
 
           const isSameAccount = this.loadedAccountNumber() === accountNumber;
           this.statementErrorMessage.set(null);
-          this.statementSuccessMessage.set(null);
 
           if (isSameAccount) {
             this.statementLoading.set(true);
@@ -166,10 +215,8 @@ export class AccountDetailsPageComponent {
           this.errorMessage.set(null);
           this.details.set(null);
           this.statementTransactions.set([]);
-          this.statementFiltersForm.reset({
-            fromDate: this.parseStatementDate(this.route.snapshot.queryParamMap.get('fromDate')),
-            toDate: this.parseStatementDate(this.route.snapshot.queryParamMap.get('toDate')),
-          });
+          this.applyDefaultStatementFilters();
+          this.statementErrorMessage.set(null);
         }),
         switchMap(({ accountNumber, page }) => {
           const isSameAccount = this.loadedAccountNumber() === accountNumber;
@@ -204,9 +251,8 @@ export class AccountDetailsPageComponent {
       return;
     }
 
-    this.statementFiltersForm.reset({ fromDate: null, toDate: null });
+    this.applyDefaultStatementFilters();
     this.statementErrorMessage.set(null);
-    this.statementSuccessMessage.set(null);
   }
 
   protected downloadStatement(): void {
@@ -217,7 +263,6 @@ export class AccountDetailsPageComponent {
     const rangeError = this.statementRangeError();
     if (rangeError) {
       this.statementErrorMessage.set(rangeError);
-      this.statementSuccessMessage.set(null);
       return;
     }
 
@@ -229,7 +274,6 @@ export class AccountDetailsPageComponent {
     const filters = this.currentStatementFilters();
     this.downloadingStatement.set(true);
     this.statementErrorMessage.set(null);
-    this.statementSuccessMessage.set(null);
 
     this.accountApi
       .downloadAccountStatement(details.account.id, filters)
@@ -240,7 +284,6 @@ export class AccountDetailsPageComponent {
             statementFile,
             this.buildStatementFileName(details.account.accountNumber, filters),
           );
-          this.statementSuccessMessage.set('Statement download started.');
         },
         error: (error: HttpErrorResponse) => {
           this.statementErrorMessage.set(this.resolveStatementErrorMessage(error));
@@ -368,9 +411,12 @@ export class AccountDetailsPageComponent {
 
   private currentStatementFilters(): AccountStatementFilters {
     const rawValue = this.statementFiltersForm.getRawValue();
+    const dateRange = this.resolveStatementDateRange(rawValue.period, rawValue.fromDate, rawValue.toDate);
+
     return {
-      fromDate: this.formatStatementDate(rawValue.fromDate),
-      toDate: this.formatStatementDate(rawValue.toDate),
+      fromDate: this.formatStatementDate(dateRange.fromDate),
+      toDate: this.formatStatementDate(dateRange.toDate),
+      direction: rawValue.direction === 'BOTH' ? null : rawValue.direction,
     };
   }
 
@@ -387,33 +433,8 @@ export class AccountDetailsPageComponent {
   private buildStatementFileName(accountNumber: string, filters: AccountStatementFilters): string {
     const fromDate = filters.fromDate ?? 'all';
     const toDate = filters.toDate ?? 'latest';
-    return `statement-${accountNumber}-${fromDate}-to-${toDate}.pdf`;
-  }
-
-  private parseStatementDate(value: string | null): Date | null {
-    if (!value) {
-      return null;
-    }
-
-    const [yearText, monthText, dayText] = value.split('-');
-    const year = Number(yearText);
-    const month = Number(monthText);
-    const day = Number(dayText);
-
-    if (!Number.isInteger(year) || !Number.isInteger(month) || !Number.isInteger(day)) {
-      return null;
-    }
-
-    const parsed = new Date(year, month - 1, day);
-    if (
-      parsed.getFullYear() !== year ||
-      parsed.getMonth() !== month - 1 ||
-      parsed.getDate() !== day
-    ) {
-      return null;
-    }
-
-    return parsed;
+    const directionSuffix = filters.direction ? `-${filters.direction.toLowerCase()}` : '';
+    return `statement-${accountNumber}-${fromDate}-to-${toDate}${directionSuffix}.pdf`;
   }
 
   private parsePageNumber(value: string | null): number {
@@ -434,6 +455,42 @@ export class AccountDetailsPageComponent {
     const month = String(value.getMonth() + 1).padStart(2, '0');
     const day = String(value.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
+  }
+
+  private resolveStatementDateRange(
+    period: StatementPeriodOption,
+    fromDate: Date | null,
+    toDate: Date | null,
+  ): { fromDate: Date | null; toDate: Date | null } {
+    if (period === 'ALL') {
+      return { fromDate: null, toDate: null };
+    }
+
+    if (period === 'CUSTOM') {
+      return { fromDate, toDate };
+    }
+
+    return this.previousMonthDateRange();
+  }
+
+  private previousMonthDateRange(): { fromDate: Date; toDate: Date } {
+    const today = new Date();
+    const previousMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+    const previousMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0);
+
+    return {
+      fromDate: previousMonthStart,
+      toDate: previousMonthEnd,
+    };
+  }
+
+  private applyDefaultStatementFilters(): void {
+    this.statementFiltersForm.reset({
+      period: DEFAULT_STATEMENT_PERIOD,
+      direction: DEFAULT_STATEMENT_DIRECTION,
+      fromDate: null,
+      toDate: null,
+    });
   }
 
   private saveStatementFile(statementFile: Blob, fileName: string): void {
