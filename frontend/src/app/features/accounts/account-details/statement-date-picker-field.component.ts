@@ -83,7 +83,7 @@ function buildCalendarWeeks(anchorDate: Date): Date[][] {
         type="button"
         variant="outline"
         class="w-full justify-between gap-4 rounded-lg px-4 py-2.5 text-left font-normal shadow-sm"
-        [hlmPopoverTriggerFor]="popover"
+        [brnPopoverTriggerFor]="popover"
         [id]="buttonId()"
         [attr.aria-label]="label()"
         (click)="prepareForOpen()"
@@ -160,7 +160,7 @@ function buildCalendarWeeks(anchorDate: Date): Date[][] {
                         brnCalendarCellButton
                         type="button"
                         [date]="day"
-                        class="flex h-10 w-10 items-center justify-center rounded-lg border border-transparent text-sm font-medium tabular-nums transition-colors outline-none data-[outside]:text-muted-foreground data-[today]:border-border data-[today]:font-semibold data-[selected]:border-transparent data-[selected]:bg-primary data-[selected]:text-primary-foreground data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40 hover:bg-accent hover:text-accent-foreground focus-visible:ring-4 focus-visible:ring-ring/20"
+                        class="flex h-10 w-10 items-center justify-center rounded-lg border border-transparent text-sm font-medium tabular-nums transition-colors outline-none data-outside:text-muted-foreground data-today:border-border data-today:font-semibold data-selected:border-transparent data-selected:bg-primary data-selected:text-primary-foreground data-disabled:cursor-not-allowed data-disabled:opacity-40 hover:bg-accent hover:text-accent-foreground focus-visible:ring-4 focus-visible:ring-ring/20"
                         [class.opacity-60]="!isSameMonth(day, visibleDate())"
                       >
                         {{ day.getDate() }}

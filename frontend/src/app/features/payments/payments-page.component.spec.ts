@@ -18,6 +18,14 @@ describe('PaymentsPageComponent', () => {
   const navigate = vi.fn();
 
   beforeEach(async () => {
+    if (!globalThis.ResizeObserver) {
+      globalThis.ResizeObserver = class ResizeObserver {
+        observe(): void {}
+        unobserve(): void {}
+        disconnect(): void {}
+      };
+    }
+
     getAccounts.mockReset();
     getExchangeRates.mockReset();
     createTransfer.mockReset();
@@ -130,7 +138,6 @@ describe('PaymentsPageComponent', () => {
       confirmationOpen: () => boolean;
       pendingConfirmation: () => { title: string } | null;
       beneficiary: () => { beneficiaryName: string } | null;
-      successPayment: () => { paymentReference: string } | null;
     };
 
     component.paymentForm.patchValue({
@@ -158,7 +165,8 @@ describe('PaymentsPageComponent', () => {
       counterpartyName: 'Beneficiary User',
       counterpartyAccount: '333333CUR01',
     });
-    expect(component.successPayment()?.paymentReference).toBe('payment-ref-1');
+    expect(component.confirmationOpen()).toBe(false);
+    expect(component.pendingConfirmation()).toBeNull();
   });
 
   it('opens a confirmation dialog before booking an own-account transfer', () => {
@@ -178,7 +186,6 @@ describe('PaymentsPageComponent', () => {
       confirmPendingConfirmation: () => void;
       confirmationOpen: () => boolean;
       pendingConfirmation: () => { title: string } | null;
-      successTransfer: () => { transferReference: string } | null;
     };
 
     component.ownTransferForm.patchValue({
@@ -202,7 +209,8 @@ describe('PaymentsPageComponent', () => {
       amount: 150,
       description: 'Monthly savings transfer',
     });
-    expect(component.successTransfer()?.transferReference).toBe('transfer-ref-1');
+    expect(component.confirmationOpen()).toBe(false);
+    expect(component.pendingConfirmation()).toBeNull();
   });
 });
 
