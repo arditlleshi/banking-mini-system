@@ -40,6 +40,11 @@ export class HomePageComponent {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
+  private readonly compactMoneyFormatter = new Intl.NumberFormat(undefined, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 1,
+    notation: 'compact',
+  });
   private readonly shortDateFormatter = new Intl.DateTimeFormat(undefined, {
     month: 'short',
     day: 'numeric',
@@ -84,7 +89,7 @@ export class HomePageComponent {
       },
     ],
   }));
-  protected readonly monthlyCashFlowChartData = computed<ChartData<'bar'>>(() => {
+  protected readonly monthlyCashFlowChartData = computed<ChartData<'line'>>(() => {
     const months = this.monthlyCashFlow()?.months ?? [];
 
     return {
@@ -93,18 +98,36 @@ export class HomePageComponent {
         {
           label: 'Income',
           data: months.map((month) => month.income),
-          backgroundColor: this.cashFlowIncomeColor,
-          borderRadius: 10,
-          borderSkipped: false,
-          maxBarThickness: 24,
+          borderColor: this.cashFlowIncomeColor,
+          backgroundColor: 'rgba(11, 139, 135, 0.18)',
+          fill: true,
+          tension: 0.38,
+          borderWidth: 2.5,
+          pointRadius: 0,
+          pointHoverRadius: 5,
+          pointHitRadius: 14,
+          pointHoverBackgroundColor: this.cashFlowIncomeColor,
+          pointHoverBorderColor: '#0F172A',
+          pointHoverBorderWidth: 2,
+          cubicInterpolationMode: 'monotone',
+          spanGaps: true,
         },
         {
           label: 'Expenses',
           data: months.map((month) => month.expenses),
-          backgroundColor: this.cashFlowExpenseColor,
-          borderRadius: 10,
-          borderSkipped: false,
-          maxBarThickness: 24,
+          borderColor: this.cashFlowExpenseColor,
+          backgroundColor: 'rgba(224, 122, 47, 0.16)',
+          fill: true,
+          tension: 0.38,
+          borderWidth: 2.5,
+          pointRadius: 0,
+          pointHoverRadius: 5,
+          pointHitRadius: 14,
+          pointHoverBackgroundColor: this.cashFlowExpenseColor,
+          pointHoverBorderColor: '#0F172A',
+          pointHoverBorderWidth: 2,
+          cubicInterpolationMode: 'monotone',
+          spanGaps: true,
         },
       ],
     };
@@ -134,7 +157,7 @@ export class HomePageComponent {
       },
     },
   };
-  protected readonly monthlyCashFlowChartOptions: ChartOptions<'bar'> = {
+  protected readonly monthlyCashFlowChartOptions: ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
     interaction: {
@@ -145,13 +168,17 @@ export class HomePageComponent {
       legend: {
         position: 'bottom',
         labels: {
-          boxWidth: 10,
-          boxHeight: 10,
-          useBorderRadius: true,
-          borderRadius: 5,
+          boxWidth: 12,
+          boxHeight: 12,
+          usePointStyle: true,
+          pointStyle: 'circle',
+          color: '#94A3B8',
+          padding: 16,
         },
       },
       tooltip: {
+        displayColors: true,
+        usePointStyle: true,
         callbacks: {
           label: (context) =>
             `${context.dataset.label}: ${this.formatSummaryMoney(context.parsed.y ?? 0)}`,
@@ -163,22 +190,28 @@ export class HomePageComponent {
         grid: {
           display: false,
         },
+        border: {
+          display: false,
+        },
         ticks: {
-          color: '#64748B',
+          color: '#94A3B8',
+          padding: 10,
         },
       },
       y: {
         beginAtZero: true,
+        grace: '8%',
         border: {
           display: false,
         },
         grid: {
-          color: 'rgba(100, 116, 139, 0.16)',
+          color: 'rgba(148, 163, 184, 0.12)',
+          drawTicks: false,
         },
         ticks: {
-          color: '#64748B',
-          callback: (value) =>
-            `${this.moneyFormatter.format(Number(value))} ${this.summaryBaseCurrency()}`,
+          color: '#94A3B8',
+          padding: 12,
+          callback: (value) => this.formatCompactAxisMoney(Number(value)),
         },
       },
     },
@@ -204,6 +237,10 @@ export class HomePageComponent {
     }
 
     return this.formatSummaryMoney(summary[metric]);
+  }
+
+  private formatCompactAxisMoney(value: number): string {
+    return `${this.compactMoneyFormatter.format(value)} ${this.summaryBaseCurrency()}`;
   }
 
   private loadDashboardMonthlyCashFlow(): void {
