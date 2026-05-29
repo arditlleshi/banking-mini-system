@@ -1,4 +1,4 @@
-<main class="workspace-page min-h-screen px-4 py-8 sm:px-6 lg:px-10">
+<main class="workspace-page min-h-full px-4 py-8 sm:px-6 lg:px-10">
   <div class="mx-auto flex max-w-6xl flex-col gap-5">
     <header
       class="rounded-lg border border-border/70 px-6 py-8 [background:var(--surface-hero)] [box-shadow:var(--surface-shadow)] backdrop-blur-lg sm:px-8 lg:px-10"
@@ -8,7 +8,7 @@
           {{ content().eyebrow }}
         </p>
         <h1
-          class="font-[var(--font-manrope)] font-bold tracking-[-0.03em] text-2xl leading-[1.08] tracking-tight text-foreground text-balance sm:text-3xl"
+          class="font-(--font-manrope) tracking-[-0.03em] text-2xl leading-[1.08] text-foreground text-balance sm:text-3xl"
         >
           {{ content().headline }}
         </h1>
@@ -29,7 +29,7 @@
             </p>
             <h2
               hlmCardTitle
-              class="font-[var(--font-manrope)] font-bold tracking-[-0.03em] text-2xl leading-none tracking-tight text-card-foreground sm:text-3xl"
+              class="font-(--font-manrope) tracking-[-0.03em] text-2xl leading-none text-card-foreground sm:text-3xl"
             >
               {{ highlight }}
             </h2>
@@ -51,7 +51,7 @@
         </p>
         <h2
           hlmCardTitle
-          class="font-[var(--font-manrope)] font-bold tracking-[-0.03em] text-xl leading-tight tracking-tight text-card-foreground text-balance sm:text-2xl"
+          class="font-(--font-manrope) tracking-[-0.03em] text-xl leading-tight text-card-foreground text-balance sm:text-2xl"
         >
           {{ content().section }} workspace
         </h2>
