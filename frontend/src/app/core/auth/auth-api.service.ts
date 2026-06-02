@@ -14,23 +14,39 @@ export type RegisterRequest = {
   username: string;
   password: string;
   email: string;
+  phone?: string | null;
+  address?: string | null;
+  theme?: UserTheme;
 };
 
 export type AuthTokens = {
   accessToken: string;
 };
 
+export type UserTheme = 'LIGHT' | 'DARK';
+
 export type RegisteredUser = {
   id: number;
   fullName: string;
   username: string;
   email: string;
+  phone: string | null;
+  address: string | null;
   active: boolean;
   role: string;
+  theme: UserTheme;
   createdAt: string;
 };
 
 export type AuthenticatedUser = RegisteredUser;
+
+export type UpdateCurrentUserRequest = {
+  fullName: string;
+  email: string;
+  phone: string | null;
+  address: string | null;
+  theme: UserTheme;
+};
 
 @Injectable({ providedIn: 'root' })
 export class AuthApiService {
@@ -70,6 +86,12 @@ export class AuthApiService {
 
   getCurrentUser(): Observable<AuthenticatedUser> {
     return this.http.get<AuthenticatedUser>(`${this.baseUrl}/users/me`, {
+      withCredentials: true,
+    });
+  }
+
+  updateCurrentUser(payload: UpdateCurrentUserRequest): Observable<AuthenticatedUser> {
+    return this.http.put<AuthenticatedUser>(`${this.baseUrl}/users/me`, payload, {
       withCredentials: true,
     });
   }

@@ -1,11 +1,16 @@
 package com.ardit.banking.security.user.controller;
 
+import jakarta.validation.Valid;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ardit.banking.security.user.dto.UpdateCurrentUserRequest;
 import com.ardit.banking.security.user.dto.UserResponse;
 import com.ardit.banking.security.user.service.UserService;
 
@@ -22,5 +27,13 @@ public class CurrentUserController {
     @GetMapping
     public UserResponse getCurrentUser(@AuthenticationPrincipal UserDetails user) {
         return userService.getUserByUsername(user.getUsername());
+    }
+
+    @PutMapping
+    public UserResponse updateCurrentUser(
+        @AuthenticationPrincipal UserDetails user,
+        @Valid @RequestBody UpdateCurrentUserRequest request
+    ) {
+        return userService.updateCurrentUser(user.getUsername(), request);
     }
 }

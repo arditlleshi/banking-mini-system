@@ -14,7 +14,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 
-import { AuthApiService } from '../auth/auth-api.service';
+import { CurrentUserService } from '../auth/current-user.service';
 import { AuthSessionService } from '../auth/auth-session.service';
 import { ThemeService } from '../theme/theme.service';
 import { PageBreadcrumbComponent, type PageBreadcrumbItem } from '../../shared/ui/page-breadcrumb';
@@ -105,7 +105,7 @@ type NavigationItem = {
   templateUrl: './banking-shell.component.html',
 })
 export class BankingShellComponent {
-  private readonly authApi = inject(AuthApiService);
+  private readonly currentUserService = inject(CurrentUserService);
   private readonly authSession = inject(AuthSessionService);
   private readonly router = inject(Router);
   protected readonly theme = inject(ThemeService);
@@ -149,12 +149,7 @@ export class BankingShellComponent {
   protected readonly breadcrumbItems = computed<readonly PageBreadcrumbItem[]>(() =>
     this.resolveBreadcrumbItems(this.primarySegments()),
   );
-  protected readonly currentUser = signal<{
-    fullName: string;
-    username: string;
-    email: string;
-    role: string;
-  } | null>(null);
+  protected readonly currentUser = this.currentUserService.currentUser;
   protected readonly userDisplayName = computed(() => {
     const user = this.currentUser();
     if (!user) {
@@ -169,17 +164,16 @@ export class BankingShellComponent {
       return '';
     }
 
-    return user.username.trim() || user.email.trim() || user.role.trim();
+    return user.email.trim() || user.username.trim() || user.role.trim();
   });
   protected readonly userInitials = computed(() => this.buildUserInitials(this.userDisplayName()));
 
   constructor() {
-    this.authApi
-      .getCurrentUser()
+    this.currentUserService
+      .loadCurrentUser()
       .pipe(takeUntilDestroyed())
       .subscribe({
-        next: (user) => this.currentUser.set(user),
-        error: () => this.currentUser.set(null),
+        error: () => this.currentUserService.clear(),
       });
 
     this.router.events

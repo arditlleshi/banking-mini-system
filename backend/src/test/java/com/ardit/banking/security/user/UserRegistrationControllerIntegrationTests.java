@@ -67,8 +67,14 @@ class UserRegistrationControllerIntegrationTests {
 
         assertThat(response.username()).isEqualTo("jane.doe");
         assertThat(response.email()).isEqualTo("jane.doe@example.com");
+        assertThat(response.phone()).isNull();
+        assertThat(response.address()).isNull();
         assertThat(response.role()).isEqualTo("USER");
+        assertThat(response.theme()).isEqualTo("LIGHT");
         assertThat(createdUser.getRole()).isEqualTo(UserRole.USER);
+        assertThat(createdUser.getPhone()).isNull();
+        assertThat(createdUser.getAddress()).isNull();
+        assertThat(createdUser.getTheme().name()).isEqualTo("LIGHT");
         assertThat(passwordEncoder.matches("secretpass123", createdUser.getPasswordHash())).isTrue();
     }
 

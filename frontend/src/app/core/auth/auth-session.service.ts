@@ -1,17 +1,16 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, finalize, of, shareReplay, throwError, tap } from 'rxjs';
 
 import { AuthApiService, AuthTokens } from './auth-api.service';
 import { AuthStateService } from './auth-state.service';
+import { CurrentUserService } from './current-user.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthSessionService {
+  private readonly authApi = inject(AuthApiService);
+  private readonly authState = inject(AuthStateService);
+  private readonly currentUser = inject(CurrentUserService);
   private refreshInFlight$: Observable<AuthTokens> | null = null;
-
-  constructor(
-    private readonly authApi: AuthApiService,
-    private readonly authState: AuthStateService,
-  ) {}
 
   refreshTokens(): Observable<AuthTokens> {
     if (this.refreshInFlight$) {
@@ -24,6 +23,7 @@ export class AuthSessionService {
       }),
       catchError((error) => {
         this.authState.clear();
+        this.currentUser.clear();
         return throwError(() => error);
       }),
       finalize(() => {
@@ -38,7 +38,10 @@ export class AuthSessionService {
   logoutAndClear(): Observable<void> {
     return this.authApi.logout().pipe(
       catchError(() => of(void 0)),
-      finalize(() => this.authState.clear()),
+      finalize(() => {
+        this.authState.clear();
+        this.currentUser.clear();
+      }),
     );
   }
 }

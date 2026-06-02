@@ -38,6 +38,12 @@ public class UserEntity {
     @Column(name = "full_name", length = 120)
     private String fullName;
 
+    @Column(name = "phone", length = 32)
+    private String phone;
+
+    @Column(name = "address", length = 255)
+    private String address;
+
     @Column(name = "password_hash", nullable = false, length = 255)
     private String passwordHash;
 
@@ -47,6 +53,10 @@ public class UserEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "user_role", nullable = false, length = 30)
     private UserRole role;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "theme_preference", nullable = false, length = 20)
+    private UserTheme theme = UserTheme.LIGHT;
 
     @Column(name = "base_number", unique = true, length = 6)
     private String baseNumber;
@@ -64,13 +74,21 @@ public class UserEntity {
     }
 
     public static UserEntity create(String username, String email, String fullName, String passwordHash, UserRole role) {
+        return create(username, email, fullName, passwordHash, null, null, null, role);
+    }
+
+    public static UserEntity create(String username, String email, String fullName, String passwordHash,
+                                    String phone, String address, UserTheme theme, UserRole role) {
         UserEntity user = new UserEntity();
         user.username = normalizeRequiredText(username, "username");
         user.email = normalizeRequiredText(email, "email");
         user.fullName = normalizeRequiredText(fullName, "fullName");
+        user.phone = normalizeOptionalText(phone);
+        user.address = normalizeOptionalText(address);
         user.passwordHash = normalizeRequiredText(passwordHash, "passwordHash");
         user.active = Boolean.TRUE;
         user.role = Objects.requireNonNull(role, "role must not be null");
+        user.theme = theme == null ? UserTheme.LIGHT : theme;
         return user;
     }
 
@@ -90,6 +108,14 @@ public class UserEntity {
         return fullName;
     }
 
+    public String getPhone() {
+        return phone;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
     public String getPasswordHash() {
         return passwordHash;
     }
@@ -100,6 +126,10 @@ public class UserEntity {
 
     public UserRole getRole() {
         return role;
+    }
+
+    public UserTheme getTheme() {
+        return theme;
     }
 
     public String getBaseNumber() {
@@ -114,6 +144,14 @@ public class UserEntity {
         return updatedAt;
     }
 
+    public void updateProfile(String fullName, String email, String phone, String address, UserTheme theme) {
+        this.fullName = normalizeRequiredText(fullName, "fullName");
+        this.email = normalizeRequiredText(email, "email");
+        this.phone = normalizeOptionalText(phone);
+        this.address = normalizeOptionalText(address);
+        this.theme = Objects.requireNonNull(theme, "theme must not be null");
+    }
+
     public void assignBaseNumber(String baseNumber) {
         this.baseNumber = normalizeRequiredText(baseNumber, "baseNumber");
     }
@@ -125,6 +163,9 @@ public class UserEntity {
     @PrePersist
     void onCreate() {
         Instant now = Instant.now();
+        if (theme == null) {
+            theme = UserTheme.LIGHT;
+        }
         createdAt = now;
         updatedAt = now;
     }

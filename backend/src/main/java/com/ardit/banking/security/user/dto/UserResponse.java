@@ -7,8 +7,11 @@ public record UserResponse(
     String fullName,
     String username,
     String email,
+    String phone,
+    String address,
     boolean active,
     String role,
+    String theme,
     Instant createdAt
 ) {
 }

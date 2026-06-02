@@ -10,7 +10,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.ardit.banking.security.user.domain.UserEntity;
 import com.ardit.banking.security.user.domain.UserRole;
+import com.ardit.banking.security.user.domain.UserTheme;
 import com.ardit.banking.security.user.dto.CreateUserRequest;
+import com.ardit.banking.security.user.dto.UpdateCurrentUserRequest;
 import com.ardit.banking.security.user.dto.UserResponse;
 import com.ardit.banking.security.user.repository.UserRepository;
 
@@ -27,18 +29,24 @@ public class UserService {
 
     @Transactional
     public UserResponse createUser(CreateUserRequest request) {
-        if (userRepository.existsByUsername(request.username().trim())) {
+        String username = request.username().trim();
+        String email = request.email().trim();
+
+        if (userRepository.existsByUsername(username)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Username is already in use");
         }
-        if (userRepository.existsByEmail(request.email().trim())) {
+        if (userRepository.existsByEmail(email)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use");
         }
 
         UserEntity user = UserEntity.create(
-            request.username(),
-            request.email(),
+            username,
+            email,
             request.fullName(),
             passwordEncoder.encode(request.password()),
+            request.phone(),
+            request.address(),
+            defaultTheme(request.theme()),
             UserRole.USER
         );
 
@@ -60,14 +68,43 @@ public class UserService {
             .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
+    @Transactional
+    public UserResponse updateCurrentUser(String username, UpdateCurrentUserRequest request) {
+        UserEntity user = userRepository.findByUsername(username)
+            .filter(existingUser -> Boolean.TRUE.equals(existingUser.getActive()))
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authenticated user not found"));
+        String email = request.email().trim();
+
+        if (userRepository.existsByEmailAndIdNot(email, user.getId())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use");
+        }
+
+        user.updateProfile(
+            request.fullName(),
+            email,
+            request.phone(),
+            request.address(),
+            request.theme()
+        );
+
+        return toResponse(user);
+    }
+
+    private static UserTheme defaultTheme(UserTheme theme) {
+        return theme == null ? UserTheme.LIGHT : theme;
+    }
+
     private static UserResponse toResponse(UserEntity user) {
         return new UserResponse(
             user.getId(),
             user.getFullName(),
             user.getUsername(),
             user.getEmail(),
+            user.getPhone(),
+            user.getAddress(),
             Boolean.TRUE.equals(user.getActive()),
             user.getRole().name(),
+            user.getTheme().name(),
             user.getCreatedAt()
         );
     }

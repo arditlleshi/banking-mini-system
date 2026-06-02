@@ -1,0 +1,478 @@
+<main class="min-h-full px-4 py-8 sm:px-6 lg:px-10">
+  <div class="mx-auto flex max-w-6xl flex-col gap-6">
+    <section
+      class="relative overflow-hidden rounded-[1.75rem] border border-border/70 px-5 py-6 sm:px-8 sm:py-8 [background:radial-gradient(circle_at_top_left,color-mix(in_oklab,var(--primary)_16%,transparent),transparent_42%),linear-gradient(135deg,color-mix(in_oklab,var(--surface-hero)_88%,var(--card)_12%),color-mix(in_oklab,var(--surface-panel)_88%,var(--background)_12%))] [box-shadow:var(--surface-shadow-strong)]"
+    >
+      <div class="absolute inset-y-0 right-0 hidden w-64 opacity-60 lg:block">
+        <div
+          class="absolute right-8 top-8 h-28 w-28 rounded-full border border-border/50 [background:color-mix(in_oklab,var(--card)_56%,transparent)]"
+        ></div>
+        <div
+          class="absolute bottom-5 right-20 h-18 w-18 rounded-[1.5rem] border border-border/40 [background:color-mix(in_oklab,var(--accent)_42%,transparent)]"
+        ></div>
+      </div>
+      <div class="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+        <div class="max-w-3xl space-y-3">
+          <p class="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+            Personal Settings
+          </p>
+          <h1
+            class="max-w-2xl font-semibold tracking-[-0.04em] text-3xl leading-tight text-foreground text-balance sm:text-4xl"
+          >
+            Keep your profile accurate, reachable, and visually consistent.
+          </h1>
+          <p class="max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
+            Update the customer-facing details stored in this banking simulation and choose the
+            theme that should follow your account across authenticated pages.
+          </p>
+        </div>
+        <div
+          class="flex w-full flex-col gap-3 rounded-2xl border border-border/55 px-4 py-4 [background:color-mix(in_oklab,var(--card)_72%,transparent)] lg:max-w-72"
+        >
+          <p class="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+            Profile Readiness
+          </p>
+          <div class="flex items-end justify-between gap-3">
+            <div>
+              <p
+                class="text-3xl font-semibold tracking-[-0.04em] text-foreground [font-variant-numeric:tabular-nums]"
+              >
+                {{ completionCount() }}/4
+              </p>
+              <p class="mt-1 text-xs leading-5 text-muted-foreground">
+                Core details filled in and ready to save.
+              </p>
+            </div>
+            <div
+              class="inline-flex h-13 w-13 items-center justify-center rounded-2xl border border-border/55 text-base font-semibold tracking-[0.08em] text-foreground [background:var(--surface-inset)]"
+            >
+              {{ profileInitials() }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    @if (loading()) {
+      <section class="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.65fr)]">
+        <article
+          class="min-h-[34rem] animate-pulse rounded-[1.5rem] border border-border/60 [background:color-mix(in_oklab,var(--surface-panel)_82%,transparent)]"
+        ></article>
+        <article
+          class="min-h-[22rem] animate-pulse rounded-[1.5rem] border border-border/60 [background:color-mix(in_oklab,var(--surface-panel)_82%,transparent)]"
+        ></article>
+      </section>
+    } @else if (loadErrorMessage()) {
+      <section
+        hlmCard
+        class="rounded-[1.5rem] border border-(--status-danger-border) [background:var(--status-danger-surface)] [box-shadow:var(--surface-shadow)]"
+      >
+        <div hlmCardContent class="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
+          <div class="space-y-1.5">
+            <h2 class="font-semibold tracking-[-0.02em] text-lg text-(--status-danger-foreground)">
+              Settings Could Not Be Loaded
+            </h2>
+            <p class="max-w-2xl text-sm leading-6 text-(--status-danger-foreground)">
+              {{ loadErrorMessage() }}
+            </p>
+          </div>
+          <button hlmBtn type="button" class="rounded-lg" (click)="retry()">
+            Retry
+          </button>
+        </div>
+      </section>
+    } @else {
+      <div class="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.65fr)]">
+        <section
+          hlmCard
+          class="overflow-hidden rounded-[1.5rem] border-0 [background:var(--surface-panel-strong)] [box-shadow:var(--surface-shadow-strong)]"
+        >
+          <div hlmCardHeader class="gap-3 border-b border-border/70 px-6 py-6 sm:px-8">
+            <div class="flex flex-wrap items-start justify-between gap-4">
+              <div class="space-y-2">
+                <h2
+                  hlmCardTitle
+                  class="font-semibold tracking-[-0.03em] text-xl leading-tight text-card-foreground"
+                >
+                  Profile & Preferences
+                </h2>
+                <p hlmCardDescription class="max-w-2xl text-sm leading-6 text-muted-foreground">
+                  Save changes to your name, reachability details, address, and appearance
+                  preference without leaving the workspace.
+                </p>
+              </div>
+              <div
+                class="rounded-2xl border border-border/60 px-4 py-3 text-right [background:var(--surface-inset)]"
+              >
+                <p class="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  Member Since
+                </p>
+                <p class="mt-1 text-sm font-medium text-foreground">
+                  {{ memberSinceLabel() }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <form
+            [formGroup]="form"
+            (ngSubmit)="saveSettings()"
+            class="flex flex-col"
+            novalidate
+          >
+            <div class="flex flex-col gap-8 px-6 py-6 sm:px-8">
+              <section class="space-y-5">
+                <div class="space-y-1">
+                  <h3 class="font-semibold tracking-[-0.02em] text-lg text-foreground">
+                    Identity
+                  </h3>
+                  <p class="text-sm leading-6 text-muted-foreground">
+                    This is the primary customer identity returned by the banking API.
+                  </p>
+                </div>
+                <div class="grid gap-5 md:grid-cols-2">
+                  <div class="flex flex-col gap-2">
+                    <label
+                      hlmLabel
+                      for="settings-full-name"
+                      class="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                    >
+                      Full Name
+                    </label>
+                    <input
+                      id="settings-full-name"
+                      hlmInput
+                      type="text"
+                      name="fullName"
+                      autocomplete="name"
+                      formControlName="fullName"
+                      class="h-11 rounded-xl border border-border/80 px-4 text-sm text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20"
+                      placeholder="e.g. Ardit Hoxha…"
+                      [attr.aria-invalid]="fieldError('fullName') ? 'true' : null"
+                      aria-describedby="settings-full-name-error"
+                    />
+                    @if (fieldError('fullName')) {
+                      <p
+                        id="settings-full-name-error"
+                        class="text-sm leading-5 text-(--status-danger-foreground)"
+                      >
+                        {{ fieldError('fullName') }}
+                      </p>
+                    }
+                  </div>
+
+                  <div class="flex flex-col gap-2">
+                    <label
+                      hlmLabel
+                      for="settings-email"
+                      class="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                    >
+                      Email
+                    </label>
+                    <input
+                      id="settings-email"
+                      hlmInput
+                      type="email"
+                      name="email"
+                      autocomplete="email"
+                      inputmode="email"
+                      spellcheck="false"
+                      autocapitalize="off"
+                      formControlName="email"
+                      class="h-11 rounded-xl border border-border/80 px-4 text-sm text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20"
+                      placeholder="e.g. ardit@example.com…"
+                      [attr.aria-invalid]="fieldError('email') ? 'true' : null"
+                      aria-describedby="settings-email-error"
+                    />
+                    @if (fieldError('email')) {
+                      <p id="settings-email-error" class="text-sm leading-5 text-(--status-danger-foreground)">
+                        {{ fieldError('email') }}
+                      </p>
+                    }
+                  </div>
+                </div>
+              </section>
+
+              <div hlmSeparator></div>
+
+              <section class="space-y-5">
+                <div class="space-y-1">
+                  <h3 class="font-semibold tracking-[-0.02em] text-lg text-foreground">
+                    Reachability
+                  </h3>
+                  <p class="text-sm leading-6 text-muted-foreground">
+                    These fields are optional, but they improve the realism of the customer profile
+                    stored in the simulation.
+                  </p>
+                </div>
+                <div class="grid gap-5 md:grid-cols-2">
+                  <div class="flex flex-col gap-2">
+                    <label
+                      hlmLabel
+                      for="settings-phone"
+                      class="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                    >
+                      Phone
+                    </label>
+                    <input
+                      id="settings-phone"
+                      hlmInput
+                      type="tel"
+                      name="phone"
+                      autocomplete="tel"
+                      inputmode="tel"
+                      formControlName="phone"
+                      class="h-11 rounded-xl border border-border/80 px-4 text-sm text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20"
+                      placeholder="e.g. +355 69 123 4567…"
+                      [attr.aria-invalid]="fieldError('phone') ? 'true' : null"
+                      aria-describedby="settings-phone-error"
+                    />
+                    @if (fieldError('phone')) {
+                      <p id="settings-phone-error" class="text-sm leading-5 text-(--status-danger-foreground)">
+                        {{ fieldError('phone') }}
+                      </p>
+                    }
+                  </div>
+
+                  <div class="flex flex-col gap-2 md:col-span-2">
+                    <label
+                      hlmLabel
+                      for="settings-address"
+                      class="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                    >
+                      Address
+                    </label>
+                    <textarea
+                      id="settings-address"
+                      name="address"
+                      autocomplete="street-address"
+                      formControlName="address"
+                      rows="4"
+                      class="min-h-30 rounded-xl border border-border/80 px-4 py-3 text-sm leading-6 text-foreground shadow-sm transition-[background-color,border-color,box-shadow] [background:var(--surface-control)] hover:[background:var(--surface-control-hover)] focus-visible:ring-4 focus-visible:ring-ring/20"
+                      placeholder="Street, city, postal code…"
+                      [attr.aria-invalid]="fieldError('address') ? 'true' : null"
+                      aria-describedby="settings-address-error"
+                    ></textarea>
+                    @if (fieldError('address')) {
+                      <p id="settings-address-error" class="text-sm leading-5 text-(--status-danger-foreground)">
+                        {{ fieldError('address') }}
+                      </p>
+                    }
+                  </div>
+                </div>
+              </section>
+
+              <div hlmSeparator></div>
+
+              <section class="space-y-5">
+                <div class="space-y-1">
+                  <h3 class="font-semibold tracking-[-0.02em] text-lg text-foreground">
+                    Appearance
+                  </h3>
+                  <p class="text-sm leading-6 text-muted-foreground">
+                    Choose the theme that should be applied when your authenticated profile is
+                    loaded.
+                  </p>
+                </div>
+
+                <div class="grid gap-4 md:grid-cols-2">
+                  @for (option of themeOptions; track option.value) {
+                    <label
+                      class="group relative cursor-pointer rounded-[1.35rem] border p-4 transition-[transform,background-color,border-color,box-shadow] focus-within:ring-4 focus-within:ring-ring/20"
+                      [class]="themeOptionClass(option.value)"
+                    >
+                      <input
+                        type="radio"
+                        name="theme"
+                        formControlName="theme"
+                        class="sr-only"
+                        [value]="option.value"
+                      />
+                      <div class="space-y-4">
+                        <div class="flex items-start justify-between gap-3">
+                          <div class="space-y-1">
+                            <p class="font-semibold tracking-[-0.02em] text-base text-foreground">
+                              {{ option.label }}
+                            </p>
+                            <p class="text-sm leading-6 text-muted-foreground">
+                              {{ option.description }}
+                            </p>
+                          </div>
+                          <span
+                            class="rounded-full border px-2.5 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.18em]"
+                            [class]="isThemeSelected(option.value)
+                              ? 'border-(--surface-selected-border) bg-primary/10 text-foreground'
+                              : 'border-border/70 text-muted-foreground'"
+                          >
+                            {{ isThemeSelected(option.value) ? 'Selected' : 'Available' }}
+                          </span>
+                        </div>
+
+                        <div
+                          class="overflow-hidden rounded-[1.1rem] border p-3"
+                          [class]="themePreviewSurfaceClass(option.value)"
+                        >
+                          <div class="flex items-center justify-between gap-3">
+                            <div class="flex items-center gap-2">
+                              <span
+                                class="inline-flex h-7 w-7 items-center justify-center rounded-full text-[0.72rem] font-semibold"
+                                [class]="themePreviewBadgeClass(option.value)"
+                              >
+                                {{ profileInitials() }}
+                              </span>
+                              <div class="space-y-1">
+                                <div
+                                  class="h-2.5 rounded-full"
+                                  [class]="themePreviewPrimaryLineClass(option.value)"
+                                ></div>
+                                <div
+                                  class="h-2 w-18 rounded-full"
+                                  [class]="themePreviewSecondaryLineClass(option.value)"
+                                ></div>
+                              </div>
+                            </div>
+                            <div
+                              class="h-8 w-15 rounded-full"
+                              [class]="themePreviewAccentClass(option.value)"
+                            ></div>
+                          </div>
+                          <div class="mt-4 grid grid-cols-3 gap-2">
+                            @for (previewBlock of [1, 2, 3]; track previewBlock) {
+                              <div
+                                class="h-14 rounded-2xl"
+                                [class]="themePreviewPanelClass(option.value)"
+                              ></div>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    </label>
+                  }
+                </div>
+              </section>
+            </div>
+
+            <div class="border-t border-border/70 px-6 py-5 sm:px-8">
+              <div aria-live="polite" class="mb-4 min-h-6">
+                @if (saveMessage()) {
+                  <p
+                    class="rounded-xl border px-4 py-3 text-sm font-medium"
+                    [class]="saveTone() === 'success'
+                      ? 'border-(--status-success-border) [background:var(--status-success-surface)] text-(--status-success-foreground)'
+                      : 'border-(--status-danger-border) [background:var(--status-danger-surface)] text-(--status-danger-foreground)'"
+                  >
+                    {{ saveMessage() }}
+                  </p>
+                }
+              </div>
+              <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div class="space-y-1">
+                  <p class="text-sm font-medium text-foreground">
+                    {{ form.dirty ? 'Changes are ready to save.' : 'No unsaved changes right now.' }}
+                  </p>
+                  <p class="text-xs leading-5 text-muted-foreground">
+                    Saving updates the profile record returned by `GET /api/users/me`.
+                  </p>
+                </div>
+                <button
+                  hlmBtn
+                  type="submit"
+                  class="h-11 rounded-xl px-6 shadow-lg shadow-primary/10 transition-[transform,box-shadow] hover:-translate-y-0.5"
+                  [disabled]="saving()"
+                >
+                  {{ saving() ? 'Saving…' : 'Save Changes' }}
+                </button>
+              </div>
+            </div>
+          </form>
+        </section>
+
+        <aside class="space-y-6">
+          <section
+            hlmCard
+            class="overflow-hidden rounded-[1.5rem] border-0 [background:var(--surface-panel-strong)] [box-shadow:var(--surface-shadow)]"
+          >
+            <div hlmCardContent class="p-6">
+              <div class="flex items-start gap-4">
+                <div
+                  class="inline-flex h-16 w-16 shrink-0 items-center justify-center rounded-[1.35rem] border border-border/60 text-lg font-semibold tracking-[0.08em] text-foreground [background:var(--surface-inset)]"
+                >
+                  {{ profileInitials() }}
+                </div>
+                <div class="min-w-0 space-y-1">
+                  <p class="truncate font-semibold tracking-[-0.02em] text-lg text-foreground">
+                    {{ profileName() }}
+                  </p>
+                  <p class="truncate text-sm text-muted-foreground" translate="no">
+                    {{ currentUsername() }}
+                  </p>
+                </div>
+              </div>
+
+              <dl class="mt-6 grid gap-4">
+                <div class="space-y-1">
+                  <dt class="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    Email
+                  </dt>
+                  <dd class="truncate text-sm font-medium text-foreground" translate="no">
+                    {{ profileEmail() }}
+                  </dd>
+                </div>
+                <div class="space-y-1">
+                  <dt class="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    Phone
+                  </dt>
+                  <dd class="text-sm font-medium text-foreground">
+                    {{ profilePhone() }}
+                  </dd>
+                </div>
+                <div class="space-y-1">
+                  <dt class="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    Address
+                  </dt>
+                  <dd class="text-sm leading-6 text-foreground">
+                    {{ profileAddress() }}
+                  </dd>
+                </div>
+                <div class="space-y-1">
+                  <dt class="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    Theme
+                  </dt>
+                  <dd class="text-sm font-medium text-foreground">
+                    {{ selectedThemeLabel() }}
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          </section>
+
+          <section
+            hlmCard
+            class="rounded-[1.5rem] border-0 [background:color-mix(in_oklab,var(--surface-inset-strong)_78%,var(--card)_22%)] [box-shadow:var(--surface-shadow)]"
+          >
+            <div hlmCardContent class="space-y-4 p-6">
+              <div class="space-y-1">
+                <h3 class="font-semibold tracking-[-0.02em] text-lg text-foreground">
+                  What Gets Saved
+                </h3>
+                <p class="text-sm leading-6 text-muted-foreground">
+                  The backend now persists your contact profile and theme preference.
+                </p>
+              </div>
+              <div class="grid gap-3">
+                @for (item of savedDetails; track item.title) {
+                  <article
+                    class="rounded-2xl border border-border/60 px-4 py-3 [background:color-mix(in_oklab,var(--card)_78%,transparent)]"
+                  >
+                    <p class="font-medium text-sm text-foreground">{{ item.title }}</p>
+                    <p class="mt-1 text-xs leading-5 text-muted-foreground">{{ item.description }}</p>
+                  </article>
+                }
+              </div>
+            </div>
+          </section>
+        </aside>
+      </div>
+    }
+  </div>
+</main>

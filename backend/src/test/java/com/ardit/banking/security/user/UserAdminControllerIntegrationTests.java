@@ -52,7 +52,10 @@ class UserAdminControllerIntegrationTests {
                           "fullName": "Jane Doe",
                           "username": "jane.doe",
                           "password": "secretpass123",
-                          "email": "jane.doe@example.com"
+                          "email": "jane.doe@example.com",
+                          "phone": "+355 69 123 4567",
+                          "address": "42 Banking Street, Tirane",
+                          "theme": "DARK"
                         }
                         """)
             )
@@ -68,14 +71,20 @@ class UserAdminControllerIntegrationTests {
         assertThat(response.fullName()).isEqualTo("Jane Doe");
         assertThat(response.username()).isEqualTo("jane.doe");
         assertThat(response.email()).isEqualTo("jane.doe@example.com");
+        assertThat(response.phone()).isEqualTo("+355 69 123 4567");
+        assertThat(response.address()).isEqualTo("42 Banking Street, Tirane");
         assertThat(response.active()).isTrue();
         assertThat(response.role()).isEqualTo("USER");
+        assertThat(response.theme()).isEqualTo("DARK");
         assertThat(response.createdAt()).isNotNull();
 
         assertThat(createdUser.getFullName()).isEqualTo("Jane Doe");
         assertThat(createdUser.getEmail()).isEqualTo("jane.doe@example.com");
+        assertThat(createdUser.getPhone()).isEqualTo("+355 69 123 4567");
+        assertThat(createdUser.getAddress()).isEqualTo("42 Banking Street, Tirane");
         assertThat(createdUser.getActive()).isTrue();
         assertThat(createdUser.getRole()).isEqualTo(UserRole.USER);
+        assertThat(createdUser.getTheme().name()).isEqualTo("DARK");
         assertThat(createdUser.getPasswordHash()).isNotEqualTo("secretpass123");
         assertThat(passwordEncoder.matches("secretpass123", createdUser.getPasswordHash())).isTrue();
         assertThat(createdUser.getBaseNumber()).isNull();
