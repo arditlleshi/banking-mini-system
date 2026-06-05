@@ -68,8 +68,6 @@ export class SettingsPageComponent {
   protected readonly loading = signal(true);
   protected readonly saving = signal(false);
   protected readonly loadErrorMessage = signal<string | null>(null);
-  protected readonly saveMessage = signal<string | null>(null);
-  protected readonly saveTone = signal<'success' | 'error' | null>(null);
   protected readonly currentUser = this.currentUserService.currentUser;
 
   protected readonly themeOptions: readonly ThemeOption[] = [
@@ -154,13 +152,6 @@ export class SettingsPageComponent {
 
   constructor() {
     this.loadSettings();
-
-    this.form.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      if (this.saveMessage()) {
-        this.saveMessage.set(null);
-        this.saveTone.set(null);
-      }
-    });
   }
 
   protected currentUsername(): string {
@@ -183,8 +174,6 @@ export class SettingsPageComponent {
     }
 
     this.saving.set(true);
-    this.saveMessage.set(null);
-    this.saveTone.set(null);
 
     const rawValue = this.form.getRawValue();
     const payload: UpdateCurrentUserRequest = {
@@ -202,20 +191,16 @@ export class SettingsPageComponent {
         next: (user) => {
           this.applyUser(user);
           this.saving.set(false);
-          this.saveTone.set('success');
-          this.saveMessage.set('Settings saved. The workspace now reflects the updated profile.');
           toast.success('Settings saved');
         },
         error: (error: HttpErrorResponse) => {
           this.saving.set(false);
-          this.saveTone.set('error');
-          this.saveMessage.set(
+          toast.error(
             extractErrorMessage(
               error,
               'Settings could not be saved. Review your details and try again.',
             ),
           );
-          toast.error('Settings could not be saved');
         },
       });
   }

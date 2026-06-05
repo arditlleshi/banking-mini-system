@@ -56,10 +56,10 @@
     @if (loading()) {
       <section class="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.65fr)]">
         <article
-          class="min-h-[34rem] animate-pulse rounded-[1.5rem] border border-border/60 [background:color-mix(in_oklab,var(--surface-panel)_82%,transparent)]"
+          class="min-h-136 animate-pulse rounded-[1.5rem] border border-border/60 [background:color-mix(in_oklab,var(--surface-panel)_82%,transparent)]"
         ></article>
         <article
-          class="min-h-[22rem] animate-pulse rounded-[1.5rem] border border-border/60 [background:color-mix(in_oklab,var(--surface-panel)_82%,transparent)]"
+          class="min-h-88 animate-pulse rounded-[1.5rem] border border-border/60 [background:color-mix(in_oklab,var(--surface-panel)_82%,transparent)]"
         ></article>
       </section>
     } @else if (loadErrorMessage()) {
@@ -353,18 +353,6 @@
             </div>
 
             <div class="border-t border-border/70 px-6 py-5 sm:px-8">
-              <div aria-live="polite" class="mb-4 min-h-6">
-                @if (saveMessage()) {
-                  <p
-                    class="rounded-xl border px-4 py-3 text-sm font-medium"
-                    [class]="saveTone() === 'success'
-                      ? 'border-(--status-success-border) [background:var(--status-success-surface)] text-(--status-success-foreground)'
-                      : 'border-(--status-danger-border) [background:var(--status-danger-surface)] text-(--status-danger-foreground)'"
-                  >
-                    {{ saveMessage() }}
-                  </p>
-                }
-              </div>
               <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div class="space-y-1">
                   <p class="text-sm font-medium text-foreground">

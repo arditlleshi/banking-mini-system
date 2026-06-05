@@ -109,25 +109,6 @@
             Account controls
           </div>
           <div hlmDropdownMenuSeparator></div>
-          <div hlmDropdownMenuItem class="cursor-default">
-            <label
-              hlmLabel
-              for="sidebar-theme-mode"
-              class="flex w-full items-center justify-between gap-4"
-            >
-              <span class="inline-flex flex-col gap-0.5">
-                <span class="text-sm font-semibold">Theme</span>
-                <span class="text-xs text-muted-foreground">Switch appearance</span>
-              </span>
-              <hlm-switch
-                inputId="sidebar-theme-mode"
-                [checked]="theme.isDark()"
-                (checkedChange)="toggleTheme($event)"
-                aria-label="Toggle color theme"
-              />
-            </label>
-          </div>
-          <div hlmDropdownMenuSeparator></div>
           <button hlmDropdownMenuItem type="button" variant="destructive" (triggered)="logout()">
             <ng-icon hlm name="lucideLogOut" size="sm"></ng-icon> Sign out
           </button>

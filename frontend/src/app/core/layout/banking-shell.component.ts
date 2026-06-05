@@ -16,7 +16,6 @@ import { filter } from 'rxjs';
 
 import { CurrentUserService } from '../auth/current-user.service';
 import { AuthSessionService } from '../auth/auth-session.service';
-import { ThemeService } from '../theme/theme.service';
 import { PageBreadcrumbComponent, type PageBreadcrumbItem } from '../../shared/ui/page-breadcrumb';
 import { HlmButton } from '@spartan/button';
 import {
@@ -27,7 +26,6 @@ import {
   HlmDropdownMenuTrigger,
 } from '@spartan/dropdown-menu';
 import { HlmIconImports } from '@spartan/icon';
-import { HlmLabel } from '@spartan/label';
 import {
   HlmSidebar,
   HlmSidebarContent,
@@ -44,7 +42,6 @@ import {
   HlmSidebarWrapper,
   provideHlmSidebarConfig,
 } from '@spartan/sidebar';
-import { HlmSwitch } from '@spartan/switch';
 
 type NavigationItem = {
   readonly path: string;
@@ -66,7 +63,6 @@ type NavigationItem = {
     HlmDropdownMenuSeparator,
     HlmDropdownMenuTrigger,
     HlmIconImports,
-    HlmLabel,
     HlmSidebar,
     HlmSidebarContent,
     HlmSidebarFooter,
@@ -80,7 +76,6 @@ type NavigationItem = {
     HlmSidebarMenuItem,
     HlmSidebarTrigger,
     HlmSidebarWrapper,
-    HlmSwitch,
   ],
   providers: [
     provideIcons({
@@ -108,7 +103,6 @@ export class BankingShellComponent {
   private readonly currentUserService = inject(CurrentUserService);
   private readonly authSession = inject(AuthSessionService);
   private readonly router = inject(Router);
-  protected readonly theme = inject(ThemeService);
 
   protected readonly navigation = signal<readonly NavigationItem[]>([
     {
@@ -198,10 +192,6 @@ export class BankingShellComponent {
     return exact
       ? currentPath === path
       : currentPath === path || currentPath.startsWith(`${path}/`);
-  }
-
-  protected toggleTheme(isDark: boolean): void {
-    this.theme.setMode(isDark ? 'dark' : 'light');
   }
 
   private resolvePrimarySegments(url: string): readonly string[] {
