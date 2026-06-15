@@ -152,7 +152,10 @@
                       Available Balance
                     </p>
                     <p class="mt-1 text-sm font-semibold text-foreground">
-                      {{ paymentSourceAccount()?.availableBalance | number: '1.2-2' }}
+                      {{
+                        $safeNavigationMigration(paymentSourceAccount()?.availableBalance)
+                          | number: '1.2-2'
+                      }}
                       {{ paymentSourceAccount()?.currency ?? '' }}
                     </p>
                   </div>
@@ -451,7 +454,10 @@
                       Available Balance
                     </p>
                     <p class="mt-1 text-sm font-semibold text-foreground">
-                      {{ sourceAccount()?.availableBalance | number: '1.2-2' }}
+                      {{
+                        $safeNavigationMigration(sourceAccount()?.availableBalance)
+                          | number: '1.2-2'
+                      }}
                       {{ sourceAccount()?.currency ?? '' }}
                     </p>
                   </div>
@@ -489,7 +495,10 @@
                       Available Balance
                     </p>
                     <p class="mt-1 text-sm font-semibold text-foreground">
-                      {{ targetAccount()?.availableBalance | number: '1.2-2' }}
+                      {{
+                        $safeNavigationMigration(targetAccount()?.availableBalance)
+                          | number: '1.2-2'
+                      }}
                       {{ targetAccount()?.currency ?? '' }}
                     </p>
                   </div>

@@ -59,7 +59,8 @@ export class HlmSwitch implements ControlValueAccessor {
     ),
   );
 
-  readonly checked = model<boolean>(false);
+  readonly checkedInput = input<boolean>(false, { alias: 'checked' });
+  readonly checked = linkedSignal(this.checkedInput);
   readonly checkedChange = output<boolean>();
   readonly disabled = input<boolean, BooleanInput>(false, {
     transform: booleanAttribute,

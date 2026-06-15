@@ -4,6 +4,7 @@ import { of } from 'rxjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AccountApiService } from '../../core/services/account-api.service';
+import { PaymentsWebMcpDraftService } from '../../core/ai/payments-web-mcp-draft.service';
 import { ExchangeRateApiService } from '../../core/services/exchange-rate-api.service';
 import { PaymentApiService } from '../../core/services/payment-api.service';
 import { TransferApiService } from '../../core/services/transfer-api.service';
@@ -117,6 +118,73 @@ describe('PaymentsPageComponent', () => {
     };
 
     expect(component.activePaymentAction()).toBe('bank-account');
+  });
+
+  it('applies a queued bank payment draft from WebMCP', () => {
+    const drafts = TestBed.inject(PaymentsWebMcpDraftService);
+    drafts.queueBankPaymentDraft({
+      sourceAccountId: 1,
+      beneficiaryAccountNumber: '333333CUR01',
+      amount: 88,
+      description: 'Quarterly fee payment',
+    });
+
+    const fixture = TestBed.createComponent(PaymentsPageComponent);
+    fixture.detectChanges();
+
+    const component = fixture.componentInstance as unknown as {
+      activePaymentAction: () => string;
+      paymentForm: {
+        getRawValue: () => {
+          sourceAccountId: number;
+          beneficiaryAccountNumber: string;
+          amount: number;
+          description: string;
+        };
+      };
+    };
+
+    expect(component.activePaymentAction()).toBe('bank-account');
+    expect(component.paymentForm.getRawValue()).toEqual({
+      sourceAccountId: 1,
+      beneficiaryAccountNumber: '333333CUR01',
+      amount: 88,
+      description: 'Quarterly fee payment',
+    });
+    expect(lookupBeneficiary).toHaveBeenCalledWith('333333CUR01');
+  });
+
+  it('applies a queued own-transfer draft from WebMCP', () => {
+    const drafts = TestBed.inject(PaymentsWebMcpDraftService);
+    drafts.queueOwnTransferDraft({
+      sourceAccountId: 1,
+      targetAccountId: 2,
+      amount: 150,
+      description: 'Monthly savings transfer',
+    });
+
+    const fixture = TestBed.createComponent(PaymentsPageComponent);
+    fixture.detectChanges();
+
+    const component = fixture.componentInstance as unknown as {
+      activePaymentAction: () => string;
+      ownTransferForm: {
+        getRawValue: () => {
+          sourceAccountId: number;
+          targetAccountId: number;
+          amount: number;
+          description: string;
+        };
+      };
+    };
+
+    expect(component.activePaymentAction()).toBe('own-accounts');
+    expect(component.ownTransferForm.getRawValue()).toEqual({
+      sourceAccountId: 1,
+      targetAccountId: 2,
+      amount: 150,
+      description: 'Monthly savings transfer',
+    });
   });
 
   it('opens a confirmation dialog before booking a beneficiary payment', () => {

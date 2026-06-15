@@ -1,6 +1,6 @@
 import { DecimalPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { toSignal, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
@@ -62,6 +62,7 @@ import {
   PaymentConfirmationDialogComponent,
   type PaymentConfirmation,
 } from './payment-confirmation-dialog.component';
+import { PaymentsWebMcpDraftService } from '../../core/ai/payments-web-mcp-draft.service';
 
 type AccountOption = {
   readonly value: number;
@@ -151,6 +152,7 @@ export class PaymentsPageComponent {
   private readonly exchangeRateApi = inject(ExchangeRateApiService);
   private readonly transferApi = inject(TransferApiService);
   private readonly paymentApi = inject(PaymentApiService);
+  private readonly webMcpDrafts = inject(PaymentsWebMcpDraftService);
 
   private readonly accountsLoading = signal(true);
   private readonly ratesLoading = signal(true);
@@ -334,6 +336,7 @@ export class PaymentsPageComponent {
 
   constructor() {
     this.initializePaymentAction();
+    this.monitorWebMcpDrafts();
     this.monitorBeneficiaryAccountNumber();
     this.loadData();
   }
@@ -581,6 +584,60 @@ export class PaymentsPageComponent {
     if (matchedAction) {
       this.activePaymentAction.set(matchedAction.id);
     }
+  }
+
+  private monitorWebMcpDrafts(): void {
+    effect(() => {
+      const draft = this.webMcpDrafts.ownTransferDraft();
+      if (!draft) {
+        return;
+      }
+
+      this.applyOwnTransferDraft(draft);
+      this.webMcpDrafts.consumeOwnTransferDraft();
+    });
+
+    effect(() => {
+      const draft = this.webMcpDrafts.bankPaymentDraft();
+      if (!draft) {
+        return;
+      }
+
+      this.applyBankPaymentDraft(draft);
+      this.webMcpDrafts.consumeBankPaymentDraft();
+    });
+  }
+
+  private applyOwnTransferDraft(draft: {
+    sourceAccountId: number;
+    targetAccountId: number;
+    amount: number;
+    description: string;
+  }): void {
+    this.activePaymentAction.set('own-accounts');
+    this.transferError.set(null);
+    this.paymentError.set(null);
+    this.pendingConfirmation.set(null);
+    this.confirmationOpen.set(false);
+    this.ownTransferForm.reset(draft);
+  }
+
+  private applyBankPaymentDraft(draft: {
+    sourceAccountId: number;
+    beneficiaryAccountNumber: string;
+    amount: number;
+    description: string;
+  }): void {
+    this.activePaymentAction.set('bank-account');
+    this.transferError.set(null);
+    this.paymentError.set(null);
+    this.beneficiaryLookupError.set(null);
+    this.pendingConfirmation.set(null);
+    this.confirmationOpen.set(false);
+    this.beneficiary.set(null);
+    this.resolvedBeneficiaryAccountNumber.set(null);
+    this.paymentForm.reset(draft);
+    this.lookupBeneficiary();
   }
 
   private monitorBeneficiaryAccountNumber(): void {
